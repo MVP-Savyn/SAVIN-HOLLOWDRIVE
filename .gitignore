@@ -1,0 +1,7 @@
+venv/
+.venv/
+engine/tools/
+otras_versiones/
+build/
+requeriments.txt
+Savin_GUI.spec
