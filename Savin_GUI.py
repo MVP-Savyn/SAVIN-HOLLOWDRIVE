@@ -306,7 +306,7 @@ class SavinOceanicCommand(ctk.CTk):
                 return
         self.refrescar_discos()
 
-    def cargar_gif_pil(self, ruta_gif, size=(70, 70)):
+    def cargar_gif_pil(self, ruta_gif, size=(70, 70), espejo=False):
         """ Carga y redimensiona fotogramas de un GIF usando PIL """
         if not os.path.exists(ruta_gif):
             print(f"Advertencia: No se localiza el recurso GIF en {ruta_gif}")
@@ -316,6 +316,9 @@ class SavinOceanicCommand(ctk.CTk):
             frames = []
             for frame in ImageSequence.Iterator(pil_img):
                 frame_resized = frame.copy().resize(size, Image.Resampling.LANCZOS)
+                # 🔄 Si pasamos espejo=True, invertimos el fotograma horizontalmente
+                if espejo:
+                    frame_resized = frame_resized.transpose(Image.FLIP_LEFT_RIGHT)
                 frames.append(ImageTk.PhotoImage(frame_resized))
             return frames
         except Exception as e:
@@ -367,10 +370,8 @@ class SavinOceanicCommand(ctk.CTk):
         else:
             self.img_reload = None
 
-        # Inicialización y cache de GIFs animados para el proceso
-        self.frames_linterna = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "hollow-linterna.gif"))
+        self.frames_linterna = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "hollow-linterna.gif"), espejo=True)
         self.frames_breakdance = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "breakdance.gif"))
-
     def setup_ui(self):
         ruta_i = os.path.join(CARPETA_MEDIA, "I.png")
         if os.path.exists(ruta_i):
