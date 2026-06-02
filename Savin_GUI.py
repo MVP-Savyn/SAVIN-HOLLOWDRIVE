@@ -139,7 +139,6 @@ class SavinOceanicCommand(ctk.CTk):
         )
         self.prog_descarga.set(0)
 
-        # Botón de información de Ventoy usando I.png ampliado (45x45)
         self.btn_info_ventoy = ctk.CTkButton(
             self.overlay, 
             image=self.img_info_descarga if hasattr(self, 'img_info_descarga') else None,
@@ -179,7 +178,6 @@ class SavinOceanicCommand(ctk.CTk):
             self.lbl_info.place(relx=0.5, rely=0.85, anchor="center")
 
     def refrescar_discos(self):
-        print(f"Refrescando... (Internos: {self.mostrar_internos.get()})")
         self.lista_discos_reales = obtener_unidades_usb(incluir_internos=self.mostrar_internos.get())
         
         if not self.lista_discos_reales:
@@ -194,7 +192,6 @@ class SavinOceanicCommand(ctk.CTk):
         webbrowser.open_new_tab(url)
 
     def crear_boton_info(self, master, comando):
-        """ Genera un botón informativo usando la imagen triangulo.png a tamaño 30x30 """
         return ctk.CTkButton(
             master, 
             image=self.img_triangulo if hasattr(self, 'img_triangulo') else None,
@@ -207,7 +204,6 @@ class SavinOceanicCommand(ctk.CTk):
         )
     
     def alternar_modo_instalacion(self, en_progreso=True):
-        """ Intercambia visualmente el botón de instalar por el panel de progreso y cancelación """
         if en_progreso:
             self.btn_start.pack_forget()
             self.f_progress.pack(side="left", fill="x", expand=True, padx=(0, 10))
@@ -235,7 +231,19 @@ class SavinOceanicCommand(ctk.CTk):
         super().__init__()
         self.title("SAVIN SUPER_USB // V12.5")
         self.geometry("1000x850")
-        self.resizable(False, False)
+        
+        self.update_idletasks()
+        ancho_ventana = 1000  
+        alto_ventana = 850    
+        
+        ancho_pantalla = self.winfo_screenwidth()
+        alto_pantalla = self.winfo_screenheight()
+        
+        x = (ancho_pantalla // 2) - (ancho_ventana // 2)
+        y = (alto_pantalla // 2) - (alto_ventana // 2)
+        
+        self.geometry(f"{ancho_ventana}x{alto_ventana}+{x}+{y}")
+        self.resizable(False, False)  
         
         self.animacion_id = None
         self.gif_after_id = None
@@ -251,7 +259,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.gb_totales = 0.0 
         self.min_cachy = 20.0 
         
-        # Historial de posiciones de los sliders para anular el parpadeo
         self.ultimo_h = 3.0
         self.ultimo_c = 20.0
         
@@ -263,9 +270,8 @@ class SavinOceanicCommand(ctk.CTk):
         self.bato_atom_act = ctk.BooleanVar(master=self, value=False)
         self.preservar_espacio = ctk.BooleanVar(master=self, value=False)
         
-        # --- CONFIGURACIÓN DE PACKS ADICIONALES ---
         self.descargar_pack_bato = ctk.BooleanVar(master=self, value=False)
-        self.pack_bato_size_var = ctk.StringVar(master=self, value="16GB") # Inicializado en 16GB
+        self.pack_bato_size_var = ctk.StringVar(master=self, value="16GB") 
         
         self.descargar_pack_hollow = ctk.BooleanVar(master=self, value=False)
         self.pack_hollow_size_var = ctk.StringVar(master=self, value="6GB")
@@ -276,14 +282,20 @@ class SavinOceanicCommand(ctk.CTk):
         self.cargar_recursos() 
         self.setup_ui()
         
-        # Sincronizamos las barras de opciones al iniciar el programa
         self.actualizar_estados_bato()
         self.actualizar_estados_cachy()
-        
         self.refrescar_discos()
 
         self.after(100, self.mostrar_capa_descarga)
         self.protocol("WM_DELETE_WINDOW", self.cerrar_aplicacion)
+
+    def confirmar_salida(self):
+        if self.en_proceso:
+            if messagebox.askyesno("⚠️ PROCESO EN CURSO", "¿Estás seguro de que quieres salir?\nLa instalación de HollowDrive se interrumpirá."):
+                self.abortar_proceso = True
+                self.destroy()
+        else:
+            self.destroy()
 
     def cerrar_aplicacion(self):
         if self.animacion_id:
@@ -307,16 +319,13 @@ class SavinOceanicCommand(ctk.CTk):
         self.refrescar_discos()
 
     def cargar_gif_pil(self, ruta_gif, size=(70, 70), espejo=False):
-        """ Carga y redimensiona fotogramas de un GIF usando PIL """
         if not os.path.exists(ruta_gif):
-            print(f"Advertencia: No se localiza el recurso GIF en {ruta_gif}")
             return []
         try:
             pil_img = Image.open(ruta_gif)
             frames = []
             for frame in ImageSequence.Iterator(pil_img):
                 frame_resized = frame.copy().resize(size, Image.Resampling.LANCZOS)
-                # 🔄 Si pasamos espejo=True, invertimos el fotograma horizontalmente
                 if espejo:
                     frame_resized = frame_resized.transpose(Image.FLIP_LEFT_RIGHT)
                 frames.append(ImageTk.PhotoImage(frame_resized))
@@ -358,7 +367,6 @@ class SavinOceanicCommand(ctk.CTk):
             except Exception as e:
                 print(f"Error abriendo imagen de descarga: {e}")
 
-        # Recurso reload.png para el botón de actualización de discos
         img_reload_path = os.path.join(path_media, "reload.png")
         if os.path.exists(img_reload_path):
             try:
@@ -372,6 +380,12 @@ class SavinOceanicCommand(ctk.CTk):
 
         self.frames_linterna = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "hollow-linterna.gif"), espejo=True)
         self.frames_breakdance = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "breakdance.gif"))
+
+    def al_clicar_pack_batocera(self):
+        if self.descargar_pack_bato.get():
+            self.abrir_info_roms()
+        self.rebalancear()
+
     def setup_ui(self):
         ruta_i = os.path.join(CARPETA_MEDIA, "I.png")
         if os.path.exists(ruta_i):
@@ -414,7 +428,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.combo_disk.pack(side="left", padx=10)
         self.widgets_interactivos.append(self.combo_disk)
 
-        # Botón de refresco usando reload.png
         self.btn_refresh = ctk.CTkButton(
             f_combo, 
             image=self.img_reload if hasattr(self, 'img_reload') and self.img_reload else None,
@@ -472,36 +485,34 @@ class SavinOceanicCommand(ctk.CTk):
         f_packs_container = ctk.CTkFrame(self.p_left, fg_color="#0d141c", corner_radius=8)
         f_packs_container.pack(fill="x", padx=15, pady=5)
 
-        # 1. FILA: PACK BATOCERA
         f_pack_bato = ctk.CTkFrame(f_packs_container, fg_color="transparent")
         f_pack_bato.pack(fill="x", padx=10, pady=6)
         
         self.ch_pack_bato = ctk.CTkCheckBox(f_pack_bato, text="PACK BATOCERA", 
-                                            variable=self.descargar_pack_bato, command=lambda: self.rebalancear("h"))
+                                            variable=self.descargar_pack_bato, command=self.al_clicar_pack_batocera)
         self.ch_pack_bato.pack(side="left", anchor="w")
         self.widgets_interactivos.append(self.ch_pack_bato)
         
         self.crear_boton_info(f_pack_bato, self.abrir_info_roms).pack(side="left", padx=5)
         
         self.menu_pack_bato = ctk.CTkOptionMenu(f_pack_bato, values=["16GB", "32GB", "64GB"], 
-                                                variable=self.pack_bato_size_var, command=lambda _: self.rebalancear("h"), 
+                                                variable=self.pack_bato_size_var, command=lambda _: self.rebalancear(), 
                                                 height=25, width=110)
         self.menu_pack_bato.pack(side="right", padx=5)
         self.widgets_interactivos.append(self.menu_pack_bato)
 
-        # 2. FILA: PACK HOLLOWDRIVE
         f_pack_hollow = ctk.CTkFrame(f_packs_container, fg_color="transparent")
         f_pack_hollow.pack(fill="x", padx=10, pady=6)
         
         self.ch_pack_hollow = ctk.CTkCheckBox(f_pack_hollow, text="PACK HOLLOWDRIVE", 
-                                              variable=self.descargar_pack_hollow, command=lambda: self.rebalancear("h"))
+                                              variable=self.descargar_pack_hollow, command=self.rebalancear)
         self.ch_pack_hollow.pack(side="left", anchor="w")
         self.widgets_interactivos.append(self.ch_pack_hollow)
         
         self.crear_boton_info(f_pack_hollow, self.abrir_info_pack_hollow).pack(side="left", padx=5)
         
         self.menu_pack_hollow = ctk.CTkOptionMenu(f_pack_hollow, values=["6GB", "10GB", "20GB"], 
-                                                 variable=self.pack_hollow_size_var, command=lambda _: self.rebalancear("h"), 
+                                                 variable=self.pack_hollow_size_var, command=lambda _: self.rebalancear(), 
                                                  height=25, width=110)
         self.menu_pack_hollow.pack(side="right", padx=5)
         self.widgets_interactivos.append(self.menu_pack_hollow)
@@ -526,11 +537,10 @@ class SavinOceanicCommand(ctk.CTk):
         self.p_right = ctk.CTkFrame(self.main_container, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         self.p_right.pack(side="right", fill="both", expand=True)
         
-        self.sw_preservar = ctk.CTkSwitch(self.p_right, text="BLOQUEAR LIBRE", variable=self.preservar_espacio, command=self.toggle_preservar_espacio, progress_color=AZUL_ELECTRICO)
+        self.sw_preservar = ctk.CTkSwitch(self.p_right, text="PRESERVAR ESPACIO", variable=self.preservar_espacio, command=self.toggle_preservar_espacio, progress_color=AZUL_ELECTRICO)
         self.sw_preservar.pack(pady=10)
         self.widgets_interactivos.append(self.sw_preservar)
 
-        # Sliders de control
         self.f_row_h = self.crear_ocean_slider(self.p_right, "HOLLOWDRIVE STORAGE", COLOR_HOLLOW, "h", min_val=3)
         self.f_row_c = self.crear_ocean_slider(self.p_right, "CACHYOS PARTITION", COLOR_CACHY, "c", min_val=20)
 
@@ -565,7 +575,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.footer = ctk.CTkFrame(self, fg_color="transparent")
         self.f_progress = ctk.CTkFrame(self.footer, fg_color="transparent")
         
-        # Subcontenedor izquierdo para alinear barras
         self.f_bars_layout = ctk.CTkFrame(self.f_progress, fg_color="transparent")
         self.f_bars_layout.pack(side="left", fill="x", expand=True)
         
@@ -580,7 +589,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.p_total.set(0)
         self.p_total.pack(fill="x", pady=2)
         
-        # Etiqueta para los GIFs animados
         self.lbl_gif = ctk.CTkLabel(self.f_progress, text="", width=70, height=70)
         self.lbl_gif.pack(side="right", padx=(15, 0))
         
@@ -606,9 +614,6 @@ class SavinOceanicCommand(ctk.CTk):
         )
 
     def toggle_preservar_espacio(self):
-        """ Salva la posición justo al congelar el espacio """
-        self.ultimo_h = self.slider_h.get()
-        self.ultimo_c = self.slider_c.get()
         self.rebalancear()
 
     def bloquear_ui(self, bloquear=True):
@@ -618,7 +623,12 @@ class SavinOceanicCommand(ctk.CTk):
     def creventana_info_base(self, titulo, ancho, alto):
         v = ctk.CTkToplevel(self)
         v.title(titulo)
-        v.geometry(f"{ancho}x{alto}")
+        
+        self.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - (ancho // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (alto // 2)
+        
+        v.geometry(f"{ancho}x{alto}+{x}+{y}")
         v.configure(fg_color=AZUL_FONDO)
         v.attributes("-alpha", 0.96)
         v.resizable(False, False)
@@ -681,7 +691,7 @@ class SavinOceanicCommand(ctk.CTk):
         v = self.creventana_info_base("SAVIN CORE INFO", 750, 720)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="≋ SAVIN CORE ENGINE ≋", font=("Impact", 38), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text="👑 SAVIN CORE ENGINE 👑", font=("Impact", 38), text_color=AZUL_CIAN).pack(pady=(0, 15))
         ctk.CTkLabel(frame_interno, text="◈ MIS PLATAFORMAS ◈", font=("Consolas", 18, "bold"), text_color=AZUL_SUAVE).pack(pady=5)
         f_social = ctk.CTkFrame(frame_interno, fg_color="transparent")
         f_social.pack(pady=10)
@@ -703,22 +713,21 @@ class SavinOceanicCommand(ctk.CTk):
         disco_elegido = next((d for d in self.lista_discos_reales if d["display"] == seleccion), None)
         if disco_elegido:
             self.gb_totales = disco_elegido["size"]
-        self.main_container.pack(fill="both", expand=True, padx=20, pady=5)
+            
         self.footer.pack(fill="x", side="bottom", padx=20, pady=10)
+        self.main_container.pack(fill="both", expand=True, padx=20, pady=5)
         
-        # Inicializamos los valores base
-        self.ultimo_h = 10.0
-        self.ultimo_c = 20.0
-        self.slider_h.set(10.0)
+        self.slider_h.set(self.gb_totales)
+        if hasattr(self, 'slider_c'):
+            self.slider_c.set(0.0)
         
-        # Forzamos una pasada de rebalancear para bloquearlos desde el inicio
         self.rebalancear()
 
     def crear_ocean_slider(self, parent, label, color, key, min_val=10):
         f = ctk.CTkFrame(parent, fg_color="transparent"); f.pack(fill="x", padx=20, pady=5)
         ctk.CTkLabel(f, text=f"❯ {label}", font=("Consolas", 11, "bold")).pack(anchor="w")
         row = ctk.CTkFrame(f, fg_color="transparent"); row.pack(fill="x")
-        s = ctk.CTkSlider(row, from_=min_val, to=1000, progress_color=color, command=lambda v, k=key: self.rebalancear(k))
+        s = ctk.CTkSlider(row, from_=min_val, to=1000, progress_color=color, command=lambda v, k=key: self.rebalancear(f"slider_{k}"))
         s.pack(side="left", fill="x", expand=True)
         setattr(self, f"slider_{key}", s)
         self.widgets_interactivos.append(s)
@@ -728,20 +737,11 @@ class SavinOceanicCommand(ctk.CTk):
 
     def rebalancear(self, source=None):
         if self.gb_totales <= 0: return
-        
-        # 🔴 LÓGICA INVERTIDA: Si NO está activado "Bloquear Libre", bloqueamos el movimiento
-        if not self.preservar_espacio.get():
-            if source == "h":
-                self.slider_h.set(self.ultimo_h)
-                return
-            elif source == "c":
-                self.slider_c.set(self.ultimo_c)
-                return
+                
         # 1. Base del sistema y estado de CachyOS
         espacio_grub = GB_GRUB if self.instalar_cachy.get() else 0.0
         gb_bato_interno = (3.8 if self.bato_64_act.get() else 0) + (1.0 if self.bato_32_act.get() else 0) + (1.0 if self.bato_atom_act.get() else 0) if self.instalar_bato.get() else 0
         
-        # Mínimo condicional de HollowDrive
         base_hollow = 10.0 if self.descargar_pack_hollow.get() else 3.0
         base_obligatoria = base_hollow
         if self.instalar_cachy.get():
@@ -795,47 +795,100 @@ class SavinOceanicCommand(ctk.CTk):
             self.menu_pack_hollow.configure(state="disabled")
             val_pack_hollow = 0
 
-        # 4. Cálculo matemático definitivo para los Sliders
+        # 4. Cálculo de límites para los Sliders
         min_h = base_hollow + gb_bato_interno + val_pack_bato + val_pack_hollow
-        min_c = self.min_cachy if self.instalar_cachy.get() else 0
+        min_c = self.min_cachy if self.instalar_cachy.get() else 0.0
         disp = self.gb_totales - espacio_grub
 
-        # Clampeo de seguridad
-        if min_h > disp - min_c:
-            min_h = max(base_hollow, disp - min_c)
+        if min_h + min_c > disp:
+            min_h = min(min_h, disp)
+            min_c = max(0.0, disp - min_h)
 
+        # Habilitar sliders por defecto siempre que tengan sentido operacional
+        self.slider_h.configure(state="normal")
+        self.slider_c.configure(state="normal" if self.instalar_cachy.get() else "disabled")
+
+        # Capturar posiciones gráficas actuales
         h = self.slider_h.get()
-        c = self.slider_c.get() if self.instalar_cachy.get() else 0
+        c = self.slider_c.get() if self.instalar_cachy.get() else 0.0
 
-        # BALANCEO AUTOMÁTICO
-        if self.instalar_cachy.get():
-            if source == "h":
-                # Si el usuario mueve HOLLOW, ajustamos CACHY
+        # Interceptamos y forzamos consistencia en los mínimos ANTES de renderizar o empujar
+        if h < min_h: h = min_h
+        if self.instalar_cachy.get() and c < min_c: c = min_c
+
+        # 🌟 NUEVA LÓGICA REBALANCEADA ADAPTATIVA 🌟
+        if self.preservar_espacio.get():
+            # --- MODO PRESERVAR ESPACIO (LIBRE puede ser mayor que cero) ---
+            # Si el usuario expande de más, se empujan dinámicamente
+            if source == "slider_h":
                 if h + c > disp:
                     c = max(min_c, disp - h)
-                # Si al bajar h, c quedó muy grande, el slider c se ajusta solo
-            elif source == "c":
-                # Si el usuario mueve CACHY, ajustamos HOLLOW
+                    if h + c > disp: h = disp - c
+            elif source == "slider_c":
                 if h + c > disp:
                     h = max(min_h, disp - c)
+                    if h + c > disp: c = disp - h
             else:
-                # Ajuste general si ninguna es source (ej: al iniciar)
                 if h + c > disp:
                     h = max(min_h, disp - c)
-                    c = max(min_c, disp - h)
+                    if h + c > disp:
+                        c = max(min_c, disp - h)
+                        h = disp - c
         else:
-            # Si solo existe Hollow
-            h = min(h, disp)
+            # --- MODO RELLENAR ESPACIO (Suma Cero estricta: LIBRE = 0.00 GB) ---
+            if self.instalar_cachy.get():
+                if source == "slider_h":
+                    # El usuario mueve Hollow -> Cachy se reduce/amplía automáticamente
+                    c = disp - h
+                    if c < min_c:
+                        c = min_c
+                        h = disp - min_c
+                elif source == "slider_c":
+                    # El usuario mueve Cachy -> Hollow se reduce/amplía automáticamente
+                    h = disp - c
+                    if h < min_h:
+                        h = min_h
+                        c = disp - min_h
+                else:
+                    # Toggles o packs externos: Sincronizar para rellenar el 100%
+                    c = disp - h
+                    if c < min_c:
+                        c = min_c
+                        h = disp - min_c
+                    if h < min_h:
+                        h = min_h
+                        c = disp - min_h
+            else:
+                # Si CachyOS no está marcado, Hollow obligatoriamente devora el disco entero
+                c = 0.0
+                h = disp
+                self.slider_h.configure(state="disabled")
 
-        # Aplicamos valores calculados
+        # Aplicamos los límites dinámicos de forma segura a CustomTkinter para no romper el dibujo
+        max_h_slider = (disp - min_c) if self.instalar_cachy.get() else disp
+        self.slider_h.configure(from_=min_h, to=max(min_h + 1, max_h_slider))
         self.slider_h.set(h)
-        self.slider_h.configure(from_=min_h, to=max(min_h + 1, disp - min_c))
         self.lbl_h_gb.configure(text=f"{int(h)} GB")
         
         if self.instalar_cachy.get():
-            self.slider_c.set(c)
             self.slider_c.configure(from_=min_c, to=max(min_c + 1, disp - min_h))
+            self.slider_c.set(c)
             self.lbl_c_gb.configure(text=f"{int(c)} GB")
+
+        # Cálculo final del espacio sobrante
+        libre_calculado = max(0.0, disp - (h + c))
+        self.lbl_libre_info.configure(text=f"LIBRE: {libre_calculado:.2f} GB")
+
+        # Actualizar textos de los botones de la leyenda
+        self.dic_leyenda["hollow"].configure(text=f"Hollow ({int(h)}GB)")
+        if self.instalar_cachy.get():
+            self.dic_leyenda["grub"].configure(text=f"GRUB ({espacio_grub}GB)")
+            self.dic_leyenda["cachy"].configure(text=f"Cachy ({int(c)}GB)")
+        else:
+            self.dic_leyenda["grub"].configure(text="GRUB (0GB)")
+            self.dic_leyenda["cachy"].configure(text="Cachy (0GB)")
+
+        self.actualizar_barra_visual(h, espacio_grub, c)
 
     def actualizar_estados_bato(self):
         if self.instalar_bato.get():
@@ -900,7 +953,7 @@ class SavinOceanicCommand(ctk.CTk):
         
         pasos_instalacion = [
             "Limpiando dispositivo...",
-            "Creando particiones...",
+            "Creating partitions...",
             "descargando complementos...",
             "volcando imágen de GRUB...",
             "volcando imagen de Cachyos..."
