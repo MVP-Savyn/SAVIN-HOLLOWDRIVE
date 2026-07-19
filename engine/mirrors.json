@@ -1,0 +1,30 @@
+{
+  "batocera_base": {
+    "mirrors": [
+      { "url": "https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev/batocerumen.img" }
+    ]
+  },
+  "hollowdrive_pack": {
+    "mirrors": [
+      { "url": "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/batocera-hollowpack.tar" },
+      { "url": "https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev/HollowdrivePackV1.tar" }
+    ]
+  },
+  "cachyos_images": {
+    "efi_grub": {
+      "mirrors": [
+        { "url": "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img" }
+      ]
+    },
+    "sistema": {
+      "mirrors": [
+        { "url": "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img" }
+      ]
+    }
+  },
+  "batocera_games": {
+    "mirrors": [
+      { "url": "https://drive.google.com/file/d/1q5NBtG5e_GVbJp5tR-T-g_nt-uePHAtU/view?usp=sharing" }
+    ]
+  }
+}

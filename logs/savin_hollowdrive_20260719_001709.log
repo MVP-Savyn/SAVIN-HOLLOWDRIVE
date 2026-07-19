@@ -1,0 +1,49 @@
+2026-07-19 00:17:09,605 [INFO] === INICIANDO SAVIN SUPER_USB ===
+2026-07-19 00:17:09,758 [DEBUG] Importing PngImagePlugin
+2026-07-19 00:17:09,766 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,767 [DEBUG] STREAM b'IDAT' 41 61589
+2026-07-19 00:17:09,767 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,767 [DEBUG] STREAM b'IDAT' 41 84110
+2026-07-19 00:17:09,767 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'eXIf' 41 180
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'pHYs' 233 9
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'iTXt' 254 1379
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'eXIf' 41 180
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'pHYs' 233 9
+2026-07-19 00:17:09,768 [DEBUG] STREAM b'iTXt' 254 1379
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'eXIf' 41 180
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'pHYs' 233 9
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'iTXt' 254 1390
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'IDAT' 1656 8192
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'eXIf' 41 180
+2026-07-19 00:17:09,769 [DEBUG] STREAM b'pHYs' 233 9
+2026-07-19 00:17:09,770 [DEBUG] STREAM b'iTXt' 254 1379
+2026-07-19 00:17:09,770 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-07-19 00:17:09,770 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,770 [DEBUG] STREAM b'IDAT' 41 4096
+2026-07-19 00:17:09,770 [DEBUG] Importing GifImagePlugin
+2026-07-19 00:17:09,778 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,778 [DEBUG] STREAM b'eXIf' 41 180
+2026-07-19 00:17:09,778 [DEBUG] STREAM b'pHYs' 233 9
+2026-07-19 00:17:09,778 [DEBUG] STREAM b'iTXt' 254 1386
+2026-07-19 00:17:09,778 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-07-19 00:17:09,778 [DEBUG] STREAM b'IHDR' 16 13
+2026-07-19 00:17:09,779 [DEBUG] STREAM b'eXIf' 41 180
+2026-07-19 00:17:09,779 [DEBUG] STREAM b'pHYs' 233 9
+2026-07-19 00:17:09,779 [DEBUG] STREAM b'iTXt' 254 1386
+2026-07-19 00:17:09,779 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-07-19 00:17:09,847 [DEBUG] STREAM b'IDAT' 9475 6
+2026-07-19 00:17:31,996 [INFO] [INFO] Detectada firma core en F:. Cambiando etiqueta a HOLLOWDRIVE...
+2026-07-19 00:17:34,134 [INFO] [CRONÓMETRO] Estructura Core (Ventoy) completado en 00m 13s
+2026-07-19 00:17:49,779 [INFO] [CRONÓMETRO] Creación Bootloader GRUB completado en 00m 06s
+2026-07-19 00:17:49,784 [DEBUG] Starting new HTTPS connection (1): docs.google.com:443
+2026-07-19 00:17:49,984 [DEBUG] https://docs.google.com:443 "GET /uc?export=download&id=134gSSqwmlhbWVq6p2B8CsoxVdFjxZNFg HTTP/1.1" 303 0
+2026-07-19 00:17:49,985 [DEBUG] Starting new HTTPS connection (1): drive.usercontent.google.com:443
+2026-07-19 00:17:50,320 [DEBUG] https://drive.usercontent.google.com:443 "GET /download?id=134gSSqwmlhbWVq6p2B8CsoxVdFjxZNFg&export=download HTTP/1.1" 200 2535
+2026-07-19 00:17:50,321 [ERROR] [DIAGNÓSTICO] Google Drive denegó el flujo. HTML Recibido:
+<!DOCTYPE html><html><head><title>Google Drive - Download warning</title><meta http-equiv="content-type" content="text/html; charset=utf-8"/><style nonce="cWbdvgNRxIGsdgy3mWBc8w">.goog-link-button{position:relative;color:#15c;text-decoration:underline;cursor:pointer}.goog-link-button-disabled{color:#ccc;text-decoration:none;cursor:default}body{color:#222;font:normal 13px/1.4 arial,sans-serif;margin:0}.grecaptcha-badge{visibility:hidden}.uc-main{padding-top:50px;text-align:center}#uc-dl-icon{display:inline-block;margin-top:16px;padding-right:1em;vertical-align:top}#uc-text{display:inline-block;max-width:68ex;text-align:left}.uc-error-caption,.uc-warning-caption{color:#222;font-size:16px}#uc-download-link{text-decoration:none}.uc-name-size a{color:#15c;text-decoration:none}.uc-name-size a:visited{color:#61c;text-decoration:none}.uc-name-size a:active{color:#d14836;text-decoration:none}.uc-footer{color:#777;font-size:11px;padding-bottom:5ex;padding-top:5ex;text-align:center}.uc-footer a{c
