@@ -6,17 +6,16 @@ import zipfile
 import tarfile
 
 def cargar_mirrors():
-    """Carga el archivo mirrors.json de forma segura."""
-    ruta_json = os.path.join("engine", "mirrors.json")
-    if not os.path.exists(ruta_json):
-        # Fallback si se ejecuta desde el directorio raíz o en tests
-        ruta_json = "mirrors.json"
+    """Carga el archivo mirrors.json de forma segura utilizando la ruta absoluta del módulo."""
+    # Obtenemos el directorio real donde reside este archivo script de forma absoluta
+    engine_dir = os.path.dirname(os.path.abspath(__file__))
+    ruta_json = os.path.join(engine_dir, "mirrors.json")
         
     try:
         with open(ruta_json, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        print(f"Error cargando mirrors.json: {e}")
+        print(f"Error cargando mirrors.json desde el motor: {e}")
         return None
 
 def extraer_id_drive(url):
@@ -177,7 +176,7 @@ def descargar_archivo(url, destino, callback_progreso=None):
         print(f"Error crítico en la descarga de {url}: {e}")
         return False
 
-def descargar_y_extraer_ventoy(callback_progreso=None):
+def descargar_y_extraer_ventoy(progress_callback=None):
     """
     Busca la configuración de Ventoy en mirrors.json, lo descarga en un directorio 
     temporal y lo extrae directamente dentro de la carpeta 'engine'.
@@ -204,7 +203,7 @@ def descargar_y_extraer_ventoy(callback_progreso=None):
     ruta_destino_zip = os.path.join(temp_dir, nombre_archivo)
     
     print(f"-> Descargando Ventoy desde: {url_ventoy}")
-    exito_descarga = descargar_archivo(url_ventoy, ruta_destino_zip, callback_progreso)
+    exito_descarga = descargar_archivo(url_ventoy, ruta_destino_zip, progress_callback)
     
     if not exito_descarga:
         print("Error: Falló la descarga de Ventoy.")

@@ -1,7 +1,12 @@
 venv/
 .venv/
 engine/tools/
-otras_versiones/
 build/
 requeriments.txt
 Savin_GUI.spec
+Savin_GUI.build/
+Savin_GUI.onefile-build/
+.DS_Store
+jolowcoras (2).png
+Savin_GUI.dist/
+HollowDrive.exe

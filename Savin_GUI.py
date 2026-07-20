@@ -26,8 +26,64 @@ except ImportError:
     from engine.download_manager import formatear_tamano
 from engine.disk_logic import obtener_unidades_usb, instalar_ventoy, crear_particion_adicional
 
+import ctypes
+from ctypes import wintypes
+
+GITHUB_REPO = "MVP-Savyn/SAVIN-HOLLOWDRIVE"
+
+def obtener_version_interna():
+    """ Lee dinámicamente la versión del ejecutable desde sus propiedades de Windows """
+    exe_actual = os.path.abspath(sys.argv[0])
+    if not exe_actual.endswith(".exe"):
+        return "12.5"  # Fallback automático para cuando ejecutas el script .py en desarrollo
+    try:
+        version_dll = ctypes.WinDLL('version', use_last_error=True)
+        dw_handle = wintypes.DWORD()
+        size = version_dll.GetFileVersionInfoSizeW(exe_actual, ctypes.byref(dw_handle))
+        if size == 0: return "12.5"
+        
+        buffer = ctypes.create_string_buffer(size)
+        if not version_dll.GetFileVersionInfoW(exe_actual, 0, size, buffer): return "12.5"
+        
+        lp_sub_block = "\\\\FixedFileInfo"
+        lp_buffer = ctypes.c_void_p()
+        pu_len = wintypes.UINT()
+        
+        if version_dll.VerQueryValueW(buffer, lp_sub_block, ctypes.byref(lp_buffer), ctypes.byref(pu_len)):
+            class VS_FIXEDFILEINFO(ctypes.Structure):
+                _fields_ = [
+                    ("dwSignature", wintypes.DWORD), ("dwStrucVersion", wintypes.DWORD),
+                    ("dwFileVersionMS", wintypes.DWORD), ("dwFileVersionLS", wintypes.DWORD)
+                ]
+            info = VS_FIXEDFILEINFO.from_address(lp_buffer.value)
+            major = info.dwFileVersionMS >> 16
+            minor = info.dwFileVersionMS & 0xFFFF
+            return f"{major}.{minor}"
+    except Exception:
+        pass
+    return "12.5"
+
+VERSION_ACTUAL = obtener_version_interna()
 # --- CONFIGURACIÓN DE LOGS ---
 os.makedirs("logs", exist_ok=True)
+
+def rotar_logs(carpeta="logs", max_archivos=5):
+    """Mantiene únicamente los 5 registros de depuración más recientes en el disco."""
+    try:
+        # Listamos todos los archivos .log de la carpeta
+        archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if f.endswith('.log')]
+        # Los ordenamos por fecha de modificación (del más viejo al más nuevo)
+        archivos.sort(key=os.path.getmtime)
+        
+        # Si hay 5 o más, eliminamos los necesarios para dejar sitio al nuevo log
+        while len(archivos) >= max_archivos:
+            os.remove(archivos.pop(0))
+    except Exception:
+        pass
+
+# Ejecutamos la limpieza antes de instanciar el nuevo archivo de log
+rotar_logs()
+
 archivo_log = os.path.join("logs", f"savin_hollowdrive_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
 logging.basicConfig(
@@ -42,20 +98,27 @@ logging.info("=== INICIANDO SAVIN SUPER_USB ===")
 
 
 def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+    # Compatibilidad con PyInstaller y Nuitka Onefile
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    # Desarrollo local o carpetas relativas del binario compilado
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
 
 # --- CONFIGURACIÓN ESTRUCTURAL ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if hasattr(sys, 'frozen') or '__compiled__' in globals():
+    # Si es un ejecutable (PyInstaller o Nuitka), apuntamos a la carpeta real donde reside el .exe
+    BASE_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
+else:
+    # Si estamos en VS Code desarrollando el .py, usamos la ruta nativa del script
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 CARPETA_MEDIA = resource_path("media")
 
 # --- CARGA DE MIRRORS ---
 def cargar_mirrors():
     try:
-        ruta_json = os.path.join("engine", "mirrors.json")
+        # Forzamos a resolver la ruta dentro del paquete interno de Nuitka
+        ruta_json = resource_path(os.path.join("engine", "mirrors.json"))
         with open(ruta_json, "r") as f:
             return json.load(f)
     except Exception as e:
@@ -402,9 +465,14 @@ def encontrar_letra_por_etiqueta_ps(label):
 class SavinOceanicCommand(ctk.CTk):
 
     def verificar_herramientas(self):
-        tools_path = os.path.join("engine", "tools")
-        if os.path.exists(tools_path):
-            if any("ventoy" in f.lower() for f in os.listdir(tools_path)): return True
+        """ Detecta de forma absoluta y recursiva si Ventoy2Disk.exe ya existe en la carpeta engine. """
+        engine_path = os.path.join(BASE_DIR, "engine")
+        if os.path.exists(engine_path):
+            # Recorremos engine para ver si el ejecutable ya está ahí de una sesión previa
+            for root, dirs, files in os.walk(engine_path):
+                if "Ventoy2Disk.exe" in files:
+                    logging.info(f"[FIRMWARE] Ventoy detectado correctamente en: {root}")
+                    return True
         return False
     
     def animar_pulso(self):
@@ -438,7 +506,8 @@ class SavinOceanicCommand(ctk.CTk):
             threading.Thread(target=self.ejecutar_descarga, daemon=True).start()
 
     def ejecutar_descarga(self):
-        def update_bar(val): self.after(0, lambda: self.prog_descarga.set(val))
+    # Usamos *args para tragar de forma segura cualquier parámetro extra que envíe el motor
+        def update_bar(val, *args): self.after(0, lambda: self.prog_descarga.set(val))
         exito = descargar_y_extraer_ventoy(progress_callback=update_bar)
         
         if exito:
@@ -563,7 +632,7 @@ class SavinOceanicCommand(ctk.CTk):
 
     def __init__(self):
         super().__init__()
-        self.title("SAVIN SUPER_USB // V12.5")
+        self.title(f"SAVIN SUPER_USB // V{VERSION_ACTUAL}")
         
         self.update_idletasks()
         self.geometry(f"1000x850+{(self.winfo_screenwidth() // 2) - 500}+{(self.winfo_screenheight() // 2) - 425}")
@@ -609,6 +678,8 @@ class SavinOceanicCommand(ctk.CTk):
         self.iniciar_carga_tamanos_reales()
         self.after(100, self.mostrar_capa_descarga)
         self.protocol("WM_DELETE_WINDOW", self.cerrar_aplicacion)
+        self.after(1000, lambda: threading.Thread(target=self.comprobar_actualizaciones, daemon=True).start())
+        self.after(1500, self.preguntar_telemetria_errores)
 
     def cerrar_aplicacion(self):
         if self.en_proceso:
@@ -621,6 +692,72 @@ class SavinOceanicCommand(ctk.CTk):
         try: self.after_cancel(self.gif_break_id)
         except: pass
         self.destroy()
+
+    def preguntar_telemetria_errores(self):
+        """Lee la configuración guardada o pregunta al usuario la primera vez."""
+        ruta_config = os.path.join(BASE_DIR, "config.json")
+        
+        # Si ya existe la configuración previa, cargamos el estado sin preguntar
+        if os.path.exists(ruta_config):
+            try:
+                with open(ruta_config, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+                    self.compartir_errores = config.get("compartir_errores", False)
+                    logging.info(f"Telemetría cargada desde configuración: {self.compartir_errores}")
+                    return
+            except Exception:
+                pass
+
+        # Primera ejecución: Lanzamos el cuadro de diálogo
+        pregunta = (
+            "¿Quieres compartir los errores conmigo?\n\n"
+            "Si pones que sí, cuando el programa falle me enviará la información "
+            "para que pueda trabajar en una solución, el programa no recopila ningún dato personal ;>"
+        )
+        self.compartir_errores = messagebox.askyesno("SOPORTE TÉCNICO", pregunta)
+        
+        # Guardamos la decisión de forma persistente en el disco duro
+        try:
+            with open(ruta_config, "w", encoding="utf-8") as f:
+                json.dump({"compartir_errores": self.compartir_errores}, f, indent=4)
+        except Exception as e:
+            logging.error(f"No se pudo salvar config.json: {e}")
+
+    def enviar_reporte_error(self, tipo_falla, mensaje_error):
+        """ Envía de forma asíncrona el último log y el mensaje exacto del popup a Discord """
+        # Coloca aquí tu URL de Webhook copiada de los ajustes del canal de Discord
+        url_webhook = "https://discord.com/api/webhooks/1528752157006893127/TU_TOKEN_AQUI"
+        
+        # Validación de seguridad por si no se ha configurado el Webhook
+        if "TU_TOKEN_AQUI" in url_webhook:
+            logging.warning("[TELEMETRÍA] Webhook no configurado. Saltando envío.")
+            return
+
+        def hilo_envio():
+            try:
+                payload = {
+                    "content": (
+                        f"🚨 **¡PROCESO INTERRUMPIDO / CRASH DETECTADO!**\n"
+                        f"💻 **Versión:** HollowDrive V{VERSION_ACTUAL}\n"
+                        f"⚠️ **Tipo:** `{tipo_falla}`\n"
+                        f"❌ **Error en Ventana:** `{mensaje_error}`"
+                    )
+                }
+                
+                # Buscamos el archivo de log actual de esta sesión
+                if 'archivo_log' in globals() and os.path.exists(archivo_log):
+                    with open(archivo_log, "rb") as f:
+                        files = {"file": (os.path.basename(archivo_log), f, "text/plain")}
+                        requests.post(url_webhook, data=payload, files=files, timeout=15)
+                else:
+                    requests.post(url_webhook, json=payload, timeout=15)
+                    
+                logging.info("[TELEMETRÍA] Reporte técnico enviado con éxito a Discord.")
+            except Exception as e:
+                print(f"Error crítico enviando el reporte a Discord: {e}")
+
+        # Lo ejecutamos en segundo plano para que la interfaz gráfica no se congele ni un milisegundo
+        threading.Thread(target=hilo_envio, daemon=True).start()
 
     def toggle_discos_internos(self):
         if self.mostrar_internos.get():
@@ -683,7 +820,7 @@ class SavinOceanicCommand(ctk.CTk):
         
         info = ("HollowDrive te permite elegir cómo el sistema gestiona la red y los archivos pesados:\n\n"
                 "⚡ ASÍNCRONO (RAM - Recomendado): Descarga a máxima velocidad volcando los datos a un colchón temporal en tu memoria RAM (usa ~2GB). Extrae directamente al USB. Es el método más rápido y no requiere espacio libre en el disco.\n\n"
-                "🛡️ CLÁSICO (Disco Local): Si tu PC es lento o tiene poca RAM, este método descargará el archivo primero a una carpeta oculta en tu disco duro (temp_downloads), y después lo extraerá al USB. Requiere espacio libre en el disco suficiente para almacenar el archivo descargado, pero es 100% infalible contra cortes de red.")
+                "🛡️ CLÁSICO (Disco Local): Si tu PC es lento o tiene poca RAM, este método descargará el archivo primero a una carpeta oculta en tu disco duro (temp_downloads), y después lo extracurricular al USB. Requiere espacio libre en el disco suficiente para almacenar el archivo descargado, pero es 100% infalible contra cortes de red.")
         ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 13), justify="left", wraplength=640).pack(pady=5)
         
         consejo = ("CONSEJO:\n"
@@ -830,14 +967,14 @@ class SavinOceanicCommand(ctk.CTk):
 
         f_pack_bato = ctk.CTkFrame(f_packs_container, fg_color="transparent")
         f_pack_bato.pack(fill="x", padx=10, pady=6)
-        self.ch_pack_bato = ctk.CTkCheckBox(f_pack_bato, text="PACK BATOCERA (Calculando...)", variable=self.descargar_pack_bato, command=self.al_clicar_pack_batocera)
+        self.ch_pack_bato = ctk.CTkCheckBox(f_pack_bato, text="PACK BATOCERA (37.8GB)", variable=self.descargar_pack_bato, command=self.al_clicar_pack_batocera)
         self.ch_pack_bato.pack(side="left", anchor="w")
         self.widgets_interactivos.append(self.ch_pack_bato)
         self.crear_boton_info(f_pack_bato, self.abrir_info_roms).pack(side="left", padx=5)
 
         f_pack_hollow = ctk.CTkFrame(f_packs_container, fg_color="transparent")
         f_pack_hollow.pack(fill="x", padx=10, pady=6)
-        self.ch_pack_hollow = ctk.CTkCheckBox(f_pack_hollow, text="PACK HOLLOWDRIVE (Calculando...)", variable=self.descargar_pack_hollow, command=self.rebalancear)
+        self.ch_pack_hollow = ctk.CTkCheckBox(f_pack_hollow, text="PACK HOLLOWDRIVE (8.06GB)", variable=self.descargar_pack_hollow, command=self.rebalancear)
         self.ch_pack_hollow.pack(side="left", anchor="w")
         self.widgets_interactivos.append(self.ch_pack_hollow)
         self.crear_boton_info(f_pack_hollow, self.abrir_info_pack_hollow).pack(side="left", padx=5)
@@ -948,7 +1085,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.lbl_gif = ctk.CTkLabel(self.f_gifs, text="", width=70, height=70)
         self.lbl_gif.pack(side="right")
         
-        self.btn_start = ctk.CTkButton(self.footer, image=getattr(self, 'img_instalar', None), text="" if getattr(self, 'img_instalar', None) else "ioInstalar HollowDrive🩵", fg_color="transparent", hover_color=AZUL_CARD, width=512, height=120, command=self.confirmar_inicio)
+        self.btn_start = ctk.CTkButton(self.footer, image=getattr(self, 'img_instalar', None), text="" if getattr(self, 'img_instalar', None) else "Instalar HollowDrive🩵", fg_color="transparent", hover_color=AZUL_CARD, width=512, height=120, command=self.confirmar_inicio)
         self.btn_start.pack(pady=5)
         
         self.btn_cancel = ctk.CTkButton(self.footer, text="CANCELAR", fg_color="#aa3333", width=120, height=50, command=self.cancelar_proceso)
@@ -1034,7 +1171,7 @@ class SavinOceanicCommand(ctk.CTk):
         f_video.pack(pady=10)
 
         # 1. Cargamos la imagen local de fondo
-        ruta_miniatura = "miniatura.png"  
+        ruta_miniatura = resource_path("miniatura.png") #  Seguro  
         try:
             img_raw = Image.open(ruta_miniatura)
             img_ctk = ctk.CTkImage(light_image=img_raw, dark_image=img_raw, size=(480, 270))
@@ -1264,6 +1401,85 @@ class SavinOceanicCommand(ctk.CTk):
             
         finally:
             self._bloqueo_rebalanceo = False
+    
+    def comprobar_actualizaciones(self):
+        """ Filtra la última release buscando estrictamente el binario oficial """
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+        try:
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                tag_remoto = data["tag_name"].strip().lower().replace("v", "")
+                version_local = VERSION_ACTUAL.strip().lower().replace("v", "")
+                
+                if tag_remoto != version_local:
+                    url_exe_descarga = None
+                    # Buscamos el ejecutable con el nombre exacto que has definido
+                    for asset in data.get("assets", []):
+                        if asset["name"] == "HollowDrive.exe":
+                            url_exe_descarga = asset["browser_download_url"]
+                            break
+                    
+                    if url_exe_descarga:
+                        self.after(0, lambda: self.notificar_actualizacion(data["tag_name"], url_exe_descarga))
+        except Exception as e:
+            logging.warning(f"No se pudo comprobar las actualizaciones: {e}")
+
+    def notificar_actualizacion(self, nueva_version, url_descarga):
+        """ Muestra un aviso estético al usuario preguntando si desea actualizar """
+        msg = f"¡Hay una nueva versión disponible de HollowDrive ({nueva_version})!\n\n¿Deseas descargarla e instalarla ahora automáticamente?"
+        if messagebox.askyesno("ACTUALIZACIÓN DETECTADA", msg):
+            # Bloqueamos la interfaz y lanzamos la descarga en un hilo para no congelar la UI
+            self.bloquear_ui(True)
+            self.lbl_status.configure(text="DESCARGANDO NUEVA VERSIÓN... POR FAVOR ESPERA", text_color=AZUL_CIAN)
+            threading.Thread(target=self.ejecutar_auto_update, args=(url_descarga,), daemon=True).start()
+
+    def ejecutar_auto_update(self, url_descarga):
+        """ Descarga el binario y delega el reemplazo a un script Batch externo """
+        try:
+            # Ruta de donde se está ejecutando el programa actual
+            exe_actual = os.path.abspath(sys.argv[0])
+            
+            # Control de entorno de desarrollo: Si ejecutas el script .py, no queremos sobreescribirlo con un .exe
+            if not exe_actual.endswith(".exe"):
+                self.after(0, lambda: messagebox.showinfo("MODO DESARROLLO", f"Actualización ({GITHUB_REPO}) disponible.\nSaltando reemplazo físico porque estás ejecutando el script nativo de Python."))
+                self.after(0, lambda: self.bloquear_ui(False))
+                self.after(0, lambda: self.lbl_status.configure(text="ESPERANDO INICIO...", text_color=AZUL_SUAVE))
+                return
+
+            ruta_temporal_exe = exe_actual + ".tmp"
+            
+            # Descarga directa del flujo de datos del asset
+            response = requests.get(url_descarga, stream=True)
+            if response.status_code != 200:
+                raise RuntimeError(f"HTTP {response.status_code}")
+                
+            with open(ruta_temporal_exe, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+
+            # Escribimos el script Batch autolimpiable que ejecutará el cambiazo físico en Windows
+            ruta_bat = os.path.join(os.path.dirname(exe_actual), "hollow_updater.bat")
+            with open(ruta_bat, "w", encoding="ansi") as f:
+                f.write('@echo off\n')
+                f.write('timeout /t 1 /nobreak > nul\n')  # Espera 1 segundo a que el proceso principal de Python muera por completo
+                f.write(f'del "{exe_actual}"\n')          # Elimina el binario antiguo desactualizado
+                f.write(f'move "{ruta_temporal_exe}" "{exe_actual}"\n') # Renombra el temporal al nombre del ejecutable oficial
+                f.write(f'start "" "{exe_actual}"\n')     # Lanza la nueva versión optimizada
+                f.write('del "%~f0"\n')                   # El propio archivo .bat se autodestruye de forma limpia sin dejar rastro
+
+            # Lanzamos el script .bat de forma totalmente invisible para el usuario
+            subprocess.Popen(["cmd.exe", "/c", ruta_bat], creationflags=subprocess.CREATE_NO_WINDOW)
+            
+            # Forzamos el cierre inmediato de la aplicación actual para liberar el descriptor del .exe viejo
+            self.after(0, self.destroy)
+
+        except Exception as e:
+            logging.error(f"Fallo crítico en el proceso de auto-actualización: {e}")
+            self.after(0, lambda: messagebox.showerror("ERROR DE ACTUALIZACIÓN", f"No se pudo completar la instalación de la nueva versión:\n{e}"))
+            self.after(0, lambda: self.bloquear_ui(False))
+            self.after(0, lambda: self.lbl_status.configure(text="FALLO AL ACTUALIZAR", text_color="#aa3333"))
 
     def comenzar_instalacion(self):
         if self.en_proceso: return
@@ -1291,6 +1507,7 @@ class SavinOceanicCommand(ctk.CTk):
             "preservar_espacio": self.preservar_espacio.get(), 
             "instalar_cachy": self.instalar_cachy.get(),
             "descargar_pack_hollow": self.descargar_pack_hollow.get(),
+            "descargar_pack_bato": self.descargar_pack_bato.get(), # <--- CORREGIDO: Añadimos el pack de Batocera
             "instalar_bato": self.instalar_bato.get(),
             "metodo_descarga": self.metodo_descarga.get()
         }
@@ -1378,6 +1595,7 @@ class SavinOceanicCommand(ctk.CTk):
             preservar_espacio = config["preservar_espacio"] 
             instalar_cachy = config["instalar_cachy"]
             descargar_pack_hollow = config["descargar_pack_hollow"]
+            descargar_pack_bato = config["descargar_pack_bato"] # <--- CORREGIDO: Extraemos la variable
             instalar_bato = config["instalar_bato"]
             metodo_ext = config["metodo_descarga"]
             
@@ -1386,14 +1604,18 @@ class SavinOceanicCommand(ctk.CTk):
                 espacio_reservado_gb = 0.0
                 if instalar_cachy: espacio_reservado_gb = cachy_gb + GB_GRUB
             
-            tools_base = os.path.join("engine", "tools")
+            # --- CORRECCIÓN DE RUTA: ESCANEO GENERAL DE ENGINE ---
+            tools_base = os.path.join(BASE_DIR, "engine")
             ventoy_dir = None
+            
             if os.path.exists(tools_base):
                 for root, dirs, files in os.walk(tools_base):
                     if "Ventoy2Disk.exe" in files:
                         ventoy_dir = root
                         break
-            if not ventoy_dir: ventoy_dir = os.path.join("engine", "tools", "ventoy")
+            
+            if not ventoy_dir: 
+                raise RuntimeError(f"No se encontró Ventoy2Disk.exe en ninguna subcarpeta de: {tools_base}")
 
             def esperar_unidad_por_etiqueta(etiqueta, intentos=6, retardo=2):
                 for i in range(intentos):
@@ -1405,7 +1627,12 @@ class SavinOceanicCommand(ctk.CTk):
                 return None
 
             pasos_activos = ["ventoy"]
-            if descargar_pack_hollow: pasos_activos.append("pack_hollow")
+            if descargar_pack_bato: pasos_activos.append("pack_bato")     
+            if descargar_pack_hollow: 
+                pasos_activos.append("pack_hollow") 
+            else:
+                pasos_activos.append("ventoy_base") # <--- NUEVO: Si no descarga el pack, extrae la base local
+                
             if instalar_bato: pasos_activos.append("batocera_img")
             if instalar_cachy:
                 pasos_activos.extend(["grub_part", "grub_extract", "cachy_part", "cachy_extract"])
@@ -1442,8 +1669,8 @@ class SavinOceanicCommand(ctk.CTk):
                 return 0.0 if total_bytes else 0.5, f"{nombre_tarea} | Calculando..."
 
 
-            # -----------------------------------------------------------------
-            # [PASO] VENTOY Y RE-ETIQUETADO (12 Pasadas Intercaladas)
+           # -----------------------------------------------------------------
+            # [PASO] VENTOY CORE
             # -----------------------------------------------------------------
             iniciar_cronometro("Estructura Core (Ventoy)")
             actualizar_progreso_paso(0.0, "Ejecutando particionamiento base con Ventoy...")
@@ -1452,51 +1679,14 @@ class SavinOceanicCommand(ctk.CTk):
                 actualizar_progreso_paso(porcentaje / 100.0, f"Ventoy: {mensaje}")
 
             instalar_ventoy(disk_index=disk_index, reserved_space_gb=espacio_reservado_gb, ventoy_dir=ventoy_dir, progress_callback=progreso_ventoy)
-
-            letra_hollow = None
-            intentos_totales = 12
-            retardo = 2
-
-            for i in range(intentos_totales):
-                if self.abortar_proceso: raise InterruptedError("Proceso abortado por el usuario.")
-                
-                # Intercalación estricta: índice par busca HOLLOWDRIVE, impar busca Ventoy
-                etiqueta_actual = "HOLLOWDRIVE" if (i % 2 == 0) else "Ventoy"
-                
-                self.after(0, lambda e=etiqueta_actual, idx=i: self.lbl_status.configure(
-                    text=f"Buscando montaje de '{e}' (Intento {idx+1}/{intentos_totales})...", 
-                    text_color=AZUL_SUAVE
-                ))
-                
-                letra = encontrar_letra_por_etiqueta_ps(etiqueta_actual)
-                if letra:
-                    if etiqueta_actual == "Ventoy":
-                        logging.info(f"[INFO] Detectada firma core en {letra[:2]}. Cambiando etiqueta a HOLLOWDRIVE...")
-                        subprocess.run(f"label {letra[:2]} HOLLOWDRIVE", shell=True)
-                        time.sleep(1) # Margen de asentamiento para la tabla de asignación de Windows
-                        letra_hollow = encontrar_letra_por_etiqueta_ps("HOLLOWDRIVE") or letra
-                    else:
-                        letra_hollow = letra
-                    break
-                    
-                time.sleep(retardo)
-            
-            # Contingencia extrema por si el subsistema de volúmenes se queda colgado
-            if not letra_hollow:
-                for letra_alt in [f"{chr(x)}:\\" for x in range(69, 91)]:
-                    if os.path.exists(letra_alt):
-                        letra_hollow = letra_alt
-                        break
-
-            if not letra_hollow: raise RuntimeError("No se detectó la letra de unidad para HOLLOWDRIVE.")
             detener_cronometro("Estructura Core (Ventoy)")
             paso_actual += 1
 
             # =====================================================================
-            # 🛡️ ESTABILIZACIÓN FÍSICA DE UNIDADES
+            # 🛡️ ESTABILIZACIÓN FÍSICA DE UNIDADES (Movido aquí para liberar el USB)
             # =====================================================================
             self.after(0, lambda: self.lbl_status.configure(text="Asentando almacenamiento y liberando descriptores...", text_color=AZUL_CIAN))
-            time.sleep(8)  
+            time.sleep(6)  # Permite al kernel asentar la nueva tabla de particiones
             
             try:
                 ruta_rescan = os.path.join(BASE_DIR, "engine", "rescan.txt")
@@ -1513,8 +1703,72 @@ class SavinOceanicCommand(ctk.CTk):
             except Exception as e:
                 logging.warning(f"No se pudo forzar el rescan de topología: {e}")
 
+            time.sleep(2) # Respiro final para asegurar el montaje limpio de las letras
+
             # -----------------------------------------------------------------
-            # [PASO] HOLLOWDRIVE PACK
+            # 🏷️ BÚSQUEDA DE LETRA DEFINITIVA Y RE-ETIQUETADO
+            # -----------------------------------------------------------------
+            letra_hollow = None
+            intentos_totales = 12
+            retardo = 2
+
+            for i in range(intentos_totales):
+                if self.abortar_proceso: raise InterruptedError("Proceso abortado por el usuario.")
+                
+                # Escaneamos bajo cualquier firma válida tras el rescan
+                letra = encontrar_letra_por_etiqueta_ps("Ventoy") or encontrar_letra_por_etiqueta_ps("HOLLOWDRIVE")
+                if letra:
+                    # Si todavía conserva el nombre de Ventoy, el acceso exclusivo ya está libre para cambiarlo
+                    es_ventoy = encontrar_letra_por_etiqueta_ps("Ventoy") is not None
+                    if es_ventoy:
+                        logging.info(f"[INFO] Detectada firma core en {letra[:2]}. Forzando cambio de etiqueta a HOLLOWDRIVE...")
+                        subprocess.run(f"label {letra[:2]} HOLLOWDRIVE", shell=True)
+                        time.sleep(1.5) # Tiempo de refresco del explorador de Windows
+                        letra_hollow = encontrar_letra_por_etiqueta_ps("HOLLOWDRIVE") or letra
+                    else:
+                        letra_hollow = letra
+                    break
+                    
+                time.sleep(retardo)
+            
+            # Contingencia extrema por desasentamiento del subsistema de volúmenes
+            if not letra_hollow:
+                for letra_alt in [f"{chr(x)}:\\" for x in range(69, 91)]:
+                    if os.path.exists(letra_alt):
+                        letra_hollow = letra_alt
+                        break
+
+            if not letra_hollow: 
+                raise RuntimeError("No se detectó la letra de unidad física para HOLLOWDRIVE.")
+                
+            logging.info(f"[ENTORNO] Unidad vinculada firmemente en: {letra_hollow}")
+
+            # -----------------------------------------------------------------
+            # [PASO] PACK ROMS BATOCERA
+            # -----------------------------------------------------------------
+            if "pack_bato" in pasos_activos:
+                iniciar_cronometro("Pack Roms Batocera")
+                if self.abortar_proceso: raise InterruptedError()
+                self.after(0, lambda: self.alternar_gif_descarga(True))
+                actualizar_progreso_paso(0.0, "Iniciando descarga de Pack Batocera...")
+                
+                # CORREGIDO: Ahora apunta a su propia clave "batocera_games"
+                try: url_pack_bato = MIRRORS_DATA["batocera_games"]["mirrors"][0]["url"]
+                except KeyError: url_pack_bato = "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/batocera-hollowpack.tar"
+                
+                t_start_bato_pack = time.time()
+                def progreso_batocera_pack(bytes_read, total_bytes, fase, override_start=None):
+                    pct, msg = generar_mensaje_progreso("Pack Batocera", bytes_read, total_bytes, t_start_bato_pack, fase, override_start)
+                    actualizar_progreso_paso(pct, msg)
+
+                stream_extract_tar(url_pack_bato, letra_hollow, is_gdrive=False, progress_callback=progocera_pack if 'progocera_pack' in globals() else progreso_batocera_pack, abort_check=lambda: self.abortar_proceso, method=metodo_ext)
+                
+                self.after(0, lambda: self.alternar_gif_descarga(False))
+                detener_cronometro("Pack Roms Batocera")
+                paso_actual += 1
+
+           # -----------------------------------------------------------------
+            # [PASO] PACK UTILS HOLLOWDRIVE
             # -----------------------------------------------------------------
             if "pack_hollow" in pasos_activos:
                 iniciar_cronometro("Pack Utils HollowDrive")
@@ -1522,6 +1776,7 @@ class SavinOceanicCommand(ctk.CTk):
                 self.after(0, lambda: self.alternar_gif_descarga(True))
                 actualizar_progreso_paso(0.0, "Iniciando descarga de Pack HollowDrive...")
                 
+                # CORREGIDO: Apunta a su clave independiente que ahora solo tiene su archivo
                 try: url_pack_hollow = MIRRORS_DATA["hollowdrive_pack"]["mirrors"][0]["url"]
                 except KeyError: url_pack_hollow = "https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev/HollowdrivePackV1.tar"
                 
@@ -1536,6 +1791,45 @@ class SavinOceanicCommand(ctk.CTk):
                 detener_cronometro("Pack Utils HollowDrive")
                 paso_actual += 1
 
+            # -----------------------------------------------------------------
+            # [PASO NUEVO] EXTRACTOR DE CONFIGURACIÓN BASE LOCAL VENTOY
+            # -----------------------------------------------------------------
+            if "ventoy_base" in pasos_activos:
+                iniciar_cronometro("Configuración Base Ventoy")
+                if self.abortar_proceso: raise InterruptedError()
+                
+                # Forzamos a Nuitka a buscar el .tar en la ruta interna de recursos integrados
+                ruta_tar_local = resource_path(os.path.join("engine", "resources", "ventoy.tar"))
+                actualizar_progreso_paso(0.0, "Buscando configuración base de Ventoy local...")
+                
+                if not os.path.exists(ruta_tar_local):
+                    logging.warning(f"[ALERTA] No se encontró el archivo base en {ruta_tar_local}. Saltando paso...")
+                else:
+                    t_start_local = time.time()
+                    actualizar_progreso_paso(0.1, "Descomprimiendo estructura base local en USB...")
+                    
+                    try:
+                        with tarfile.open(ruta_tar_local, "r") as tar:
+                            miembros = tar.getmembers()
+                            total_miembros = len(miembros)
+                            
+                            for idx, member in enumerate(miembros):
+                                if self.abortar_proceso: raise InterruptedError()
+                                
+                                # Extrae elemento por elemento manteniendo la topología
+                                tar.extract(member, path=letra_hollow)
+                                
+                                # Refrescamos el string por cada elemento para que la UI no parezca congelada
+                                pct = (idx + 1) / total_miembros
+                                actualizar_progreso_paso(pct, f"Inyectando base local: {member.name[:30]} ({idx+1}/{total_miembros})")
+                                
+                        logging.info("Estructura base de Ventoy inyectada de forma limpia desde recursos locales.")
+                    except Exception as e:
+                        logging.error(f"Error crítico descomprimiendo ventoy.tar: {e}")
+                        raise RuntimeError(f"Fallo al desempaquetar la configuración interna de Ventoy:\n{e}")
+                
+                detener_cronometro("Configuración Base Ventoy")
+                paso_actual += 1
 
             # -----------------------------------------------------------------
             # [PASO] BATOCERA
@@ -1663,14 +1957,25 @@ class SavinOceanicCommand(ctk.CTk):
             self.after(0, lambda: self.lbl_status.configure(text="CANCELADO", text_color="#aa3333"))
         except RuntimeError as e:
             limpiar_temporales()
-            self.after(0, lambda: messagebox.showerror("ERROR DE CONEXIÓN", str(e)))
+            msg = str(e)
+            self.after(0, lambda: messagebox.showerror("ERROR DE CONEXIÓN", msg))
             self.after(0, lambda: self.p_total.set(0.0))
             self.after(0, lambda: self.p_task.set(0.0))
+            
+            # 🔥 ENVIAR SOLO SI EL USUARIO DIO SU CONSENTIMIENTO
+            if getattr(self, "compartir_errores", False):
+                self.enviar_reporte_error("RuntimeError (Problema de Proceso/Red)", msg)
+
         except Exception as e:
             limpiar_temporales()
-            self.after(0, lambda: messagebox.showerror("ERROR FATAL", f"Ocurrió un fallo de sistema:\n{e}"))
+            msg = str(e)
+            self.after(0, lambda: messagebox.showerror("ERROR FATAL", f"Ocurrió un fallo de sistema:\n{msg}"))
             self.after(0, lambda: self.p_total.set(0.0))
             self.after(0, lambda: self.p_task.set(0.0))
+            
+            # 🔥 ENVIAR SOLO SI EL USUARIO DIO SU CONSENTIMIENTO
+            if getattr(self, "compartir_errores", False):
+                self.enviar_reporte_error("Fatal Crash (Excepción Crítica)", msg)
         finally:
             self.en_proceso = False
             self.after(0, lambda: self.alternar_gif_descarga(False)) 
@@ -1766,6 +2071,36 @@ class SavinOceanicCommand(ctk.CTk):
             setattr(self, anim_key, anim_id)
             
         step()
+
+    def enviar_reporte_error(self, tipo_falla, mensaje_error):
+        """ Envía de forma asíncrona el último log y el mensaje exacto del popup a Discord """
+        url_webhook = "https://discord.com/api/webhooks/1528755076339073034/M33425jD90QwjII-hH8r7TXh3DdV0hY9qTiEsj47QPvowKxgOuuSc8pFceIqgu0zay6T"
+
+        def hilo_envio():
+            try:
+                payload = {
+                    "content": (
+                        f"🚨 **¡PROCESO INTERRUMPIDO / CRASH DETECTADO!**\n"
+                        f"💻 **Versión:** HollowDrive V{VERSION_ACTUAL}\n"
+                        f"⚠️ **Tipo:** `{tipo_falla}`\n"
+                        f"❌ **Error en Ventana:** `{mensaje_error}`"
+                    )
+                }
+                
+                # Buscamos el archivo de log dinámico de esta sesión
+                if 'archivo_log' in globals() and os.path.exists(archivo_log):
+                    with open(archivo_log, "rb") as f:
+                        files = {"file": (os.path.basename(archivo_log), f, "text/plain")}
+                        requests.post(url_webhook, data=payload, files=files, timeout=15)
+                else:
+                    requests.post(url_webhook, json=payload, timeout=15)
+                    
+                logging.info("[TELEMETRÍA] Reporte técnico enviado con éxito a Discord.")
+            except Exception as e:
+                print(f"Error crítico enviando el reporte a Discord: {e}")
+
+        # Lo ejecutamos en segundo plano para no congelar la UI principal
+        threading.Thread(target=hilo_envio, daemon=True).start()
 
 if __name__ == "__main__":
     app = SavinOceanicCommand()
