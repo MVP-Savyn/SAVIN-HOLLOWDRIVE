@@ -2,6 +2,7 @@ import subprocess
 import json
 import os
 import time
+import logging
 
 def obtener_unidades_usb(incluir_internos=False):
     unidades_validas = []
@@ -93,6 +94,24 @@ def obtener_unidades_usb(incluir_internos=False):
         print(f"Error en el backend: {e}")
         
     return unidades_validas
+
+def obtener_estructura_disco_ps(disk_index):
+    """ Retorna la lista de particiones físicas del disco con su tamaño, etiqueta y letra """
+    try:
+        cmd = (f'Get-Partition -DiskNumber {disk_index} | ForEach-Object {{ '
+               f'$p = $_; $v = Get-Volume -Partition $p -ErrorAction SilentlyContinue; '
+               f'[PSCustomObject]@{{"Number"=$p.PartitionNumber; "Size"=[math]::Round($p.Size/1GB, 2); '
+               f'"Letter"=$p.DriveLetter; "Label"=$v.FileSystemLabel; "Type"=$p.Type}} }} | ConvertTo-Json')
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        si.wShowWindow = subprocess.SW_HIDE
+        out = subprocess.check_output(["powershell", "-NoProfile", "-Command", cmd], startupinfo=si, creationflags=subprocess.CREATE_NO_WINDOW, text=True, errors="ignore")
+        if not out.strip(): return []
+        data = json.loads(out)
+        return [data] if isinstance(data, dict) else data
+    except Exception as e:
+        logging.error(f"Error analizando estructura de disco {disk_index}: {e}")
+        return []
 
 def instalar_ventoy(disk_index, reserved_space_gb, ventoy_dir="tools/ventoy", progress_callback=None):
     """
