@@ -1121,18 +1121,18 @@ class SavinOceanicCommand(ctk.CTk):
         else: self.after(0, lambda: self.prog_descarga.configure(progress_color="red"))
 
     def abrir_info_ventoy(self):
-        v = self.creventana_info_base("INFORMACIÓN DE COMPLEMENTOS", 620, 340)
+        v = self.creventana_info_base("INFORMACIÓN DE COMPLEMENTOS", 640, 420)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🔧 COMPLEMENTO CORE: VENTOY", font=("Impact", 26), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text="🔧 COMPLEMENTO CORE: VENTOY", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
         info = ("Ventoy es una herramienta open-source esencial que gestiona el entorno multi-boot de tu HollowDrive.\n\n"
                 "Permite arrancar múltiples sistemas operativos directamente desde archivos ISO sin formatear la unidad.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 14), justify="center", wraplength=540).pack(pady=5)
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 17), justify="center", wraplength=560).pack(pady=5)
         
         f_botones = ctk.CTkFrame(frame_interno, fg_color="transparent")
         f_botones.pack(pady=(20, 0))
-        ctk.CTkButton(f_botones, text="VISITAR VENTOY", font=("Segoe UI", 12, "bold"), fg_color=AZUL_CARD, border_width=1, border_color=AZUL_CIAN, height=40, width=180, command=lambda: self.abrir_url("https://www.ventoy.net")).pack(side="left", padx=10)
-        ctk.CTkButton(f_botones, text="ENTENDIDO", font=("Segoe UI", 12, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=140, command=v.destroy).pack(side="left", padx=10)
+        ctk.CTkButton(f_botones, text="VISITAR VENTOY", font=("Segoe UI", 13, "bold"), fg_color=AZUL_CARD, border_width=1, border_color=AZUL_CIAN, height=42, width=180, command=lambda: self.abrir_url("https://www.ventoy.net")).pack(side="left", padx=10)
+        ctk.CTkButton(f_botones, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=140, command=v.destroy).pack(side="left", padx=10)
         v.update(); v.grab_set()
 
     def mostrar_capa_descarga(self):
@@ -1480,22 +1480,22 @@ class SavinOceanicCommand(ctk.CTk):
         self.rebalancear()
 
     def abrir_info_motor(self):
-        v = self.creventana_info_base("MOTORES DE EXTRACCIÓN", 720, 520)
+        v = self.creventana_info_base("MOTORES DE EXTRACCIÓN", 740, 600)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="⚙️ MOTORES DE INSTALACIÓN", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 10))
+        ctk.CTkLabel(frame_interno, text="⚙️ MOTORES DE INSTALACIÓN", font=("Impact", 30), text_color=AZUL_CIAN).pack(pady=(0, 10))
         
         info = ("HollowDrive te permite elegir cómo el sistema gestiona la red y los archivos pesados:\n\n"
                 "⚡ ASÍNCRONO (RAM - Recomendado): Descarga a máxima velocidad volcando los datos a un colchón temporal en tu memoria RAM. Extrae directamente al USB sin saturar el disco duro.\n\n"
                 "🛡️ CLÁSICO (Disco Local): Si el primer modo falla por algo, este método descargará el archivo a una carpeta oculta en tu disco SSD/HDD (temp_downloads), y después lo extraerá al USB.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 13), justify="left", wraplength=640).pack(pady=5)
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=660).pack(pady=5)
         
         consejo = ("CONSEJO:\n"
-                   "• Usa \"Asíncrono\" si no te da fallos, simplemente es mejor.\n"
-                   "• Usa \"Clásico\" si quieres máxima seguridad ante cortes de descarga (Necesitas espacio libre en el disco).")
-        ctk.CTkLabel(frame_interno, text=consejo, font=("Segoe UI", 13, "bold"), text_color=AZUL_CIAN, justify="left", wraplength=640).pack(pady=10)
+                   "• Usa \"Asíncrono\" si no te da fallos, simplemente es más rápido.\n"
+                   "• Usa \"Clásico\" si buscas máxima estabilidad ante cortes de red (requiere espacio libre en SSD).")
+        ctk.CTkLabel(frame_interno, text=consejo, font=("Segoe UI", 16, "bold"), text_color=AZUL_CIAN, justify="left", wraplength=660).pack(pady=10)
 
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=180, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def iniciar_carga_tamanos_reales(self): threading.Thread(target=self.cargar_tamanos_reales_hilo, daemon=True).start()
@@ -1509,18 +1509,18 @@ class SavinOceanicCommand(ctk.CTk):
         return default_bytes
 
     def abrir_info_roms(self):
-        v = self.creventana_info_base("AVISO LEGAL", 620, 380)
+        v = self.creventana_info_base("AVISO LEGAL", 620, 420)
         v.configure(fg_color="#1a0a0a") 
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
         ctk.CTkLabel(frame_interno, text="⚠️ AVISO LEGAL", font=("Impact", 32), text_color="#ff4d4d").pack(pady=(0, 15))
         legal_text = ("Savin Super USB NO INCLUYE ROMS ni archivos de juegos\nprotegidos por derechos de autor.")
-        ctk.CTkLabel(frame_interno, text=legal_text, font=("Segoe UI", 14), justify="center", wraplength=550).pack(pady=10)
+        ctk.CTkLabel(frame_interno, text=legal_text, font=("Segoe UI", 16), justify="center", wraplength=550).pack(pady=10)
         ctk.CTkButton(frame_interno, text="ACEPTO LOS RIESGOS", font=("Segoe UI", 14, "bold"), fg_color="#444", height=40, width=220, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_pack_hollow(self):
-        v = self.creventana_info_base("PACK HOLLOWDRIVE INFO", 620, 360)
+        v = self.creventana_info_base("PACK HOLLOWDRIVE INFO", 620, 400)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
         ctk.CTkLabel(frame_interno, text="🛠️ PACK DE HERRAMIENTAS HOLLOWDRIVE", font=("Impact", 24), text_color=AZUL_CIAN).pack(pady=(0, 15))
@@ -1530,7 +1530,7 @@ class SavinOceanicCommand(ctk.CTk):
                 "• Utilidades de clonación, backup y recuperación de datos.\n"
                 "• Entornos Windows Live (WinPE) para reparar sistemas caídos.\n\n"
                 "Y mucho más...")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 14), justify="left", wraplength=550).pack(pady=5)
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=550).pack(pady=5)
         ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
@@ -1551,7 +1551,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.ch_pack_hollow.configure(text=f"PACK HOLLOWDRIVE ({self.tamanos_formateados['pack_hollow']})")
         self.rebalancear()
 
-    # =====================================================================
+# =====================================================================
     # 🎛️ CONSTRUCCIÓN Y NAVEGACIÓN DE LA INTERFAZ
     # =====================================================================
 
@@ -1623,11 +1623,12 @@ class SavinOceanicCommand(ctk.CTk):
 
         self.f_bato_opts = ctk.CTkFrame(f_bato_txt, fg_color="#0d141c", corner_radius=8)
         self.f_bato_opts.pack(fill="x", pady=5)
+        # --- CÓDIGO CORREGIDO ---
         self.ch_b64 = ctk.CTkCheckBox(self.f_bato_opts, text="Batocera 64bits (4.60GB)", variable=self.bato_64_act, command=self.rebalancear)
         self.ch_b64.pack(pady=2, padx=10, anchor="w")
         self.ch_b32 = ctk.CTkCheckBox(self.f_bato_opts, text="Batocera 32bits (Próximamente)", variable=self.bato_32_act, command=self.rebalancear, state="disabled")
         self.ch_b32.pack(pady=2, padx=10, anchor="w")
-        self.widgets_interactivos.extend([self.ch_b64, self.ch_b32])
+        self.widgets_interactivos.append(self.ch_b64)  # Solo añadimos el de 64bits
         if getattr(self, 'logo_batocera', None):
             f_bato_logo_container = ctk.CTkFrame(f_bato_master, width=135, height=95, fg_color="transparent")
             f_bato_logo_container.pack(side="right", padx=10)
@@ -1678,7 +1679,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.widgets_interactivos.append(sw_cachy)
         self.crear_boton_info(f_cachy_h, self.abrir_info_cachyos).pack(side="left", padx=5)
 
-        # NUEVO: Contenedor para elegir escritorio de CachyOS
+        # Contenedor para elegir escritorio de CachyOS
         self.cachy_flavor = ctk.StringVar(value="kde")
         self.f_cachy_opts = ctk.CTkFrame(f_cachy_master, fg_color="#0d141c", corner_radius=8)
         
@@ -1884,6 +1885,17 @@ class SavinOceanicCommand(ctk.CTk):
         )
         self.seg_ht_cachy.set("🔄 Actualizar CachyOS")
         self.seg_ht_cachy.pack(fill="x", pady=(2, 8))
+
+        # NUEVO: Selector de KDE/Hyprland para HollowTools
+        self.ht_cachy_flavor = ctk.StringVar(value="kde")
+        self.f_ht_flavor = ctk.CTkFrame(f_body_cachy, fg_color="#090d12", corner_radius=8, border_width=1, border_color="#1e293b")
+        self.f_ht_flavor.pack(fill="x", pady=(0, 8))
+        
+        ctk.CTkLabel(self.f_ht_flavor, text="Entorno:", font=("Segoe UI", 11, "bold"), text_color=AZUL_SUAVE).pack(side="left", padx=10, pady=6)
+        r_ht_kde = ctk.CTkRadioButton(self.f_ht_flavor, text="KDE", variable=self.ht_cachy_flavor, value="kde", font=("Segoe UI", 11))
+        r_ht_kde.pack(side="left", padx=5)
+        r_ht_hypr = ctk.CTkRadioButton(self.f_ht_flavor, text="Hyprland", variable=self.ht_cachy_flavor, value="hyprland", font=("Segoe UI", 11))
+        r_ht_hypr.pack(side="left", padx=5)
 
         self.f_slider_sec = ctk.CTkFrame(f_body_cachy, fg_color="#090d12", corner_radius=10, border_width=1, border_color="#1e293b")
 
@@ -2305,7 +2317,10 @@ class SavinOceanicCommand(ctk.CTk):
 
                 metodo = self.metodo_descarga.get()
                 url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
-                if getattr(self, 'cachy_flavor', None) and self.cachy_flavor.get() == "hyprland":
+                
+                # SELECCIÓN DE ENTORNO EN HOLLOWTOOLS
+                sabor_ht = getattr(self, 'ht_cachy_flavor', ctk.StringVar(value="kde")).get()
+                if sabor_ht == "hyprland":
                     try: url_cachy = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
                     except KeyError: url_cachy = "AQUI_IRÁ_EL_FUTURO_LINK_DE_HYPRLAND"
                 else:
@@ -2571,13 +2586,13 @@ class SavinOceanicCommand(ctk.CTk):
         letra_grub, letra_cachy = obtener_o_asignar_letras_cachyos_grub(disco["device"])
 
         if letra_grub and letra_cachy:
-            v = self.creventana_info_base("GESTIÓN CACHYOS DETECTADO", 520, 320)
+            v = self.creventana_info_base("GESTIÓN CACHYOS DETECTADO", 540, 360)
             f_in = ctk.CTkFrame(v, fg_color="transparent")
             f_in.pack(expand=True, fill="both", padx=20, pady=20)
 
-            ctk.CTkLabel(f_in, text="🚀 CACHYOS DETECTADO", font=("Impact", 26), text_color=COLOR_CACHY).pack(pady=(0, 10))
+            ctk.CTkLabel(f_in, text="🚀 CACHYOS DETECTADO", font=("Impact", 28), text_color=COLOR_CACHY).pack(pady=(0, 10))
             msg = "Se han detectado particiones de CachyOS existentes en esta unidad.\n¿Qué acción deseas realizar?"
-            ctk.CTkLabel(f_in, text=msg, font=("Segoe UI", 13), justify="center", wraplength=460).pack(pady=10)
+            ctk.CTkLabel(f_in, text=msg, font=("Segoe UI", 15), justify="center", wraplength=480).pack(pady=10)
 
             def opt_actualizar():
                 v.destroy()
@@ -2612,8 +2627,16 @@ class SavinOceanicCommand(ctk.CTk):
         def hilo():
             try:
                 url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
-                url_cachy = MIRRORS_DATA["cachyos_images"]["sistema"]["mirrors"][0]["url"]
                 metodo = self.metodo_descarga.get()
+
+                # SELECCIÓN DE ENTORNO EN HOLLOWTOOLS
+                sabor_ht = getattr(self, 'ht_cachy_flavor', ctk.StringVar(value="kde")).get()
+                if sabor_ht == "hyprland":
+                    try: url_cachy = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
+                    except KeyError: url_cachy = "AQUI_IRÁ_EL_FUTURO_LINK_DE_HYPRLAND"
+                else:
+                    try: url_cachy = MIRRORS_DATA["cachyos_images"]["sistema"]["mirrors"][0]["url"]
+                    except KeyError: url_cachy = "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img"
 
                 # PASO 1: Volcar GRUB Bootloader
                 def prog_grub(written, total, info_estado="Flasheando", *args):
@@ -2682,43 +2705,43 @@ class SavinOceanicCommand(ctk.CTk):
         return v
 
     def abrir_info_batocera(self):
-        v = self.creventana_info_base("¿QUÉ ES BATOCERA?", 620, 320)
+        v = self.creventana_info_base("¿QUÉ ES BATOCERA?", 640, 360)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🎮 SOBRE BATOCERA", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        info = ("Batocera es un sistema de emulación que puede convertir\ncualquier ordenador en una consola de videojuegos.\n\n🛡️ SEGURIDAD DE DATOS:\nAunque inicies Batocera, NUNCA perderás los datos del ordenador.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 14), justify="center", wraplength=550).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=180, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text="🎮 SOBRE BATOCERA", font=("Impact", 30), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        info = ("Batocera es un sistema de emulación que puede convertir cualquier ordenador en una consola de videojuegos.\n\n🛡️ SEGURIDAD DE DATOS:\nAunque inicies Batocera, NUNCA perderás los datos del ordenador.")
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="center", wraplength=560).pack(pady=5)
+        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_cachyos(self):
-        v = self.creventana_info_base("¿QUÉ ES CACHYOS?", 680, 440)
+        v = self.creventana_info_base("¿QUÉ ES CACHYOS?", 700, 480)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🚀 CACHYOS: ARCH LINUX OPTIMIZADO", font=("Impact", 28), text_color=COLOR_CACHY).pack(pady=(0, 15))
-        info = ("He preparado una versión personalizada de CachyOS (Arch Linux)\ndiseñada específicamente para ser rápida y fácil de usar.\n\n⚡ CARACTERÍSTICAS PRINCIPALES:\n• Universal: Funciona en casi cualquier PC moderno.\n• Rendimiento: Optimizado para sacar el máximo provecho al hardware.\n• Portable: Llevas tu sistema operativo, archivos y apps siempre contigo.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 14), justify="center", wraplength=600).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="¡EXCELENTE!", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=180, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text="🚀 CACHYOS: ARCH LINUX OPTIMIZADO", font=("Impact", 30), text_color=COLOR_CACHY).pack(pady=(0, 15))
+        info = ("He preparado una versión personalizada de CachyOS (Arch Linux) diseñada específicamente para ser rápida y fácil de usar.\n\n⚡ CARACTERÍSTICAS PRINCIPALES:\n• Universal: Funciona en casi cualquier PC moderno.\n• Rendimiento: Optimizado para sacar el máximo provecho al hardware.\n• Portable: Llevas tu sistema operativo, archivos y apps siempre contigo.")
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="center", wraplength=620).pack(pady=5)
+        ctk.CTkButton(frame_interno, text="¡EXCELENTE!", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
         
     def abrir_info_kde(self):
-        v = self.creventana_info_base("INFO: KDE PLASMA", 500, 260)
+        v = self.creventana_info_base("INFO: KDE PLASMA", 540, 300)
         f = ctk.CTkFrame(v, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(f, text="❄️ KDE PLASMA", font=("Impact", 24), text_color=AZUL_CIAN).pack(pady=(0, 10))
-        info = "Es perfecto para los que quieren algo como Windows, el más fácil de usar, pero ocupa más que Hyprland."
-        ctk.CTkLabel(f, text=info, font=("Segoe UI", 14), justify="center", wraplength=450).pack(pady=5)
-        ctk.CTkButton(f, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, command=v.destroy).pack(pady=(15,0))
+        ctk.CTkLabel(f, text="❄️ KDE PLASMA", font=("Impact", 26), text_color=AZUL_CIAN).pack(pady=(0, 10))
+        info = "Es perfecto para los que quieren algo familiar como Windows. Es el entorno más fácil de usar de primeras, aunque ocupa algo más que Hyprland."
+        ctk.CTkLabel(f, text=info, font=("Segoe UI", 16), justify="center", wraplength=480).pack(pady=5)
+        ctk.CTkButton(f, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=v.destroy).pack(pady=(15,0))
         v.update(); v.grab_set()
 
     def abrir_info_hyprland(self):
-        v = self.creventana_info_base("INFO: HYPRLAND", 580, 310)
+        v = self.creventana_info_base("INFO: HYPRLAND", 620, 340)
         f = ctk.CTkFrame(v, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(f, text="🌀 HYPRLAND", font=("Impact", 24), text_color=COLOR_CACHY).pack(pady=(0, 10))
-        info = "Uno de los escritorios más bonitos para Linux, y de los mejores para productividad, además es muy ligero y consume menos recursos. Hay que aprender a usarlo pero una vez lo dominas es la mejor sensación que puedes tener con un ordenador."
-        ctk.CTkLabel(f, text=info, font=("Segoe UI", 14), justify="center", wraplength=520).pack(pady=5)
-        ctk.CTkButton(f, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, command=v.destroy).pack(pady=(15,0))
+        ctk.CTkLabel(f, text="🌀 HYPRLAND", font=("Impact", 26), text_color=COLOR_CACHY).pack(pady=(0, 10))
+        info = "Uno de los escritorios más bonitos y fluidos para Linux. Es ideal para máxima productividad, consume poquísimos recursos y ofrece un control total del sistema."
+        ctk.CTkLabel(f, text=info, font=("Segoe UI", 16), justify="center", wraplength=550).pack(pady=5)
+        ctk.CTkButton(f, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=v.destroy).pack(pady=(15,0))
         v.update(); v.grab_set()
 
     def abrir_ventana_info(self):
@@ -3539,42 +3562,41 @@ class SavinOceanicCommand(ctk.CTk):
         step()
 
     def abrir_info_ht_isos(self):
-        v = self.creventana_info_base("INFORMACIÓN: AÑADIR ISOs", 600, 320)
+        v = self.creventana_info_base("INFORMACIÓN: AÑADIR ISOs", 640, 390)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="CD GESTOR DE IMÁGENES ISO", font=("Impact", 26), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        info = ("Esta función permite volcar imágenes de sistemas operativos (.iso) directamente "
-                "a la carpeta /HOLLOWDRIVE/OSimages/ de tu unidad HollowDrive.\n\n"
+        ctk.CTkLabel(frame_interno, text="CD GESTOR DE IMÁGENES ISO", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        info = ("Esta función permite volcar imágenes de sistemas operativos (.iso) directamente a la carpeta /HOLLOWDRIVE/OSimages/ de tu unidad HollowDrive.\n\n"
                 "• No requiere formatear la unidad.\n"
                 "• Ventoy detectará automáticamente las ISOs añadidas al arrancar.\n"
                 "• Puedes arrastrar los archivos directamente a la casilla o pulsar el botón (+).")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 13), justify="left", wraplength=520).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=38, width=160, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=560).pack(pady=5)
+        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_ht_packs(self):
-        v = self.creventana_info_base("INFORMACIÓN: INYECCIÓN DE PAQUETES", 620, 350)
+        v = self.creventana_info_base("INFORMACIÓN: INYECCIÓN DE PAQUETES", 660, 400)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="📦 INYECCIÓN DE CONTENIDO", font=("Impact", 26), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text="📦 INYECCIÓN DE CONTENIDO", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
         info = ("Te permite descargar e inyectar paquetes pesados en un USB que ya ha sido creado anteriormente:\n\n"
                 "• Batocera OS (.img): Actualiza o restaura el sistema de emulación base.\n"
                 "• Pack ROMs: Inyecta el paquete de juegos y BIOS en la partición correspondiente.\n"
                 "• Pack HollowDrive: Descarga el conjunto completo de utilidades de rescate.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 13), justify="left", wraplength=540).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=38, width=160, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=580).pack(pady=5)
+        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_ht_cachy(self):
-        v = self.creventana_info_base("INFORMACIÓN: GESTIÓN CACHYOS", 620, 350)
+        v = self.creventana_info_base("INFORMACIÓN: GESTIÓN CACHYOS", 660, 400)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🚀 GESTOR CACHYOS Y PARTICIONES", font=("Impact", 26), text_color=COLOR_CACHY).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text="🚀 GESTOR CACHYOS Y PARTICIONES", font=("Impact", 28), text_color=COLOR_CACHY).pack(pady=(0, 15))
         info = ("Herramienta de mantenimiento específica para el sistema operativo CachyOS:\n\n"
                 "• Reinstalar / Actualizar: Reflashea la partición de sistema y el arranque GRUB sin tocar la partición principal de Ventoy.\n"
                 "• Instalación en Espacio Libre: Si tu USB tiene espacio sin asignar, crea las particiones necesarias e instala CachyOS en dicho espacio.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 13), justify="left", wraplength=540).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=38, width=160, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=580).pack(pady=5)
+        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def crear_barra_tarea_dinamica(self, id_tarea, titulo_inicial, color=AZUL_CIAN):

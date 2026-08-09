@@ -1,0 +1,104 @@
+2026-08-09 12:45:27,893 [INFO] === INICIANDO HOLLOWDRIVE V12.5 ===
+2026-08-09 12:45:27,893 [INFO] Ruta base del programa: D:\Documents\vscode\SAVIN-HOLLOWDRIVE
+2026-08-09 12:45:27,893 [INFO] Archivo de registro de la sesión: D:\Documents\vscode\SAVIN-HOLLOWDRIVE\logs\hollowdrive_2026-08-09_12-45-27.log
+2026-08-09 12:45:27,895 [DEBUG] Starting new HTTPS connection (1): raw.githubusercontent.com:443
+2026-08-09 12:45:28,279 [DEBUG] https://raw.githubusercontent.com:443 "GET /MVP-Savyn/SAVIN-HOLLOWDRIVE/main/engine/mirrors.json HTTP/1.1" 404 14
+2026-08-09 12:45:28,383 [DEBUG] Importing PngImagePlugin
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'iTXt' 254 1377
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'IDAT' 1643 8192
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'iTXt' 254 1377
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'IDAT' 1643 8192
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,396 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'iTXt' 254 1379
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'iTXt' 254 1379
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'iTXt' 254 1390
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'IDAT' 1656 8192
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'iTXt' 254 1379
+2026-08-09 12:45:28,397 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-08-09 12:45:28,398 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,398 [DEBUG] STREAM b'IDAT' 41 4096
+2026-08-09 12:45:28,398 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,398 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,398 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,398 [DEBUG] STREAM b'iTXt' 254 1390
+2026-08-09 12:45:28,398 [DEBUG] STREAM b'IDAT' 1656 8192
+2026-08-09 12:45:28,398 [DEBUG] Importing GifImagePlugin
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'iTXt' 254 1386
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'IHDR' 16 13
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'eXIf' 41 180
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'pHYs' 233 9
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'iTXt' 254 1386
+2026-08-09 12:45:28,406 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-08-09 12:45:28,798 [DEBUG] STREAM b'IDAT' 9475 6
+2026-08-09 12:45:29,247 [INFO] -> Usando tamaño local predefinido para bato_64: 0 bytes.
+2026-08-09 12:45:29,248 [INFO] -> Usando tamaño local predefinido para batocera_64: 0 bytes.
+2026-08-09 12:45:29,248 [INFO] -> Usando tamaño local predefinido para bato_32: 0 bytes.
+2026-08-09 12:45:29,248 [INFO] -> Usando tamaño local predefinido para batocera_32: 0 bytes.
+2026-08-09 12:45:29,249 [INFO] -> Usando tamaño local predefinido para pack_bato: 0 bytes.
+2026-08-09 12:45:29,249 [INFO] -> Usando tamaño local predefinido para pack_batocera: 0 bytes.
+2026-08-09 12:45:29,249 [INFO] -> Usando tamaño local predefinido para pack_hollow: 0 bytes.
+2026-08-09 12:45:29,249 [INFO] -> Usando tamaño local predefinido para pack_hollow: 0 bytes.
+2026-08-09 12:45:30,261 [DEBUG] Starting new HTTPS connection (1): api.github.com:443
+2026-08-09 12:45:30,750 [DEBUG] https://api.github.com:443 "GET /repos/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest HTTP/1.1" 404 125
+2026-08-09 12:56:42,543 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-08-09 12:56:42,761 [DEBUG] https://huggingface.co:443 "HEAD / HTTP/1.1" 200 0
+2026-08-09 12:57:04,541 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-08-09 12:57:04,819 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "HEAD /HollowdrivePackV1.tar HTTP/1.1" 200 0
+2026-08-09 12:57:04,821 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-08-09 12:57:05,310 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "GET /HollowdrivePackV1.tar HTTP/1.1" 200 8661701120
+2026-08-09 13:02:16,756 [ERROR] D:\Documents\vscode\SAVIN-HOLLOWDRIVE\Savin_GUI.py:533: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.
+2026-08-09 13:02:16,756 [ERROR]   tar.extract(member, path=target_dir)
+2026-08-09 13:02:54,302 [DEBUG] Starting new HTTPS connection (1): pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443
+2026-08-09 13:02:54,580 [DEBUG] https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443 "HEAD /batocerumen.img HTTP/1.1" 200 0
+2026-08-09 13:02:54,583 [DEBUG] Starting new HTTPS connection (1): pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443
+2026-08-09 13:02:54,849 [DEBUG] https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443 "GET /batocerumen.img HTTP/1.1" 200 4949278720
+2026-08-09 13:04:38,522 [INFO] [+] Letra asignada dinámicamente para GRUB: G:
+2026-08-09 13:04:39,873 [INFO] =======================================================
+2026-08-09 13:04:39,874 [INFO] [DIAGNÓSTICO SSD] Iniciando descarga previa a disco para: \\.\G:
+2026-08-09 13:04:39,874 [INFO] =======================================================
+2026-08-09 13:04:39,875 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-08-09 13:04:40,209 [DEBUG] https://huggingface.co:443 "HEAD /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img HTTP/1.1" 302 0
+2026-08-09 13:04:40,210 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-08-09 13:04:40,577 [DEBUG] https://us.aws.cdn.hf.co:443 "HEAD /xet-bridge-us/6a5bfdc368c85db044febc71/984f0f2f2ca65fbf97fb2cc0399523ad8bbac5364c108d711bdbd60319daade5?response-content-type=application%2Foctet-stream&user_id=6a5bfd38147a8c22c7f583b3&X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_efi.img%3B+filename%3D%22hollowdrive_cachy_efi.img%22%3B&Expires=1786277081&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxLzk4NGYwZjJmMmNhNjVmYmY5N2ZiMmNjMDM5OTUyM2FkOGJiYWM1MzY0YzEwOGQ3MTFiZGJkNjAzMTlkYWFkZTVcXD9yZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZvY3RldC1zdHJlYW0mdXNlcl9pZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMmWC1YZXQtQ2FzLVVpZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN2hvbGxvd2RyaXZlX2NhY2h5X2VmaS5pbWclM0IrZmlsZW5hbWUlM0QlMjJob2xsb3dkcml2ZV9jYWNoeV9lZmkuaW1nJTIyJTNCIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJFcG9jaFRpbWUiOjE3ODYyNzcwODF9fX1dfQ__&Signature=MEUCIQCxuGEeSrNmuoEEIm3nV26d58N1SD0q9JTU9Y1~C5fdSQIgNRiQG088mmLpd3tKVhucfsxo3rcsOFwBbBfynxKAjks_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 0
+2026-08-09 13:04:40,580 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-08-09 13:04:40,896 [DEBUG] https://huggingface.co:443 "GET /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img HTTP/1.1" 302 1217
+2026-08-09 13:04:40,897 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-08-09 13:04:41,505 [DEBUG] https://us.aws.cdn.hf.co:443 "GET /xet-bridge-us/6a5bfdc368c85db044febc71/984f0f2f2ca65fbf97fb2cc0399523ad8bbac5364c108d711bdbd60319daade5?X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&response-content-type=application%2Foctet-stream&user_id=6a5bfd38147a8c22c7f583b3&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_efi.img%3B+filename%3D%22hollowdrive_cachy_efi.img%22%3B&Expires=1786277082&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxLzk4NGYwZjJmMmNhNjVmYmY5N2ZiMmNjMDM5OTUyM2FkOGJiYWM1MzY0YzEwOGQ3MTFiZGJkNjAzMTlkYWFkZTVcXD9YLVhldC1DYXMtVWlkPTZhNWJmZDM4MTQ3YThjMjJjN2Y1ODNiMyZyZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZvY3RldC1zdHJlYW0mdXNlcl9pZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN2hvbGxvd2RyaXZlX2NhY2h5X2VmaS5pbWclM0IrZmlsZW5hbWUlM0QlMjJob2xsb3dkcml2ZV9jYWNoeV9lZmkuaW1nJTIyJTNCIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJFcG9jaFRpbWUiOjE3ODYyNzcwODJ9fX1dfQ__&Signature=MEUCIQDNmtCnluexTx0VQzYYtkUZpReExjsvCcAUmSVeM0qoCwIgF83q3OEKf9ebTxwqBqVbpMnGrElJcJnHtULdmjgTkGA_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 537587712
+2026-08-09 13:06:11,999 [INFO] [DIAGNÓSTICO SSD] Descarga completada. Iniciando volcado RAW a USB: \\.\G:
+2026-08-09 13:06:27,788 [INFO] =======================================================
+
+2026-08-09 13:06:37,260 [INFO] [+] Letra asignada dinámicamente para CachyOS: H:
+2026-08-09 13:06:38,591 [INFO] =======================================================
+2026-08-09 13:06:38,591 [INFO] [DIAGNÓSTICO SSD] Iniciando descarga previa a disco para: \\.\H:
+2026-08-09 13:06:38,591 [INFO] =======================================================
+2026-08-09 13:06:38,592 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-08-09 13:06:38,927 [DEBUG] https://huggingface.co:443 "HEAD /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img HTTP/1.1" 302 0
+2026-08-09 13:06:38,929 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-08-09 13:06:39,285 [DEBUG] https://us.aws.cdn.hf.co:443 "HEAD /xet-bridge-us/6a5bfdc368c85db044febc71/f61c02c110d19ebd04fc19487a37d8c60d62143e671a71a5ad2b1c2ca0e833ab?response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_sistema.img%3B+filename%3D%22hollowdrive_cachy_sistema.img%22%3B&response-content-type=application%2Foctet-stream&X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&user_id=6a5bfd38147a8c22c7f583b3&Expires=1786277200&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxL2Y2MWMwMmMxMTBkMTllYmQwNGZjMTk0ODdhMzdkOGM2MGQ2MjE0M2U2NzFhNzFhNWFkMmIxYzJjYTBlODMzYWJcXD9yZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3aG9sbG93ZHJpdmVfY2FjaHlfc2lzdGVtYS5pbWclM0IrZmlsZW5hbWUlM0QlMjJob2xsb3dkcml2ZV9jYWNoeV9zaXN0ZW1hLmltZyUyMiUzQiZyZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZvY3RldC1zdHJlYW0mWC1YZXQtQ2FzLVVpZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMmdXNlcl9pZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc4NjI3NzIwMH19fV19&Signature=MEYCIQDYmN1qxEOnWkt7vCZft9CJQwonFr2J44GCu87kJSAWWQIhAIXXZ6nsgRDXncfvCG7Hb7fnnCOyaPuwbKP6GSUZMuTR&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 0
+2026-08-09 13:06:39,288 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-08-09 13:06:39,616 [DEBUG] https://huggingface.co:443 "GET /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img HTTP/1.1" 302 1235
+2026-08-09 13:06:39,617 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-08-09 13:06:40,221 [DEBUG] https://us.aws.cdn.hf.co:443 "GET /xet-bridge-us/6a5bfdc368c85db044febc71/f61c02c110d19ebd04fc19487a37d8c60d62143e671a71a5ad2b1c2ca0e833ab?user_id=6a5bfd38147a8c22c7f583b3&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_sistema.img%3B+filename%3D%22hollowdrive_cachy_sistema.img%22%3B&response-content-type=application%2Foctet-stream&X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&Expires=1786277200&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxL2Y2MWMwMmMxMTBkMTllYmQwNGZjMTk0ODdhMzdkOGM2MGQ2MjE0M2U2NzFhNzFhNWFkMmIxYzJjYTBlODMzYWJcXD91c2VyX2lkPTZhNWJmZDM4MTQ3YThjMjJjN2Y1ODNiMyZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3aG9sbG93ZHJpdmVfY2FjaHlfc2lzdGVtYS5pbWclM0IrZmlsZW5hbWUlM0QlMjJob2xsb3dkcml2ZV9jYWNoeV9zaXN0ZW1hLmltZyUyMiUzQiZyZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZvY3RldC1zdHJlYW0mWC1YZXQtQ2FzLVVpZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc4NjI3NzIwMH19fV19&Signature=MEUCIA1IpnZ~JEY6aHf4r0JozZlwTKOPYm5EJ-zvWPLqz2R3AiEAvMEqCQs7RLwWV4Cl36oHGwq3Mhm3RddsLxGaL1dIRQ0_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 13958643712
