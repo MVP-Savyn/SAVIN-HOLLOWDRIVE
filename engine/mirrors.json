@@ -1,12 +1,31 @@
 {
+  "ventoy": {
+    "mirrors": [
+      { 
+        "url": "https://github.com/ventoy/Ventoy/releases/download/v1.0.99/ventoy-1.0.99-windows.zip",
+        "priority": 1 
+      }
+    ]
+  },
   "batocera_base": {
     "mirrors": [
       { "url": "https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev/batocerumen.img" }
     ]
   },
   "batocera_games": {
+    "parts": [
+      { "url": "https://pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev/batocera.tar.001" },
+      { "url": "https://pub-d7ed6e3136e44d369b09e85feb23e5e8.r2.dev/batocera.tar.002" },
+      { "url": "https://pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev/batocera.tar.003" },
+      { "url": "https://pub-99b334f4eaad4ba8a894214f74e8a5ed.r2.dev/batocera.tar.004" },
+      { "url": "https://pub-28f8711a6e664f949664125aca117fb9.r2.dev/batocera.tar.005" }
+    ],
     "mirrors": [
-      { "url": "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/batocera-hollowpack.tar" }
+      { "url": "https://pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev/batocera.tar.001" },
+      { "url": "https://pub-d7ed6e3136e44d369b09e85feb23e5e8.r2.dev/batocera.tar.002" },
+      { "url": "https://pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev/batocera.tar.003" },
+      { "url": "https://pub-99b334f4eaad4ba8a894214f74e8a5ed.r2.dev/batocera.tar.004" },
+      { "url": "https://pub-28f8711a6e664f949664125aca117fb9.r2.dev/batocera.tar.005" }
     ]
   },
   "hollowdrive_pack": {
@@ -23,6 +42,16 @@
     "sistema": {
       "mirrors": [
         { "url": "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img" }
+      ]
+    },
+    "efi_grub_hyprland": {
+      "mirrors": [
+        { "url": "https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev/grub_boot.img" }
+      ]
+    },
+    "hyprland": {
+      "mirrors": [
+        { "url": "https://pub-a129edcf7e704b7b925dfafc7a876a15.r2.dev/cachyos_system.img" }
       ]
     }
   }

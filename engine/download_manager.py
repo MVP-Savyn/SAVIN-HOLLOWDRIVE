@@ -5,12 +5,12 @@ import requests
 import zipfile
 import tarfile
 
+# Ruta absoluta del directorio 'engine'
+ENGINE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def cargar_mirrors():
-    """Carga el archivo mirrors.json de forma segura utilizando la ruta absoluta del módulo."""
-    # Obtenemos el directorio real donde reside este archivo script de forma absoluta
-    engine_dir = os.path.dirname(os.path.abspath(__file__))
-    ruta_json = os.path.join(engine_dir, "mirrors.json")
-        
+    """ Carga el archivo mirrors.json de forma segura utilizando la ruta absoluta del módulo """
+    ruta_json = os.path.join(ENGINE_DIR, "mirrors.json")
     try:
         with open(ruta_json, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -36,23 +36,20 @@ def obtener_tamano_drive(file_id):
     
     try:
         # 1. Primer intento (stream=True para no descargar el cuerpo del archivo)
-        response = session.get(url_base, params={'id': file_id}, stream=True, timeout=5)
+        response = session.get(url_base, params={'id': file_id}, stream=True, timeout=6)
         
-        # 2. Buscamos si Google ha soltado la cookie de advertencia (para archivos grandes)
+        # 2. Buscamos si Google ha soltado la cookie de advertencia
         token = None
         for key, value in session.cookies.items():
             if key.startswith('download_warning'):
                 token = value
                 break
         
-        # 3. Si existía la cookie, repetimos la petición confirmando que "aceptamos el riesgo"
+        # 3. Si existía la cookie, confirmamos
         if token:
-            response = session.get(url_base, params={'id': file_id, 'confirm': token}, stream=True, timeout=5)
+            response = session.get(url_base, params={'id': file_id, 'confirm': token}, stream=True, timeout=6)
             
-        # 4. Leemos el tamaño real de las cabeceras de la respuesta final
         size = response.headers.get('content-length')
-        
-        # SÚPER IMPORTANTE: Cerramos la conexión de inmediato para no descargar nada
         response.close()
         
         if size:
@@ -67,16 +64,14 @@ def obtener_tamano_link(url):
     Detecta si el enlace es de Google Drive o un servidor directo (como Cloudflare R2)
     y obtiene su tamaño online de forma óptima.
     """
-    # Si es de Google Drive, usamos nuestro bypass de cookies
     if "drive.google.com" in url:
         file_id = extraer_id_drive(url)
         if file_id:
             return obtener_tamano_drive(file_id)
         return None
         
-    # Si es un servidor estándar (R2, etc.), usamos un HEAD rápido
     try:
-        response = requests.head(url, allow_redirects=True, timeout=3)
+        response = requests.head(url, allow_redirects=True, timeout=4)
         if response.status_code == 200:
             size = response.headers.get('content-length')
             if size:
@@ -100,7 +95,6 @@ def resolver_tamano_pack(clave_pack, subclave=None):
         
     mirrors = pack.get("mirrors", [])
     
-    # Intentamos obtener el tamaño online recorriendo los mirrors por orden de prioridad
     for m in sorted(mirrors, key=lambda x: x.get("priority", 99)):
         url = m.get("url")
         size_online = obtener_tamano_link(url)
@@ -108,13 +102,12 @@ def resolver_tamano_pack(clave_pack, subclave=None):
             print(f"-> Tamaño detectado online para {clave_pack}: {size_online} bytes.")
             return size_online
                 
-    # Fallback offline si no hay conexión o fallan las peticiones
     fallback_size = pack.get("size_bytes", 0)
     print(f"-> Usando tamaño local predefinido para {clave_pack}: {fallback_size} bytes.")
     return fallback_size
 
 def formatear_tamano(bytes_size):
-    """Convierte bytes a formato legible (GB o MB) para la GUI."""
+    """ Convierte bytes a formato legible (GB o MB) para la GUI """
     if not bytes_size or bytes_size <= 0:
         return "0 GB"
     gb = bytes_size / (1024 ** 3)
@@ -133,10 +126,9 @@ def descargar_archivo(url, destino, callback_progreso=None):
     file_id = extraer_id_drive(url) if is_drive else None
     
     try:
-        # Si es Google Drive, gestionamos la cookie de confirmación
         if is_drive and file_id:
             url_base = "https://docs.google.com/uc?export=download"
-            response = session.get(url_base, params={'id': file_id}, stream=True)
+            response = session.get(url_base, params={'id': file_id}, stream=True, timeout=(6.0, 15.0))
             
             token = None
             for key, value in session.cookies.items():
@@ -145,28 +137,24 @@ def descargar_archivo(url, destino, callback_progreso=None):
                     break
             
             if token:
-                response = session.get(url_base, params={'id': file_id, 'confirm': token}, stream=True)
+                response = session.get(url_base, params={'id': file_id, 'confirm': token}, stream=True, timeout=(6.0, 15.0))
         else:
-            # Descarga directa convencional
-            response = session.get(url, stream=True)
+            response = session.get(url, stream=True, timeout=(6.0, 15.0))
             
         response.raise_for_status()
         
-        # Intentamos obtener el tamaño total para la barra de progreso
         total_size = response.headers.get('content-length')
         total_size = int(total_size) if total_size else None
         
-        # Asegurar que el directorio de descarga existe
         os.makedirs(os.path.dirname(os.path.abspath(destino)), exist_ok=True)
         
         bytes_descargados = 0
         with open(destino, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
+            for chunk in response.iter_content(chunk_size=64 * 1024):
                 if chunk:
                     f.write(chunk)
                     bytes_descargados += len(chunk)
                     
-                    # Llamamos al callback si la GUI nos lo ha pasado
                     if callback_progreso and total_size:
                         progreso = bytes_descargados / total_size
                         callback_progreso(progreso, bytes_descargados, total_size)
@@ -184,7 +172,6 @@ def descargar_y_extraer_ventoy(progress_callback=None):
     data = cargar_mirrors()
     url_ventoy = None
     
-    # 1. Intentamos obtener la URL de Ventoy desde mirrors.json
     if data and "ventoy" in data:
         pack_ventoy = data["ventoy"]
         mirrors = pack_ventoy.get("mirrors", [])
@@ -192,14 +179,13 @@ def descargar_y_extraer_ventoy(progress_callback=None):
             mirrors_ordenados = sorted(mirrors, key=lambda x: x.get("priority", 99))
             url_ventoy = mirrors_ordenados[0].get("url")
             
-    # Fallback si no hay mirrors.json o falta la clave "ventoy"
     if not url_ventoy:
         url_ventoy = "https://github.com/ventoy/Ventoy/releases/download/v1.0.99/ventoy-1.0.99-windows.zip"
         print(f"-> 'ventoy' no detectado en mirrors.json. Usando fallback oficial: {url_ventoy}")
 
-    # 2. Definir rutas temporales de descarga
-    temp_dir = "temp"
-    nombre_archivo = url_ventoy.split("/")[-1].split("?")[0] # Limpiamos posibles parámetros de la URL
+    temp_dir = os.path.join(ENGINE_DIR, "temp_downloads")
+    os.makedirs(temp_dir, exist_ok=True)
+    nombre_archivo = url_ventoy.split("/")[-1].split("?")[0]
     ruta_destino_zip = os.path.join(temp_dir, nombre_archivo)
     
     print(f"-> Descargando Ventoy desde: {url_ventoy}")
@@ -209,10 +195,7 @@ def descargar_y_extraer_ventoy(progress_callback=None):
         print("Error: Falló la descarga de Ventoy.")
         return False
         
-    # 3. Extraer el archivo en la carpeta 'engine'
-    ruta_extraccion = "engine"
-    os.makedirs(ruta_extraccion, exist_ok=True)
-    
+    ruta_extraccion = ENGINE_DIR
     print(f"-> Extrayendo {nombre_archivo} en '{ruta_extraccion}'...")
     try:
         if nombre_archivo.endswith(".zip"):
@@ -225,13 +208,15 @@ def descargar_y_extraer_ventoy(progress_callback=None):
             print("Error: El formato de compresión de Ventoy no es compatible (.zip o .tar.gz).")
             return False
             
-        # Limpieza del archivo comprimido temporal
-        if os.path.exists(ruta_destino_zip):
-            os.remove(ruta_destino_zip)
-            
         print("-> ¡Ventoy se ha descargado y extraído correctamente!")
         return True
         
     except Exception as e:
         print(f"Error crítico durante la extracción de Ventoy: {e}")
         return False
+    finally:
+        if os.path.exists(ruta_destino_zip):
+            try:
+                os.remove(ruta_destino_zip)
+            except Exception:
+                pass

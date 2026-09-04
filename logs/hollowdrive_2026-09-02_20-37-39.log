@@ -1,0 +1,375 @@
+2026-09-02 20:37:39,578 [INFO] === INICIANDO HOLLOWDRIVE V12.5 ===
+2026-09-02 20:37:39,578 [INFO] Ruta base del programa: D:\Documents\vscode\SAVIN-HOLLOWDRIVE
+2026-09-02 20:37:39,578 [INFO] Archivo de registro de la sesión: D:\Documents\vscode\SAVIN-HOLLOWDRIVE\logs\hollowdrive_2026-09-02_20-37-39.log
+2026-09-02 20:37:39,580 [DEBUG] Starting new HTTPS connection (1): raw.githubusercontent.com:443
+2026-09-02 20:37:40,033 [DEBUG] https://raw.githubusercontent.com:443 "GET /MVP-Savyn/SAVIN-HOLLOWDRIVE/main/engine/mirrors.json HTTP/1.1" 404 14
+2026-09-02 20:37:40,161 [DEBUG] Importing PngImagePlugin
+2026-09-02 20:37:40,172 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,172 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,172 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,172 [DEBUG] STREAM b'iTXt' 254 1377
+2026-09-02 20:37:40,172 [DEBUG] STREAM b'IDAT' 1643 8192
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'iTXt' 254 1377
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'IDAT' 1643 8192
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'iTXt' 254 1379
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'iTXt' 254 1379
+2026-09-02 20:37:40,173 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'iTXt' 254 1390
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IDAT' 1656 8192
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'iTXt' 254 1379
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IDAT' 41 4096
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'iTXt' 254 1390
+2026-09-02 20:37:40,174 [DEBUG] STREAM b'IDAT' 1656 8192
+2026-09-02 20:37:40,175 [DEBUG] Importing GifImagePlugin
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'iTXt' 254 1386
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-02 20:37:40,183 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-02 20:37:40,184 [DEBUG] STREAM b'iTXt' 254 1386
+2026-09-02 20:37:40,184 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-09-02 20:37:40,535 [DEBUG] STREAM b'IDAT' 9475 6
+2026-09-02 20:37:40,906 [INFO] -> Usando tamaño local predefinido para bato_64: 0 bytes.
+2026-09-02 20:37:40,907 [INFO] -> Usando tamaño local predefinido para batocera_64: 0 bytes.
+2026-09-02 20:37:40,907 [INFO] -> Usando tamaño local predefinido para bato_32: 0 bytes.
+2026-09-02 20:37:40,907 [INFO] -> Usando tamaño local predefinido para batocera_32: 0 bytes.
+2026-09-02 20:37:40,908 [INFO] -> Usando tamaño local predefinido para pack_bato: 0 bytes.
+2026-09-02 20:37:40,908 [INFO] -> Usando tamaño local predefinido para pack_batocera: 0 bytes.
+2026-09-02 20:37:40,908 [INFO] -> Usando tamaño local predefinido para pack_hollow: 0 bytes.
+2026-09-02 20:37:40,908 [INFO] -> Usando tamaño local predefinido para pack_hollow: 0 bytes.
+2026-09-02 20:37:41,914 [DEBUG] Starting new HTTPS connection (1): api.github.com:443
+2026-09-02 20:37:42,501 [DEBUG] https://api.github.com:443 "GET /repos/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest HTTP/1.1" 404 125
+2026-09-02 20:37:49,186 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-02 20:37:49,428 [DEBUG] https://huggingface.co:443 "HEAD / HTTP/1.1" 200 0
+2026-09-02 20:38:17,967 [INFO] Exclusión de Windows Defender añadida para: F:\
+2026-09-02 20:38:17,990 [ERROR] D:\Documents\vscode\SAVIN-HOLLOWDRIVE\Savin_GUI.py:3287: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.
+2026-09-02 20:38:17,990 [ERROR]   tar.extract(member, path=letra_hollow)
+2026-09-02 20:38:25,239 [INFO] [+] Letra asignada dinámicamente para GRUB: G:
+2026-09-02 20:38:26,634 [INFO] =======================================================
+2026-09-02 20:38:26,634 [INFO] [DIAGNÓSTICO RAM] Iniciando Stream Directo a USB: \\.\G:
+2026-09-02 20:38:26,634 [INFO] =======================================================
+2026-09-02 20:38:26,637 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-02 20:38:27,018 [DEBUG] https://huggingface.co:443 "HEAD /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img HTTP/1.1" 302 0
+2026-09-02 20:38:27,019 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-09-02 20:38:27,470 [DEBUG] https://us.aws.cdn.hf.co:443 "HEAD /xet-bridge-us/6a5bfdc368c85db044febc71/984f0f2f2ca65fbf97fb2cc0399523ad8bbac5364c108d711bdbd60319daade5?X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_efi.img%3B+filename%3D%22hollowdrive_cachy_efi.img%22%3B&user_id=6a5bfd38147a8c22c7f583b3&response-content-type=application%2Foctet-stream&Expires=1788377907&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxLzk4NGYwZjJmMmNhNjVmYmY5N2ZiMmNjMDM5OTUyM2FkOGJiYWM1MzY0YzEwOGQ3MTFiZGJkNjAzMTlkYWFkZTVcXD9YLVhldC1DYXMtVWlkPTZhNWJmZDM4MTQ3YThjMjJjN2Y1ODNiMyZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3aG9sbG93ZHJpdmVfY2FjaHlfZWZpLmltZyUzQitmaWxlbmFtZSUzRCUyMmhvbGxvd2RyaXZlX2NhY2h5X2VmaS5pbWclMjIlM0ImdXNlcl9pZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMmcmVzcG9uc2UtY29udGVudC10eXBlPWFwcGxpY2F0aW9uJTJGb2N0ZXQtc3RyZWFtIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJFcG9jaFRpbWUiOjE3ODgzNzc5MDd9fX1dfQ__&Signature=MEUCIGS02LXWsM906UqHK~XU18eCQC9AmMXK7Tl7AgdDwwgRAiEA38zidDfBnMrwpw7ETNZkk0hVqe18EvBpgjRZ02H2Pn0_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 0
+2026-09-02 20:38:27,472 [INFO] [RAM -> USB] Llenando colchón inicial de precarga en RAM...
+2026-09-02 20:38:27,473 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-02 20:38:27,824 [DEBUG] https://huggingface.co:443 "GET /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img HTTP/1.1" 302 1217
+2026-09-02 20:38:27,826 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-09-02 20:38:28,448 [DEBUG] https://us.aws.cdn.hf.co:443 "GET /xet-bridge-us/6a5bfdc368c85db044febc71/984f0f2f2ca65fbf97fb2cc0399523ad8bbac5364c108d711bdbd60319daade5?response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_efi.img%3B+filename%3D%22hollowdrive_cachy_efi.img%22%3B&response-content-type=application%2Foctet-stream&X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&user_id=6a5bfd38147a8c22c7f583b3&Expires=1788377908&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxLzk4NGYwZjJmMmNhNjVmYmY5N2ZiMmNjMDM5OTUyM2FkOGJiYWM1MzY0YzEwOGQ3MTFiZGJkNjAzMTlkYWFkZTVcXD9yZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3aG9sbG93ZHJpdmVfY2FjaHlfZWZpLmltZyUzQitmaWxlbmFtZSUzRCUyMmhvbGxvd2RyaXZlX2NhY2h5X2VmaS5pbWclMjIlM0ImcmVzcG9uc2UtY29udGVudC10eXBlPWFwcGxpY2F0aW9uJTJGb2N0ZXQtc3RyZWFtJlgtWGV0LUNhcy1VaWQ9NmE1YmZkMzgxNDdhOGMyMmM3ZjU4M2IzJnVzZXJfaWQ9NmE1YmZkMzgxNDdhOGMyMmM3ZjU4M2IzIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJFcG9jaFRpbWUiOjE3ODgzNzc5MDh9fX1dfQ__&Signature=MEUCIA1R-bv45kNLVx9wPywkTkQM29DfWcVeLD25u5R3esZ1AiEAmpN6HoExLO5rFyN3b1e5ndzzraUkkH9BZEPlPGogaNg_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 537587712
+2026-09-02 20:38:29,134 [INFO] [RED -> RAM] Descargados: 0 MB | Vel. Red: 0.3 MB/s | Cola: 1/256
+2026-09-02 20:38:30,436 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 16.9 MB/s | Cola: 82/256
+2026-09-02 20:38:30,436 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 17.0 MB/s | Cola: 83/256
+2026-09-02 20:38:31,351 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 25.8 MB/s | Cola: 173/256
+2026-09-02 20:38:31,363 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 25.8 MB/s | Cola: 174/256
+2026-09-02 20:38:33,440 [WARNING] [  2.6%] [RAM -> USB] 14 MB | WriteFile lento:  2866 ms | Cola: 256/256
+2026-09-02 20:38:33,701 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 24.1 MB/s | Cola: 256/256
+2026-09-02 20:38:33,717 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 24.1 MB/s | Cola: 256/256
+2026-09-02 20:38:33,820 [INFO] [  4.9%] [RAM -> USB] 25 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:38:37,365 [WARNING] [  9.1%] [RAM -> USB] 46 MB | WriteFile lento:  2853 ms | Cola: 256/256
+2026-09-02 20:38:37,480 [INFO] [  9.8%] [RAM -> USB] 50 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:38:38,299 [INFO] [ 14.6%] [RAM -> USB] 75 MB | WriteFile:    16 ms | Cola: 215/256
+2026-09-02 20:38:39,158 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 17.1 MB/s | Cola: 241/256
+2026-09-02 20:38:39,174 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 17.1 MB/s | Cola: 242/256
+2026-09-02 20:38:41,283 [WARNING] [ 15.5%] [RAM -> USB] 80 MB | WriteFile lento:  2848 ms | Cola: 256/256
+2026-09-02 20:38:41,952 [INFO] [ 19.5%] [RAM -> USB] 100 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:38:45,219 [WARNING] [ 21.9%] [RAM -> USB] 112 MB | WriteFile lento:  2866 ms | Cola: 256/256
+2026-09-02 20:38:45,511 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 13.9 MB/s | Cola: 256/256
+2026-09-02 20:38:45,527 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 13.9 MB/s | Cola: 256/256
+2026-09-02 20:38:45,631 [INFO] [ 24.4%] [RAM -> USB] 125 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:38:49,152 [WARNING] [ 28.4%] [RAM -> USB] 146 MB | WriteFile lento:  2862 ms | Cola: 256/256
+2026-09-02 20:38:49,300 [INFO] [ 29.3%] [RAM -> USB] 150 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:38:50,007 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 13.3 MB/s | Cola: 256/256
+2026-09-02 20:38:50,023 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 13.3 MB/s | Cola: 256/256
+2026-09-02 20:38:50,119 [INFO] [ 34.1%] [RAM -> USB] 175 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:38:53,068 [WARNING] [ 34.8%] [RAM -> USB] 178 MB | WriteFile lento:  2847 ms | Cola: 256/256
+2026-09-02 20:38:53,777 [INFO] [ 39.0%] [RAM -> USB] 200 MB | WriteFile:    22 ms | Cola: 256/256
+2026-09-02 20:38:56,981 [WARNING] [ 41.3%] [RAM -> USB] 212 MB | WriteFile lento:  2842 ms | Cola: 256/256
+2026-09-02 20:38:57,305 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 11.7 MB/s | Cola: 256/256
+2026-09-02 20:38:57,328 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 11.7 MB/s | Cola: 256/256
+2026-09-02 20:38:57,426 [INFO] [ 43.9%] [RAM -> USB] 225 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:00,922 [WARNING] [ 47.7%] [RAM -> USB] 244 MB | WriteFile lento:  2867 ms | Cola: 256/256
+2026-09-02 20:39:01,103 [INFO] [ 48.8%] [RAM -> USB] 250 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:01,810 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 11.6 MB/s | Cola: 256/256
+2026-09-02 20:39:01,826 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 11.7 MB/s | Cola: 256/256
+2026-09-02 20:39:01,922 [INFO] [ 53.6%] [RAM -> USB] 275 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:04,853 [WARNING] [ 54.1%] [RAM -> USB] 278 MB | WriteFile lento:  2861 ms | Cola: 256/256
+2026-09-02 20:39:05,596 [INFO] [ 58.5%] [RAM -> USB] 300 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:08,776 [WARNING] [ 60.6%] [RAM -> USB] 310 MB | WriteFile lento:  2846 ms | Cola: 256/256
+2026-09-02 20:39:09,137 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 10.8 MB/s | Cola: 256/256
+2026-09-02 20:39:09,153 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 10.8 MB/s | Cola: 256/256
+2026-09-02 20:39:09,250 [INFO] [ 63.4%] [RAM -> USB] 325 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:12,682 [WARNING] [ 67.0%] [RAM -> USB] 344 MB | WriteFile lento:  2841 ms | Cola: 256/256
+2026-09-02 20:39:12,895 [INFO] [ 68.3%] [RAM -> USB] 350 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:13,601 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 10.8 MB/s | Cola: 256/256
+2026-09-02 20:39:13,617 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 10.8 MB/s | Cola: 256/256
+2026-09-02 20:39:13,715 [INFO] [ 73.1%] [RAM -> USB] 375 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:16,617 [WARNING] [ 73.4%] [RAM -> USB] 376 MB | WriteFile lento:  2865 ms | Cola: 256/256
+2026-09-02 20:39:16,880 [INFO] ✔ Parte descargada con éxito (512.7 MB). Pasando a la siguiente...
+2026-09-02 20:39:17,392 [INFO] [ 78.0%] [RAM -> USB] 400 MB | WriteFile:    16 ms | Cola: 227/256
+2026-09-02 20:39:20,551 [WARNING] [ 79.9%] [RAM -> USB] 410 MB | WriteFile lento:  2859 ms | Cola: 208/256
+2026-09-02 20:39:21,060 [INFO] [ 82.9%] [RAM -> USB] 425 MB | WriteFile:    16 ms | Cola: 177/256
+2026-09-02 20:39:24,463 [WARNING] [ 86.3%] [RAM -> USB] 442 MB | WriteFile lento:  2846 ms | Cola: 142/256
+2026-09-02 20:39:24,708 [INFO] [ 87.8%] [RAM -> USB] 450 MB | WriteFile:    16 ms | Cola: 127/256
+2026-09-02 20:39:25,534 [INFO] [ 92.6%] [RAM -> USB] 475 MB | WriteFile:    22 ms | Cola:  77/256
+2026-09-02 20:39:28,376 [WARNING] [ 92.7%] [RAM -> USB] 476 MB | WriteFile lento:  2842 ms | Cola:  76/256
+2026-09-02 20:39:29,181 [INFO] [ 97.5%] [RAM -> USB] 500 MB | WriteFile:    16 ms | Cola:  27/256
+2026-09-02 20:39:29,607 [INFO] =======================================================
+
+2026-09-02 20:39:37,017 [INFO] [+] Letra asignada dinámicamente para CachyOS: H:
+2026-09-02 20:39:38,427 [INFO] =======================================================
+2026-09-02 20:39:38,427 [INFO] [DIAGNÓSTICO RAM] Iniciando Stream Directo a USB: \\.\H:
+2026-09-02 20:39:38,428 [INFO] =======================================================
+2026-09-02 20:39:38,430 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-02 20:39:38,835 [DEBUG] https://huggingface.co:443 "HEAD /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img HTTP/1.1" 302 0
+2026-09-02 20:39:38,837 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-09-02 20:39:39,272 [DEBUG] https://us.aws.cdn.hf.co:443 "HEAD /xet-bridge-us/6a5bfdc368c85db044febc71/f61c02c110d19ebd04fc19487a37d8c60d62143e671a71a5ad2b1c2ca0e833ab?X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&response-content-type=application%2Foctet-stream&user_id=6a5bfd38147a8c22c7f583b3&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_sistema.img%3B+filename%3D%22hollowdrive_cachy_sistema.img%22%3B&Expires=1788377979&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxL2Y2MWMwMmMxMTBkMTllYmQwNGZjMTk0ODdhMzdkOGM2MGQ2MjE0M2U2NzFhNzFhNWFkMmIxYzJjYTBlODMzYWJcXD9YLVhldC1DYXMtVWlkPTZhNWJmZDM4MTQ3YThjMjJjN2Y1ODNiMyZyZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZvY3RldC1zdHJlYW0mdXNlcl9pZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN2hvbGxvd2RyaXZlX2NhY2h5X3Npc3RlbWEuaW1nJTNCK2ZpbGVuYW1lJTNEJTIyaG9sbG93ZHJpdmVfY2FjaHlfc2lzdGVtYS5pbWclMjIlM0IiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc4ODM3Nzk3OX19fV19&Signature=MEUCIQD5m2EoerTMegOUD6uNS67Yl1o4SL1xQVPNamaO2QSbDAIgV9MW5TfK5Zz-8kkkZHOhuQd-DDv7zfbD9AiBu8g-izw_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 0
+2026-09-02 20:39:39,275 [INFO] [RAM -> USB] Llenando colchón inicial de precarga en RAM...
+2026-09-02 20:39:39,276 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-02 20:39:39,625 [DEBUG] https://huggingface.co:443 "GET /datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img HTTP/1.1" 302 1233
+2026-09-02 20:39:39,626 [DEBUG] Starting new HTTPS connection (1): us.aws.cdn.hf.co:443
+2026-09-02 20:39:40,247 [DEBUG] https://us.aws.cdn.hf.co:443 "GET /xet-bridge-us/6a5bfdc368c85db044febc71/f61c02c110d19ebd04fc19487a37d8c60d62143e671a71a5ad2b1c2ca0e833ab?response-content-disposition=inline%3B+filename*%3DUTF-8%27%27hollowdrive_cachy_sistema.img%3B+filename%3D%22hollowdrive_cachy_sistema.img%22%3B&user_id=6a5bfd38147a8c22c7f583b3&response-content-type=application%2Foctet-stream&X-Xet-Cas-Uid=6a5bfd38147a8c22c7f583b3&Expires=1788377980&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmE1YmZkYzM2OGM4NWRiMDQ0ZmViYzcxL2Y2MWMwMmMxMTBkMTllYmQwNGZjMTk0ODdhMzdkOGM2MGQ2MjE0M2U2NzFhNzFhNWFkMmIxYzJjYTBlODMzYWJcXD9yZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3aG9sbG93ZHJpdmVfY2FjaHlfc2lzdGVtYS5pbWclM0IrZmlsZW5hbWUlM0QlMjJob2xsb3dkcml2ZV9jYWNoeV9zaXN0ZW1hLmltZyUyMiUzQiZ1c2VyX2lkPTZhNWJmZDM4MTQ3YThjMjJjN2Y1ODNiMyZyZXNwb25zZS1jb250ZW50LXR5cGU9YXBwbGljYXRpb24lMkZvY3RldC1zdHJlYW0mWC1YZXQtQ2FzLVVpZD02YTViZmQzODE0N2E4YzIyYzdmNTgzYjMiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc4ODM3Nzk4MH19fV19&Signature=MEYCIQDvrqTnb2aQmtq1JywcUttYpxxEWBQL8SwKvOMpm0rHgQIhAKBlSa5B2pE8nmx4Fo4SnkjNHNteI0ofzRLUTUkBiOq6&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F HTTP/1.1" 200 13958643712
+2026-09-02 20:39:41,359 [INFO] [RED -> RAM] Descargados: 0 MB | Vel. Red: 0.2 MB/s | Cola: 1/256
+2026-09-02 20:39:42,728 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 14.5 MB/s | Cola: 94/256
+2026-09-02 20:39:42,729 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 14.6 MB/s | Cola: 95/256
+2026-09-02 20:39:43,461 [INFO] [  0.2%] [RAM -> USB] 25 MB | WriteFile:    16 ms | Cola: 131/256
+2026-09-02 20:39:43,639 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 22.9 MB/s | Cola: 139/256
+2026-09-02 20:39:43,650 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 23.0 MB/s | Cola: 139/256
+2026-09-02 20:39:44,275 [INFO] [  0.4%] [RAM -> USB] 50 MB | WriteFile:    16 ms | Cola: 166/256
+2026-09-02 20:39:44,595 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 28.2 MB/s | Cola: 199/256
+2026-09-02 20:39:44,604 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 28.2 MB/s | Cola: 200/256
+2026-09-02 20:39:47,115 [WARNING] [  0.4%] [RAM -> USB] 50 MB | WriteFile lento:  2841 ms | Cola: 256/256
+2026-09-02 20:39:47,801 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 23.5 MB/s | Cola: 256/256
+2026-09-02 20:39:47,821 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 23.5 MB/s | Cola: 256/256
+2026-09-02 20:39:47,918 [INFO] [  0.6%] [RAM -> USB] 75 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:51,043 [WARNING] [  0.6%] [RAM -> USB] 84 MB | WriteFile lento:  2860 ms | Cola: 256/256
+2026-09-02 20:39:51,586 [INFO] [  0.8%] [RAM -> USB] 100 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:54,956 [WARNING] [  0.9%] [RAM -> USB] 116 MB | WriteFile lento:  2841 ms | Cola: 256/256
+2026-09-02 20:39:55,119 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 15.8 MB/s | Cola: 256/256
+2026-09-02 20:39:55,135 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 15.8 MB/s | Cola: 256/256
+2026-09-02 20:39:55,230 [INFO] [  0.9%] [RAM -> USB] 125 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:58,862 [WARNING] [  1.1%] [RAM -> USB] 150 MB | WriteFile lento:  2839 ms | Cola: 256/256
+2026-09-02 20:39:58,882 [INFO] [  1.1%] [RAM -> USB] 150 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:39:59,583 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 14.8 MB/s | Cola: 256/256
+2026-09-02 20:39:59,600 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 14.8 MB/s | Cola: 256/256
+2026-09-02 20:39:59,698 [INFO] [  1.3%] [RAM -> USB] 175 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:02,786 [WARNING] [  1.4%] [RAM -> USB] 182 MB | WriteFile lento:  2858 ms | Cola: 256/256
+2026-09-02 20:40:03,360 [INFO] [  1.5%] [RAM -> USB] 200 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:06,710 [WARNING] [  1.6%] [RAM -> USB] 216 MB | WriteFile lento:  2856 ms | Cola: 256/256
+2026-09-02 20:40:06,908 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 12.7 MB/s | Cola: 256/256
+2026-09-02 20:40:06,924 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 12.7 MB/s | Cola: 256/256
+2026-09-02 20:40:07,019 [INFO] [  1.7%] [RAM -> USB] 225 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:10,624 [WARNING] [  1.9%] [RAM -> USB] 248 MB | WriteFile lento:  2844 ms | Cola: 256/256
+2026-09-02 20:40:10,676 [INFO] [  1.9%] [RAM -> USB] 250 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:11,380 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 12.5 MB/s | Cola: 256/256
+2026-09-02 20:40:11,397 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 12.5 MB/s | Cola: 256/256
+2026-09-02 20:40:11,495 [INFO] [  2.1%] [RAM -> USB] 275 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:14,536 [WARNING] [  2.1%] [RAM -> USB] 282 MB | WriteFile lento:  2842 ms | Cola: 256/256
+2026-09-02 20:40:15,142 [INFO] [  2.3%] [RAM -> USB] 300 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:18,469 [WARNING] [  2.4%] [RAM -> USB] 314 MB | WriteFile lento:  2863 ms | Cola: 256/256
+2026-09-02 20:40:18,698 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 11.4 MB/s | Cola: 256/256
+2026-09-02 20:40:18,714 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 11.4 MB/s | Cola: 256/256
+2026-09-02 20:40:18,817 [INFO] [  2.4%] [RAM -> USB] 325 MB | WriteFile:    23 ms | Cola: 256/256
+2026-09-02 20:40:22,399 [WARNING] [  2.6%] [RAM -> USB] 348 MB | WriteFile lento:  2857 ms | Cola: 256/256
+2026-09-02 20:40:22,482 [INFO] [  2.6%] [RAM -> USB] 350 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:23,188 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 11.4 MB/s | Cola: 256/256
+2026-09-02 20:40:23,204 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 11.4 MB/s | Cola: 256/256
+2026-09-02 20:40:23,302 [INFO] [  2.8%] [RAM -> USB] 375 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:26,313 [WARNING] [  2.9%] [RAM -> USB] 380 MB | WriteFile lento:  2845 ms | Cola: 256/256
+2026-09-02 20:40:26,951 [INFO] [  3.0%] [RAM -> USB] 400 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:30,222 [WARNING] [  3.1%] [RAM -> USB] 414 MB | WriteFile lento:  2840 ms | Cola: 256/256
+2026-09-02 20:40:30,485 [INFO] [RED -> RAM] Descargados: 550 MB | Vel. Red: 10.7 MB/s | Cola: 256/256
+2026-09-02 20:40:30,501 [INFO] [RED -> RAM] Descargados: 550 MB | Vel. Red: 10.7 MB/s | Cola: 256/256
+2026-09-02 20:40:30,604 [INFO] [  3.2%] [RAM -> USB] 425 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:34,159 [WARNING] [  3.4%] [RAM -> USB] 446 MB | WriteFile lento:  2864 ms | Cola: 256/256
+2026-09-02 20:40:34,276 [INFO] [  3.4%] [RAM -> USB] 450 MB | WriteFile:    17 ms | Cola: 256/256
+2026-09-02 20:40:34,980 [INFO] [RED -> RAM] Descargados: 600 MB | Vel. Red: 10.8 MB/s | Cola: 256/256
+2026-09-02 20:40:34,996 [INFO] [RED -> RAM] Descargados: 600 MB | Vel. Red: 10.8 MB/s | Cola: 256/256
+2026-09-02 20:40:35,092 [INFO] [  3.6%] [RAM -> USB] 475 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:38,087 [WARNING] [  3.6%] [RAM -> USB] 480 MB | WriteFile lento:  2858 ms | Cola: 256/256
+2026-09-02 20:40:38,754 [INFO] [  3.8%] [RAM -> USB] 500 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:41,997 [WARNING] [  3.8%] [RAM -> USB] 512 MB | WriteFile lento:  2842 ms | Cola: 256/256
+2026-09-02 20:40:42,294 [INFO] [RED -> RAM] Descargados: 650 MB | Vel. Red: 10.3 MB/s | Cola: 256/256
+2026-09-02 20:40:42,310 [INFO] [RED -> RAM] Descargados: 650 MB | Vel. Red: 10.3 MB/s | Cola: 256/256
+2026-09-02 20:40:42,413 [INFO] [  3.9%] [RAM -> USB] 525 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:45,908 [WARNING] [  4.1%] [RAM -> USB] 546 MB | WriteFile lento:  2838 ms | Cola: 256/256
+2026-09-02 20:40:46,058 [INFO] [  4.1%] [RAM -> USB] 550 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:46,763 [INFO] [RED -> RAM] Descargados: 700 MB | Vel. Red: 10.4 MB/s | Cola: 256/256
+2026-09-02 20:40:46,779 [INFO] [RED -> RAM] Descargados: 700 MB | Vel. Red: 10.4 MB/s | Cola: 256/256
+2026-09-02 20:40:46,875 [INFO] [  4.3%] [RAM -> USB] 575 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:49,835 [WARNING] [  4.3%] [RAM -> USB] 578 MB | WriteFile lento:  2854 ms | Cola: 256/256
+2026-09-02 20:40:50,543 [INFO] [  4.5%] [RAM -> USB] 600 MB | WriteFile:    22 ms | Cola: 256/256
+2026-09-02 20:40:53,744 [WARNING] [  4.6%] [RAM -> USB] 612 MB | WriteFile lento:  2839 ms | Cola: 256/256
+2026-09-02 20:40:54,069 [INFO] [RED -> RAM] Descargados: 750 MB | Vel. Red: 10.0 MB/s | Cola: 256/256
+2026-09-02 20:40:54,092 [INFO] [RED -> RAM] Descargados: 750 MB | Vel. Red: 10.0 MB/s | Cola: 256/256
+2026-09-02 20:40:54,189 [INFO] [  4.7%] [RAM -> USB] 625 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:57,674 [WARNING] [  4.8%] [RAM -> USB] 644 MB | WriteFile lento:  2856 ms | Cola: 256/256
+2026-09-02 20:40:57,855 [INFO] [  4.9%] [RAM -> USB] 650 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:40:58,563 [INFO] [RED -> RAM] Descargados: 800 MB | Vel. Red: 10.1 MB/s | Cola: 256/256
+2026-09-02 20:40:58,579 [INFO] [RED -> RAM] Descargados: 800 MB | Vel. Red: 10.1 MB/s | Cola: 256/256
+2026-09-02 20:40:58,674 [INFO] [  5.1%] [RAM -> USB] 675 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:01,595 [WARNING] [  5.1%] [RAM -> USB] 678 MB | WriteFile lento:  2850 ms | Cola: 256/256
+2026-09-02 20:41:02,334 [INFO] [  5.3%] [RAM -> USB] 700 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:05,502 [WARNING] [  5.3%] [RAM -> USB] 710 MB | WriteFile lento:  2839 ms | Cola: 256/256
+2026-09-02 20:41:05,867 [INFO] [RED -> RAM] Descargados: 850 MB | Vel. Red: 9.8 MB/s | Cola: 256/256
+2026-09-02 20:41:05,883 [INFO] [RED -> RAM] Descargados: 850 MB | Vel. Red: 9.8 MB/s | Cola: 256/256
+2026-09-02 20:41:05,981 [INFO] [  5.4%] [RAM -> USB] 725 MB | WriteFile:    17 ms | Cola: 256/256
+2026-09-02 20:41:09,410 [WARNING] [  5.6%] [RAM -> USB] 744 MB | WriteFile lento:  2837 ms | Cola: 256/256
+2026-09-02 20:41:09,623 [INFO] [  5.6%] [RAM -> USB] 750 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:10,324 [INFO] [RED -> RAM] Descargados: 900 MB | Vel. Red: 9.9 MB/s | Cola: 256/256
+2026-09-02 20:41:10,340 [INFO] [RED -> RAM] Descargados: 900 MB | Vel. Red: 9.9 MB/s | Cola: 256/256
+2026-09-02 20:41:10,438 [INFO] [  5.8%] [RAM -> USB] 775 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:13,337 [WARNING] [  5.8%] [RAM -> USB] 776 MB | WriteFile lento:  2863 ms | Cola: 256/256
+2026-09-02 20:41:14,111 [INFO] [  6.0%] [RAM -> USB] 800 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:17,265 [WARNING] [  6.1%] [RAM -> USB] 810 MB | WriteFile lento:  2858 ms | Cola: 256/256
+2026-09-02 20:41:17,661 [INFO] [RED -> RAM] Descargados: 950 MB | Vel. Red: 9.7 MB/s | Cola: 256/256
+2026-09-02 20:41:17,678 [INFO] [RED -> RAM] Descargados: 950 MB | Vel. Red: 9.7 MB/s | Cola: 256/256
+2026-09-02 20:41:17,775 [INFO] [  6.2%] [RAM -> USB] 825 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:21,178 [WARNING] [  6.3%] [RAM -> USB] 842 MB | WriteFile lento:  2841 ms | Cola: 256/256
+2026-09-02 20:41:21,423 [INFO] [  6.4%] [RAM -> USB] 850 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:22,130 [INFO] [RED -> RAM] Descargados: 1000 MB | Vel. Red: 9.7 MB/s | Cola: 256/256
+2026-09-02 20:41:22,146 [INFO] [RED -> RAM] Descargados: 1000 MB | Vel. Red: 9.7 MB/s | Cola: 256/256
+2026-09-02 20:41:22,250 [INFO] [  6.6%] [RAM -> USB] 875 MB | WriteFile:    22 ms | Cola: 256/256
+2026-09-02 20:41:25,089 [WARNING] [  6.6%] [RAM -> USB] 876 MB | WriteFile lento:  2838 ms | Cola: 256/256
+2026-09-02 20:41:25,891 [INFO] [  6.8%] [RAM -> USB] 900 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:29,012 [WARNING] [  6.8%] [RAM -> USB] 908 MB | WriteFile lento:  2857 ms | Cola: 256/256
+2026-09-02 20:41:29,439 [INFO] [RED -> RAM] Descargados: 1050 MB | Vel. Red: 9.5 MB/s | Cola: 256/256
+2026-09-02 20:41:29,455 [INFO] [RED -> RAM] Descargados: 1050 MB | Vel. Red: 9.5 MB/s | Cola: 256/256
+2026-09-02 20:41:29,553 [INFO] [  6.9%] [RAM -> USB] 925 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:32,934 [WARNING] [  7.1%] [RAM -> USB] 942 MB | WriteFile lento:  2850 ms | Cola: 256/256
+2026-09-02 20:41:33,211 [INFO] [  7.1%] [RAM -> USB] 950 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:33,919 [INFO] [RED -> RAM] Descargados: 1100 MB | Vel. Red: 9.6 MB/s | Cola: 256/256
+2026-09-02 20:41:33,937 [INFO] [RED -> RAM] Descargados: 1100 MB | Vel. Red: 9.6 MB/s | Cola: 256/256
+2026-09-02 20:41:36,854 [WARNING] [  7.3%] [RAM -> USB] 974 MB | WriteFile lento:  2849 ms | Cola: 256/256
+2026-09-02 20:41:36,874 [INFO] [  7.3%] [RAM -> USB] 975 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:37,696 [INFO] [  7.5%] [RAM -> USB] 1000 MB | WriteFile:    17 ms | Cola: 256/256
+2026-09-02 20:41:40,775 [WARNING] [  7.6%] [RAM -> USB] 1008 MB | WriteFile lento:  2849 ms | Cola: 256/256
+2026-09-02 20:41:41,238 [INFO] [RED -> RAM] Descargados: 1150 MB | Vel. Red: 9.4 MB/s | Cola: 256/256
+2026-09-02 20:41:41,254 [INFO] [RED -> RAM] Descargados: 1150 MB | Vel. Red: 9.4 MB/s | Cola: 256/256
+2026-09-02 20:41:41,351 [INFO] [  7.7%] [RAM -> USB] 1025 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:44,708 [WARNING] [  7.8%] [RAM -> USB] 1040 MB | WriteFile lento:  2862 ms | Cola: 256/256
+2026-09-02 20:41:45,017 [INFO] [  7.9%] [RAM -> USB] 1050 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:45,726 [INFO] [RED -> RAM] Descargados: 1200 MB | Vel. Red: 9.5 MB/s | Cola: 256/256
+2026-09-02 20:41:45,741 [INFO] [RED -> RAM] Descargados: 1200 MB | Vel. Red: 9.5 MB/s | Cola: 256/256
+2026-09-02 20:41:48,632 [WARNING] [  8.1%] [RAM -> USB] 1074 MB | WriteFile lento:  2852 ms | Cola: 256/256
+2026-09-02 20:41:48,683 [INFO] [  8.1%] [RAM -> USB] 1075 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:49,505 [INFO] [  8.3%] [RAM -> USB] 1100 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:52,563 [WARNING] [  8.3%] [RAM -> USB] 1106 MB | WriteFile lento:  2860 ms | Cola: 256/256
+2026-09-02 20:41:53,058 [INFO] [RED -> RAM] Descargados: 1250 MB | Vel. Red: 9.3 MB/s | Cola: 256/256
+2026-09-02 20:41:53,074 [INFO] [RED -> RAM] Descargados: 1250 MB | Vel. Red: 9.3 MB/s | Cola: 256/256
+2026-09-02 20:41:53,171 [INFO] [  8.5%] [RAM -> USB] 1125 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:41:56,476 [WARNING] [  8.6%] [RAM -> USB] 1140 MB | WriteFile lento:  2843 ms | Cola: 256/256
+2026-09-02 20:41:56,824 [INFO] [  8.6%] [RAM -> USB] 1150 MB | WriteFile:    23 ms | Cola: 256/256
+2026-09-02 20:41:57,527 [INFO] [RED -> RAM] Descargados: 1300 MB | Vel. Red: 9.4 MB/s | Cola: 256/256
+2026-09-02 20:41:57,547 [INFO] [RED -> RAM] Descargados: 1300 MB | Vel. Red: 9.4 MB/s | Cola: 256/256
+2026-09-02 20:42:00,386 [WARNING] [  8.8%] [RAM -> USB] 1172 MB | WriteFile lento:  2839 ms | Cola: 256/256
+2026-09-02 20:42:00,470 [INFO] [  8.8%] [RAM -> USB] 1175 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:42:01,287 [INFO] [  9.0%] [RAM -> USB] 1200 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:42:04,301 [WARNING] [  9.1%] [RAM -> USB] 1206 MB | WriteFile lento:  2846 ms | Cola: 256/256
+2026-09-02 20:42:04,828 [INFO] [RED -> RAM] Descargados: 1350 MB | Vel. Red: 9.3 MB/s | Cola: 256/256
+2026-09-02 20:42:04,844 [INFO] [RED -> RAM] Descargados: 1350 MB | Vel. Red: 9.3 MB/s | Cola: 256/256
+2026-09-02 20:42:04,939 [INFO] [  9.2%] [RAM -> USB] 1225 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:42:08,213 [WARNING] [  9.3%] [RAM -> USB] 1238 MB | WriteFile lento:  2842 ms | Cola: 256/256
+2026-09-02 20:42:08,593 [INFO] [  9.4%] [RAM -> USB] 1250 MB | WriteFile:    16 ms | Cola: 256/256
+2026-09-02 20:42:12,147 [WARNING] [  9.6%] [RAM -> USB] 1272 MB | WriteFile lento:  2863 ms | Cola: 229/256
+2026-09-02 20:42:12,262 [INFO] [  9.6%] [RAM -> USB] 1275 MB | WriteFile:    16 ms | Cola: 222/256
+2026-09-02 20:42:13,084 [INFO] [  9.8%] [RAM -> USB] 1300 MB | WriteFile:    16 ms | Cola: 174/256
+2026-09-02 20:42:14,801 [INFO] [RED -> RAM] Descargados: 1400 MB | Vel. Red: 9.0 MB/s | Cola: 191/256
+2026-09-02 20:42:14,824 [INFO] [RED -> RAM] Descargados: 1400 MB | Vel. Red: 9.0 MB/s | Cola: 192/256
+2026-09-02 20:42:16,081 [WARNING] [  9.8%] [RAM -> USB] 1304 MB | WriteFile lento:  2861 ms | Cola: 193/256
+2026-09-02 20:42:16,755 [INFO] [ 10.0%] [RAM -> USB] 1325 MB | WriteFile:    16 ms | Cola: 152/256
+2026-09-02 20:42:20,002 [WARNING] [ 10.0%] [RAM -> USB] 1338 MB | WriteFile lento:  2843 ms | Cola: 169/256
+2026-09-02 20:42:20,417 [INFO] [ 10.1%] [RAM -> USB] 1350 MB | WriteFile:    16 ms | Cola: 145/256
+2026-09-02 20:42:23,916 [WARNING] [ 10.3%] [RAM -> USB] 1370 MB | WriteFile lento:  2840 ms | Cola: 112/256
+2026-09-02 20:42:24,066 [INFO] [ 10.3%] [RAM -> USB] 1375 MB | WriteFile:    16 ms | Cola: 106/256
+2026-09-02 20:42:24,888 [INFO] [ 10.5%] [RAM -> USB] 1400 MB | WriteFile:    16 ms | Cola:  64/256
+2026-09-02 20:42:27,851 [WARNING] [ 10.5%] [RAM -> USB] 1404 MB | WriteFile lento:  2859 ms | Cola:  58/256
+2026-09-02 20:42:28,559 [INFO] [ 10.7%] [RAM -> USB] 1425 MB | WriteFile:    22 ms | Cola:  15/256
+2026-09-02 20:42:35,086 [WARNING] [ 10.8%] [RAM -> USB] 1434 MB | Parón de Red: esperó 4.63s | Cola:   0/256
+2026-09-02 20:42:40,516 [WARNING] [ 10.8%] [RAM -> USB] 1434 MB | Parón de Red: esperó 4.06s | Cola:   0/256
+2026-09-02 20:42:44,005 [WARNING] [ 10.8%] [RAM -> USB] 1436 MB | Parón de Red: esperó 2.92s | Cola:   0/256
+2026-09-02 20:42:48,259 [WARNING] [ 10.8%] [RAM -> USB] 1436 MB | WriteFile lento:  2864 ms | Cola:   1/256
+2026-09-02 20:42:51,506 [INFO] =======================================================
+
+2026-09-02 20:43:02,356 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-02 20:43:02,597 [DEBUG] https://huggingface.co:443 "HEAD / HTTP/1.1" 200 0
+2026-09-02 20:43:29,264 [INFO] Exclusión de Windows Defender añadida para: F:\
+2026-09-02 20:43:29,278 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-09-02 20:43:29,684 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "HEAD /HollowdrivePackV1.tar HTTP/1.1" 200 0
+2026-09-02 20:43:29,687 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-09-02 20:43:30,167 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "GET /HollowdrivePackV1.tar HTTP/1.1" 200 8661701120
+2026-09-02 20:45:43,825 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-02 20:45:44,130 [DEBUG] https://huggingface.co:443 "HEAD / HTTP/1.1" 200 0
+2026-09-02 20:46:52,951 [INFO] Exclusión de Windows Defender añadida para: F:\
+2026-09-02 20:46:52,959 [INFO] 🔗 Extrayendo al vuelo parte 1/5
+2026-09-02 20:46:52,960 [DEBUG] Starting new HTTPS connection (1): pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev:443
+2026-09-02 20:46:53,356 [DEBUG] https://pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev:443 "HEAD /batocera.tar.001 HTTP/1.1" 200 0
+2026-09-02 20:46:53,358 [DEBUG] Starting new HTTPS connection (1): pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev:443
+2026-09-02 20:46:54,033 [DEBUG] https://pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev:443 "GET /batocera.tar.001 HTTP/1.1" 200 9663676416
+2026-09-02 20:49:02,485 [WARNING] ⚠️ [RED] Pausa de red detectada (('Connection broken: IncompleteRead(94014781 bytes read, 9569661635 more expected)', IncompleteRead(94014781 bytes read, 9569661635 more expected))). Reintentando 1/8 en 2s...
+2026-09-02 20:49:04,485 [INFO] 🔄 [RED] Reanudando descarga desde byte 93847552 (89.5 MB)...
+2026-09-02 20:49:04,486 [DEBUG] Starting new HTTPS connection (1): pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev:443
+2026-09-02 20:49:04,966 [DEBUG] https://pub-34a76bb6c5cb47ffb32336cdd176511b.r2.dev:443 "GET /batocera.tar.001 HTTP/1.1" 206 9569828864
+2026-09-02 21:20:47,742 [INFO] ✔ Parte descargada con éxito (9216.0 MB). Pasando a la siguiente...
+2026-09-02 21:20:47,745 [INFO] 🔗 Extrayendo al vuelo parte 2/5
+2026-09-02 21:20:47,746 [DEBUG] Starting new HTTPS connection (1): pub-d7ed6e3136e44d369b09e85feb23e5e8.r2.dev:443
+2026-09-02 21:20:48,217 [DEBUG] https://pub-d7ed6e3136e44d369b09e85feb23e5e8.r2.dev:443 "HEAD /batocera.tar.002 HTTP/1.1" 200 0
+2026-09-02 21:20:48,219 [DEBUG] Starting new HTTPS connection (1): pub-d7ed6e3136e44d369b09e85feb23e5e8.r2.dev:443
+2026-09-02 21:20:49,125 [DEBUG] https://pub-d7ed6e3136e44d369b09e85feb23e5e8.r2.dev:443 "GET /batocera.tar.002 HTTP/1.1" 200 9663676416
+2026-09-02 21:50:22,468 [INFO] ✔ Parte descargada con éxito (9216.0 MB). Pasando a la siguiente...
+2026-09-02 21:50:22,470 [INFO] 🔗 Extrayendo al vuelo parte 3/5
+2026-09-02 21:50:22,471 [DEBUG] Starting new HTTPS connection (1): pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev:443
+2026-09-02 21:50:23,014 [DEBUG] https://pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev:443 "HEAD /batocera.tar.003 HTTP/1.1" 200 0
+2026-09-02 21:50:23,016 [DEBUG] Starting new HTTPS connection (1): pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev:443
+2026-09-02 21:50:23,687 [DEBUG] https://pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev:443 "GET /batocera.tar.003 HTTP/1.1" 200 9663676416
+2026-09-02 22:08:52,627 [WARNING] ⚠️ [RED] Pausa de red detectada (('Connection broken: IncompleteRead(6988779008 bytes read, 2674897408 more expected)', IncompleteRead(6988779008 bytes read, 2674897408 more expected))). Reintentando 1/8 en 2s...
+2026-09-02 22:08:54,628 [INFO] 🔄 [RED] Reanudando descarga desde byte 6988759040 (6665.0 MB)...
+2026-09-02 22:08:54,629 [DEBUG] Starting new HTTPS connection (1): pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev:443
+2026-09-02 22:08:55,210 [DEBUG] https://pub-4a8617c5c71e48ddb6ced5120a3d1dd8.r2.dev:443 "GET /batocera.tar.003 HTTP/1.1" 206 2674917376
+2026-09-02 22:14:09,571 [INFO] ✔ Parte descargada con éxito (9216.0 MB). Pasando a la siguiente...
+2026-09-02 22:14:09,572 [INFO] 🔗 Extrayendo al vuelo parte 4/5
+2026-09-02 22:14:09,573 [DEBUG] Starting new HTTPS connection (1): pub-99b334f4eaad4ba8a894214f74e8a5ed.r2.dev:443
+2026-09-02 22:14:10,355 [DEBUG] https://pub-99b334f4eaad4ba8a894214f74e8a5ed.r2.dev:443 "HEAD /batocera.tar.004 HTTP/1.1" 200 0
+2026-09-02 22:14:10,358 [DEBUG] Starting new HTTPS connection (1): pub-99b334f4eaad4ba8a894214f74e8a5ed.r2.dev:443
+2026-09-02 22:14:11,252 [DEBUG] https://pub-99b334f4eaad4ba8a894214f74e8a5ed.r2.dev:443 "GET /batocera.tar.004 HTTP/1.1" 200 9663676416
+2026-09-02 22:36:47,884 [INFO] ✔ Parte descargada con éxito (9216.0 MB). Pasando a la siguiente...
+2026-09-02 22:36:47,885 [INFO] 🔗 Extrayendo al vuelo parte 5/5
+2026-09-02 22:36:47,887 [DEBUG] Starting new HTTPS connection (1): pub-28f8711a6e664f949664125aca117fb9.r2.dev:443
+2026-09-02 22:36:48,741 [DEBUG] https://pub-28f8711a6e664f949664125aca117fb9.r2.dev:443 "HEAD /batocera.tar.005 HTTP/1.1" 200 0
+2026-09-02 22:36:48,744 [DEBUG] Starting new HTTPS connection (1): pub-28f8711a6e664f949664125aca117fb9.r2.dev:443
+2026-09-02 22:36:49,196 [DEBUG] https://pub-28f8711a6e664f949664125aca117fb9.r2.dev:443 "GET /batocera.tar.005 HTTP/1.1" 200 1932745216
+2026-09-02 22:56:38,875 [INFO] ✔ Parte descargada con éxito (1843.2 MB). Pasando a la siguiente...
+2026-09-02 22:56:42,014 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-09-02 22:56:42,928 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "HEAD /HollowdrivePackV1.tar HTTP/1.1" 200 0
+2026-09-02 22:56:42,931 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-09-02 22:56:43,660 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "GET /HollowdrivePackV1.tar HTTP/1.1" 200 8661701120
+2026-09-02 23:15:23,273 [INFO] ✔ Parte descargada con éxito (8260.4 MB). Pasando a la siguiente...
+2026-09-02 23:15:23,293 [DEBUG] Starting new HTTPS connection (1): pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443
+2026-09-02 23:15:23,850 [DEBUG] https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443 "HEAD /batocerumen.img HTTP/1.1" 200 0
+2026-09-02 23:15:23,867 [DEBUG] Starting new HTTPS connection (1): pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443
+2026-09-02 23:15:24,371 [DEBUG] https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443 "GET /batocerumen.img HTTP/1.1" 200 4949278720
+2026-09-02 23:25:01,040 [INFO] ✔ Parte descargada con éxito (4720.0 MB). Pasando a la siguiente...

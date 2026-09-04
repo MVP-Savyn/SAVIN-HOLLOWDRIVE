@@ -31,17 +31,6 @@ try:
 except ImportError:
     HAS_WINDND = False
 
-def enganchar_drag_drop_recursivo(widget, callback):
-    """ Engancha el evento drag & drop en el widget y en todos sus elementos hijos """
-    if not HAS_WINDND: return
-    try:
-        windnd.hook_dropfiles(widget, func=callback)
-        if hasattr(widget, "winfo_children"):
-            for child in widget.winfo_children():
-                enganchar_drag_drop_recursivo(child, callback)
-    except Exception:
-        pass
-
 # Importaciones del motor local
 from engine.download_manager import descargar_y_extraer_ventoy, resolver_tamano_pack
 
@@ -54,13 +43,28 @@ from engine.disk_logic import obtener_unidades_usb, instalar_ventoy, crear_parti
 GITHUB_REPO = "MVP-Savyn/SAVIN-HOLLOWDRIVE"
 URL_MIRRORS_GITHUB = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/engine/mirrors.json"
 
+# =====================================================================
+# 🛠️ UTILIDADES GLOBALES DE SISTEMA Y ENTORNO (COLUMNA 0)
+# =====================================================================
+
 def es_administrador():
     """ Comprueba si la aplicación tiene privilegios de Administrador en Windows """
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except Exception:
         return False
-    
+
+def enganchar_drag_drop_recursivo(widget, callback):
+    """ Engancha el evento drag & drop en el widget y en todos sus elementos hijos """
+    if not HAS_WINDND: return
+    try:
+        windnd.hook_dropfiles(widget, func=callback)
+        if hasattr(widget, "winfo_children"):
+            for child in widget.winfo_children():
+                enganchar_drag_drop_recursivo(child, callback)
+    except Exception:
+        pass
+
 def enganchar_drag_drop_global_win32(hwnd_tkinter, callback):
     """ Desbloquea UIPI y engancha windnd a la ventana raíz y a todos sus handles hijos en Win32 """
     if os.name != 'nt' or not HAS_WINDND: return
@@ -107,10 +111,8 @@ if hasattr(sys, 'frozen') or '__compiled__' in globals():
 else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# --- RUTA DE ARCHIVOS MULTIMEDIA ---
 CARPETA_MEDIA = resource_path("media")
 
-# 2. OBTENER VERSIÓN DEL EJECUTABLE
 def obtener_version_interna():
     """ Lee dinámicamente la versión del ejecutable desde sus propiedades de Windows """
     exe_actual = os.path.abspath(sys.argv[0])
@@ -145,7 +147,10 @@ def obtener_version_interna():
 
 VERSION_ACTUAL = obtener_version_interna()
 
-# 3. CLASES Y FUNCIONES DE SOPORTE PARA LOGS
+# =====================================================================
+# 📋 SISTEMA DE REGISTRO Y LOGGING
+# =====================================================================
+
 class TeeStream:
     """ Redirige sys.stdout y sys.stderr hacia logging manteniendo la salida en pantalla """
     def __init__(self, log_level_func, original_stream):
@@ -172,15 +177,11 @@ class TeeStream:
 def rotar_logs(carpeta_logs, max_archivos=5):
     """ Borra los archivos de log más antiguos si sobrepasan el límite """
     try:
-        # Obtener todos los archivos .log de la carpeta
         archivos = [
             os.path.join(carpeta_logs, f) for f in os.listdir(carpeta_logs)
             if f.endswith(".log")
         ]
-        # Ordenar por fecha de modificación (de más viejo a más nuevo)
         archivos.sort(key=os.path.getmtime)
-        
-        # Dejar espacio para el log nuevo que se creará en esta sesión (máximo max_archivos - 1)
         limite = max_archivos - 1
         
         while len(archivos) > limite:
@@ -188,19 +189,14 @@ def rotar_logs(carpeta_logs, max_archivos=5):
             try:
                 os.remove(f_a_borrar)
             except Exception as ex:
-                # Si un archivo está bloqueado por otro proceso, se omite y continúa borrando los demás
                 print(f"No se pudo borrar {os.path.basename(f_a_borrar)} (posiblemente bloqueado): {ex}")
     except Exception as e:
         print(f"Aviso: Error general al rotar logs: {e}")
 
-# 4. CONFIGURACIÓN DEL SISTEMA DE REGISTRO
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)
-
-# Limpiar logs viejos
 rotar_logs(LOGS_DIR, max_archivos=5)
 
-# Crear archivo de log único para esta sesión
 timestamp_inicio = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 archivo_log = os.path.join(LOGS_DIR, f"hollowdrive_{timestamp_inicio}.log")
 
@@ -212,11 +208,9 @@ logging.basicConfig(
     ]
 )
 
-# Redirección única de la consola
 sys.stdout = TeeStream(logging.info, sys.__stdout__)
 sys.stderr = TeeStream(logging.error, sys.__stderr__)
 
-# 5. MENSAJE DE ARRANQUE
 logging.info(f"=== INICIANDO HOLLOWDRIVE V{VERSION_ACTUAL} ===")
 logging.info(f"Ruta base del programa: {BASE_DIR}")
 logging.info(f"Archivo de registro de la sesión: {archivo_log}")
@@ -256,9 +250,10 @@ AZUL_SUAVE = "#70a1ff"
 COLOR_HOLLOW, COLOR_CACHY = "#1e3799", "#2ecc71"
 COLOR_LIMINE, COLOR_LIBRE = "#6c757d", "#444444"
 VERDE_EXITO = "#2ecc71"
+MODO_DEBUG = True
 
 # =====================================================================
-# ⚡ MOTOR DE EXTRACCIÓN, DESCARGA Y COPIA ULTRARRÁPIDA
+# ⚡ MOTOR DE EXTRACCIÓN, RED Y ALMACENAMIENTO (COLUMNA 0)
 # =====================================================================
 
 def formatear_eta(segundos):
@@ -270,12 +265,8 @@ def formatear_eta(segundos):
 
 class ETACalculator:
     def __init__(self, total_bytes, window_size=5.0):
-        """
-        window_size: Segundos de historial para calcular la velocidad media.
-        5.0 segundos da un ETA muy estable y profesional.
-        """
         self.total_bytes = total_bytes
-        self.history = [(time.time(), 0)]  # Guarda tuplas de (tiempo, bytes_descargados)
+        self.history = [(time.time(), 0)]
         self.window_size = window_size
         self.last_speed = 0.0
 
@@ -283,18 +274,15 @@ class ETACalculator:
         now = time.time()
         self.history.append((now, bytes_actuales))
         
-        # 1. Limpiar el historial para mantener solo los últimos 'window_size' segundos
         while len(self.history) > 1 and (now - self.history[0][0]) > self.window_size:
             self.history.pop(0)
 
-        # 2. Calcular la velocidad media exacta en esa ventana de tiempo
         dt = now - self.history[0][0]
         db = bytes_actuales - self.history[0][1]
         
         if dt > 0:
-            self.last_speed = (db / (1024 * 1024)) / dt  # Resultado en MB/s
+            self.last_speed = (db / (1024 * 1024)) / dt
         
-        # 3. Calcular el tiempo restante (ETA)
         if self.total_bytes and self.last_speed > 0:
             bytes_restantes = max(0, self.total_bytes - bytes_actuales)
             eta_sec = (bytes_restantes / (1024 * 1024)) / self.last_speed
@@ -305,7 +293,6 @@ class ETACalculator:
 
 class AsyncBufferStream(object):
     def __init__(self, response, progress_callback=None, total_size=None, abort_check=None):
-        # Búfer acotado a 32 bloques de 4MB (128 MB máximo de RAM)
         self.q = queue.Queue(maxsize=32) 
         self.total_size = total_size
         self.progress_callback = progress_callback
@@ -362,6 +349,30 @@ class AsyncBufferStream(object):
             
         return data
 
+def obtener_ruta_7z():
+    """ Localiza el binario de consola 7z.exe en engine/resources """
+    posibles_rutas = [
+        resource_path(os.path.join("engine", "resources", "7z.exe")),
+        resource_path(os.path.join("engine", "7z.exe")),
+        "7z.exe"
+    ]
+    for ruta in posibles_rutas:
+        if os.path.exists(ruta):
+            return ruta
+    return None
+
+def agregar_exclusion_antivirus(ruta_o_unidad):
+    """ Añade la unidad/carpeta a las exclusiones de Windows Defender vía PowerShell """
+    if os.name == 'nt' and es_administrador():
+        try:
+            cmd = f'powershell -Command "Add-MpPreference -ExclusionPath \'{ruta_o_unidad}\'"'
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            si.wShowWindow = subprocess.SW_HIDE
+            subprocess.run(cmd, shell=True, startupinfo=si, creationflags=subprocess.CREATE_NO_WINDOW)
+            logging.info(f"Exclusión de Windows Defender añadida para: {ruta_o_unidad}")
+        except Exception as e:
+            logging.warning(f"No se pudo añadir la exclusión del antivirus: {e}")
 
 def obtener_stream_gdrive(file_id):
     session = requests.Session()
@@ -390,17 +401,10 @@ def obtener_stream_gdrive(file_id):
         
     return res
 
-
-# =====================================================================
-# CONFIGURACIÓN DE DEBUG
-# =====================================================================
-MODO_DEBUG = True
-
 def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
     """
     Motor de Red de Flujo Continuo:
-    Mantiene una sola conexión a máxima velocidad sin cierres artificiales.
-    Solo reconecta si la red cae a 0 KB/s durante más de 6 segundos.
+    Descarga una parte completa y permite encadenar múltiples partes continuas sin cortes.
     """
     if not url or not isinstance(url, str) or not url.startswith("http"):
         raise ValueError(f"URL no válida: '{url}'")
@@ -408,13 +412,17 @@ def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
     domain = urlparse(url).netloc
     is_hf = "huggingface.co" in domain
 
-    headers_base = {"User-Agent": "HollowDrive-Installer/1.1", "Connection": "keep-alive"}
+    headers_base = {
+        "User-Agent": "HollowDrive-Installer/1.1", 
+        "Connection": "keep-alive",
+        "Accept-Encoding": "identity"  # Evita compresiones automáticas intermedias
+    }
     if is_hf and HF_TOKEN:
         headers_base["Authorization"] = f"Bearer {HF_TOKEN}"
 
-    # 1. Obtener tamaño total de la imagen
+    # 1. Obtener tamaño total de la parte (opcional para progreso)
     try:
-        head_res = requests.head(url, headers=headers_base, allow_redirects=True, timeout=8.0)
+        head_res = requests.head(url, headers=headers_base, allow_redirects=True, timeout=6.0)
         total_size = int(head_res.headers.get('Content-Length', 0)) or None
     except Exception:
         total_size = None
@@ -422,7 +430,7 @@ def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
     def stream_generator():
         bytes_read = 0
         retries = 0
-        max_retries = 10
+        max_retries = 8
 
         while True:
             if abort_check and abort_check():
@@ -434,24 +442,35 @@ def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
                 logging.info(f"🔄 [RED] Reanudando descarga desde byte {bytes_read} ({bytes_read / (1024**2):.1f} MB)...")
 
             try:
-                # Timeout: 6s para conectar, 8s para recibir chunks de datos sin congelarse
-                with requests.get(url, headers=headers, stream=True, timeout=(6.0, 8.0)) as response:
-                    if bytes_read > 0 and response.status_code != 206:
-                        raise RuntimeError(f"El servidor no aceptó HTTP 206 Range (Status: {response.status_code})")
+                with requests.get(url, headers=headers, stream=True, timeout=(6.0, 10.0)) as response:
+                    # Si pedimos rango y no nos da 206 ni 200, es error
+                    if bytes_read > 0 and response.status_code not in (200, 206):
+                        raise RuntimeError(f"El servidor rechazó el rango HTTP (Status: {response.status_code})")
                     response.raise_for_status()
                     
-                    retries = 0  # Reset de reintentos tras conexión exitosa
+                    # Si no teníamos total_size del HEAD, lo leemos directamente del GET
+                    cl = response.headers.get('Content-Length')
+                    part_size = int(cl) if cl else total_size
+
+                    retries = 0
 
                     for chunk in response.iter_content(chunk_size=chunk_size):
                         if abort_check and abort_check():
                             raise InterruptedError()
 
                         if chunk:
-                            len_chunk = len(chunk)
-                            bytes_read += len_chunk
+                            bytes_read += len(chunk)
                             yield chunk
 
+                    # Si el bucle iter_content terminó sin excepciones, la parte se completó al 100%
+                    logging.info(f"✔ Parte descargada con éxito ({bytes_read / (1024**2):.1f} MB). Pasando a la siguiente...")
+                    return
+
             except (requests.RequestException, RuntimeError, TimeoutError) as e:
+                # Si el error es 416 (Range Not Satisfiable), significa que ya leímos todo el archivo
+                if hasattr(e, 'response') and e.response is not None and e.response.status_code == 416:
+                    return
+
                 retries += 1
                 if retries > max_retries:
                     raise RuntimeError(f"Conexión de red fallida tras {max_retries} intentos: {e}")
@@ -459,206 +478,88 @@ def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
                 logging.warning(f"⚠️ [RED] Pausa de red detectada ({e}). Reintentando {retries}/{max_retries} en 2s...")
                 time.sleep(2)
 
-            # Si se alcanzó el tamaño total esperado, finalizar limpiamente
-            if total_size and bytes_read >= total_size:
-                return
-
     return stream_generator(), total_size
 
-def stream_extract_tar(url_or_id, target_dir, is_gdrive=False, progress_callback=None, abort_check=None, method="ram"):
-    total_size = None
-    response_gd = None
+def stream_extract_tar(url_or_id=None, target_dir="", dest_dir=None, is_gdrive=False, 
+                       progress_callback=None, abort_check=None, method="ram", 
+                       custom_stream=None, custom_total_size=None):
+    """
+    Inyecta y extrae un stream de archivo .tar usando 7-Zip (o tar.exe) por STDIN.
+    Soporta generadores custom_stream para descargas multi-parte.
+    """
+    directorio_destino = dest_dir or target_dir
+    os.makedirs(directorio_destino, exist_ok=True)
 
-    if is_gdrive:
-        match = re.search(r'/d/([a-zA-Z0-9_-]+)', url_or_id)
-        file_id = match.group(1) if match else url_or_id
-        response_gd = obtener_stream_gdrive(file_id)
-        if response_gd.status_code != 200:
-            raise RuntimeError(f"Fallo de conexión: HTTP {response_gd.status_code}")
-        total_size = int(response_gd.headers.get('Content-Length', 0)) or None
-        
-    os.makedirs(target_dir, exist_ok=True)
+    ruta_7z = obtener_ruta_7z()
     
-    if method == "disco":
-        # === MODO DISCO CLÁSICO ===
-        temp_dir = os.path.join(BASE_DIR, "engine", "temp_downloads")
-        os.makedirs(temp_dir, exist_ok=True)
-        temp_tar = os.path.join(temp_dir, "temp_pack.tar")
-        
-        bytes_read = 0
-        
-        # 1. Asignar el stream correcto según el origen
-        if is_gdrive:
-            stream = response_gd.iter_content(chunk_size=4 * 1024 * 1024)
-        else:
-            # USA EL NUEVO SISTEMA RESILIENTE
-            stream, total_size = generar_stream_resiliente_v2(url_or_id, chunk_size=4 * 1024 * 1024, abort_check=abort_check)
-            
-        eta_calc_net = ETACalculator(total_size) if total_size else None
-        
-        with open(temp_tar, "wb") as f:
-            for chunk in stream:
-                if abort_check and abort_check(): raise InterruptedError()
-                if chunk:
-                    f.write(chunk)
-                    bytes_read += len(chunk)
-                    if progress_callback and eta_calc_net:
-                        mb_s, eta_sec = eta_calc_net.update(bytes_read)
-                        if mb_s is not None:
-                            progress_callback(bytes_read, total_size, f"Descargando a SSD ({mb_s:.1f} MB/s | Faltan: {formatear_eta(eta_sec)})")
-                    
-        extracted_bytes = 0
-        last_reported_bytes = 0
-        t_start_extract = time.time() 
-        
-        with open(temp_tar, "rb") as f:
-            with tarfile.open(fileobj=f, mode="r|*") as tar:
-                for member in tar:
-                    if abort_check and abort_check(): raise InterruptedError()
-                    if member.isreg(): 
-                        f_in = tar.extractfile(member)
-                        dest_file = os.path.normpath(os.path.join(target_dir, member.name))
-                        os.makedirs(os.path.dirname(dest_file), exist_ok=True)
-                        with open(dest_file, "wb") as f_out:
-                            while True:
-                                buf = f_in.read(2 * 1024 * 1024)
-                                if not buf: break
-                                if abort_check and abort_check(): raise InterruptedError()
-                                f_out.write(buf)
-                                extracted_bytes += len(buf)
-                                if progress_callback and (extracted_bytes - last_reported_bytes > 5 * 1024 * 1024):
-                                    last_reported_bytes = extracted_bytes
-                                    progress_callback(extracted_bytes, total_size or extracted_bytes, "Extrayendo a USB", t_start_extract)
-                    else:
-                        tar.extract(member, path=target_dir)
-        try: os.remove(temp_tar)
-        except Exception: pass
-
+    if ruta_7z:
+        cmd = [ruta_7z, "x", "-si", "-ttar", f"-o{directorio_destino}", "-y"]
     else:
-        # === MODO AL VUELO CON MONITOR DE CONEXIÓN Y LOGGING FÍSICO ===
-        letra_usb = os.path.splitdrive(target_dir)[0] + "\\"
-        
-        try:
-            subprocess.run(
-                ["powershell", "-Command", f"Add-MpPreference -ExclusionPath '{letra_usb}'"],
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
-        except Exception:
-            pass
+        cmd = ["tar", "-xf", "-", "-C", directorio_destino]
 
-        cmd_tar = ["tar.exe", "-xf", "-", "-C", target_dir]
-        proc_tar = subprocess.Popen(
-            cmd_tar, 
-            stdin=subprocess.PIPE, 
-            stderr=subprocess.PIPE, 
-            bufsize=10 * 1024 * 1024, # Buffer de tubería ampliado a 10MB
-            creationflags=subprocess.CREATE_NO_WINDOW
+    si = subprocess.STARTUPINFO()
+    si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    si.wShowWindow = subprocess.SW_HIDE
+
+    proc = subprocess.Popen(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        startupinfo=si,
+        creationflags=subprocess.CREATE_NO_WINDOW
+    )
+
+    bytes_read = 0
+    total_size = custom_total_size
+
+    if custom_stream:
+        stream = custom_stream
+    elif is_gdrive or (url_or_id and "drive.google.com" in url_or_id):
+        match = re.search(r'/d/([a-zA-Z0-9_-]+)', url_or_id) if url_or_id else None
+        file_id = match.group(1) if match else url_or_id
+        res = obtener_stream_gdrive(file_id)
+        if res.status_code != 200:
+            raise RuntimeError(f"Fallo de conexión GDrive: HTTP {res.status_code}")
+        total_size = total_size or int(res.headers.get('Content-Length', 0)) or None
+        stream = res.iter_content(chunk_size=8 * 1024 * 1024)
+    else:
+        stream, total_size_net = generar_stream_resiliente_v2(
+            url_or_id, chunk_size=8 * 1024 * 1024, abort_check=abort_check
         )
+        total_size = total_size or total_size_net
 
-        bytes_read = 0
-        chunk_index = 0
-        t_inicio = time.perf_counter()
-        t_last_pkt = time.perf_counter()
-        last_ui_update = 0.0
-        UI_UPDATE_INTERVAL = 1.0
+    eta_calc = ETACalculator(total_size) if total_size else None
+    last_ui_update = 0.0
 
-        try:
-            CHUNK_SIZE = 2 * 1024 * 1024 
-            
-            # 2. Asignar el stream correcto según el origen
-            if is_gdrive:
-                stream = response_gd.iter_content(chunk_size=CHUNK_SIZE)
-            else:
-                # USA EL NUEVO SISTEMA RESILIENTE
-                stream, total_size = generar_stream_resiliente(url_or_id, chunk_size=CHUNK_SIZE, abort_check=abort_check)
-                
-            eta_calc = ETACalculator(total_size) if total_size else None
-            
-            if MODO_DEBUG:
-                logging.debug("="*60)
-                logging.debug(f"[DEBUG STREAM] Iniciando extracción nativa hacia: {target_dir}")
-                logging.debug(f"[DEBUG STREAM] Tamaño total esperado: {total_size / (1024**3):.2f} GB" if total_size else "[DEBUG STREAM] Tamaño total desconocido")
-                logging.debug("="*60)
-                
-            for chunk in stream:
-                if abort_check and abort_check():
-                    proc_tar.kill()
-                    raise InterruptedError("Extracción cancelada por el usuario.")
-                
-                if chunk:
-                    now = time.perf_counter()
-                    net_delay = now - t_last_pkt  # Tiempo que tardó la red en entregar este paquete
-                    t_last_pkt = now
-                    
-                    chunk_len = len(chunk)
-                    t_write_start = time.perf_counter()
-                    
-                    # Inyección a tar.exe
-                    proc_tar.stdin.write(chunk)
-                    proc_tar.stdin.flush()
-                    t_write_duration = time.perf_counter() - t_write_start
-                    
-                    bytes_read += chunk_len
-                    chunk_index += 1
+    try:
+        for chunk in stream:
+            if abort_check and abort_check():
+                proc.kill()
+                raise InterruptedError("Extracción cancelada por el usuario.")
 
-                    # TELEMETRÍA EN REGISTRO DE LOGS
-                    if MODO_DEBUG:
-                        elapsed = now - t_inicio
-                        instant_speed = (chunk_len / (1024 * 1024)) / t_write_duration if t_write_duration > 0 else 0
-                        avg_speed = (bytes_read / (1024 * 1024)) / elapsed if elapsed > 0 else 0
-                        pct = (bytes_read / total_size * 100) if total_size else 0.0
-                        
-                        logging.debug(
-                            f"[PKT #{chunk_index:04d}] "
-                            f"Bloque: {chunk_len / (1024*1024):.2f}MB | "
-                            f"Espera Red: {net_delay:5.2f}s | "
-                            f"I/O Pipe: {t_write_duration*1000:5.1f}ms ({instant_speed:5.1f} MB/s) | "
-                            f"Media: {avg_speed:5.1f} MB/s | "
-                            f"Total: {bytes_read / (1024**3):5.2f} GB ({pct:5.1f}%)"
-                        )
+            if chunk:
+                proc.stdin.write(chunk)
+                proc.stdin.flush()
+                bytes_read += len(chunk)
 
-                    # ACTUALIZACIÓN DE INTERFAZ
-                    if progress_callback and (now - last_ui_update >= UI_UPDATE_INTERVAL):
-                        last_ui_update = now
-                        mb_s, eta_sec = eta_calc.update(bytes_read) if eta_calc else (None, None)
-                        if mb_s is not None:
-                            progress_callback(
-                                bytes_read, 
-                                total_size or bytes_read, 
-                                f"Extrayendo al vuelo: {mb_s:.1f} MB/s | Faltan: {formatear_eta(eta_sec)}"
-                            )
+                now = time.perf_counter()
+                if progress_callback and (now - last_ui_update >= 0.5):
+                    last_ui_update = now
+                    mb_s, eta_sec = eta_calc.update(bytes_read) if eta_calc else (None, None)
+                    msg = f"Extrayendo (7-Zip): {mb_s:.1f} MB/s | Faltan: {formatear_eta(eta_sec)}" if mb_s else "Extrayendo datos a USB..."
+                    progress_callback(bytes_read, total_size or bytes_read, msg)
 
-            if progress_callback and eta_calc:
-                mb_s, eta_sec = eta_calc.update(bytes_read)
-                progress_callback(bytes_read, total_size or bytes_read, "Vaciando búferes a la unidad USB...")
+        proc.stdin.close()
+        proc.wait()
 
-            proc_tar.stdin.close()
-            proc_tar.wait()
+        if proc.returncode != 0:
+            err = proc.stderr.read().decode('utf-8', errors='ignore')
+            raise RuntimeError(f"Error en extracción (código {proc.returncode}): {err}")
 
-            if proc_tar.returncode != 0:
-                err = proc_tar.stderr.read().decode('utf-8', errors='ignore')
-                raise RuntimeError(f"Error nativo en descompresión: {err}")
-
-            if MODO_DEBUG:
-                t_total = time.perf_counter() - t_inicio
-                vel_final = (bytes_read / (1024 * 1024)) / t_total if t_total > 0 else 0
-                logging.debug("="*60)
-                logging.debug(f"[DEBUG STREAM] Proceso finalizado con éxito en {t_total:.2f}s (Media global: {vel_final:.2f} MB/s)")
-                logging.debug("="*60)
-
-        except Exception as e:
-            proc_tar.kill()
-            raise e
-            
-        finally:
-            try:
-                subprocess.run(
-                    ["powershell", "-Command", f"Remove-MpPreference -ExclusionPath '{letra_usb}'"],
-                    creationflags=subprocess.CREATE_NO_WINDOW
-                )
-            except Exception:
-                pass
-
+    except Exception as e:
+        proc.kill()
+        raise e
 
 def stream_download_file_direct(url_or_id, dest_path, is_gdrive=False, progress_callback=None, abort_check=None):
     if is_gdrive:
@@ -669,38 +570,32 @@ def stream_download_file_direct(url_or_id, dest_path, is_gdrive=False, progress_
         total_size = int(response.headers.get('Content-Length', 0)) or None
         stream, eta_calc = response.iter_content(chunk_size=2*1024*1024), ETACalculator(total_size) if total_size else None
     else:
-        # USA EL NUEVO SISTEMA RESILIENTE
         stream, total_size = generar_stream_resiliente_v2(url_or_id, chunk_size=2*1024*1024, abort_check=abort_check)
         eta_calc = ETACalculator(total_size) if total_size else None
 
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     bytes_read = 0
-
     last_ui_update = 0.0
+
     with open(dest_path, "wb") as f:
         for chunk in stream:
             if abort_check and abort_check(): raise InterruptedError()
             f.write(chunk)
-            f.flush() # Vacía RAM a disco inmediatamente
+            f.flush()
             bytes_read += len(chunk)
             
             now = time.time()
-            # Validamos que haya pasado 1 segundo desde la última actualización
             if progress_callback and eta_calc and (now - last_ui_update >= 1.0):
                 last_ui_update = now
                 mb_s, eta_sec = eta_calc.update(bytes_read)
                 if mb_s is not None:
                     progress_callback(bytes_read, total_size, f"Descargando: {mb_s:.1f} MB/s | Faltan: {formatear_eta(eta_sec)}")
                     
-        # Forzamos una última actualización al 100% cuando termina el bucle
         if progress_callback:
             progress_callback(bytes_read, total_size, "Descarga completada, vaciando búferes...")
 
-
 def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_check=None, method="ram"):
-    """
-    Volcado RAW con precarga en RAM y diagnóstico calibrado.
-    """
+    """ Volcado RAW con precarga en RAM y diagnóstico calibrado """
     letra_limpia = letra_unidad.strip().replace("\\", "").replace("/", "")
     ruta_raw = f"\\\\.\\{letra_limpia}"
 
@@ -715,13 +610,12 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
     time.sleep(0.3)
 
     if method == "ram":
-        logging.info(f"=======================================================")
+        logging.info("=======================================================")
         logging.info(f"[DIAGNÓSTICO RAM] Iniciando Stream Directo a USB: {ruta_raw}")
-        logging.info(f"=======================================================")
+        logging.info("=======================================================")
 
         if progress_callback: progress_callback(0, 100, "Conectando al servidor...")
         
-        # 1. Obtener stream y tamaño con el proxy resiliente
         stream_gen, total_size = generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=abort_check)
         
         handle = kernel32.CreateFileW(
@@ -738,15 +632,12 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
         error_red = []
 
         def hilo_descarga_red():
-            """ Productor: Descarga por red en bloques de 512KB para mayor fluidez """
             try:
                 bytes_net = 0
                 t_net_start = time.time()
-                
                 for chunk in stream_gen:
                     bytes_net += len(chunk)
                     cola_bloques.put(chunk)
-                    
                     if (bytes_net // (1024 * 1024)) % 50 == 0:
                         mb_desc = bytes_net / (1024 * 1024)
                         dt_net = time.time() - t_net_start
@@ -760,7 +651,6 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
         t_red = threading.Thread(target=hilo_descarga_red, daemon=True)
         t_red.start()
 
-        # PRECARGA EN RAM: Esperar a tener al menos 32 bloques (16 MB) en memoria antes de escribir
         logging.info("[RAM -> USB] Llenando colchón inicial de precarga en RAM...")
         if progress_callback: progress_callback(0, total_size or 100, "Llenando búfer de RAM...")
         while cola_bloques.qsize() < 64 and t_red.is_alive():
@@ -808,7 +698,6 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
 
                 pct = (bytes_escritos / total_size * 100) if total_size else 0.0
                 
-                # REGISTRO DE TELEMETRÍA (Aviso solo si la espera supera los 2.5 segundos reales)
                 if dt_write > 0.8 or t_wait_queue > 2.5:
                     q_level = cola_bloques.qsize()
                     if dt_write > 0.8:
@@ -818,7 +707,6 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
                 elif i_bloque % 50 == 0:
                     logging.info(f"[{pct:5.1f}%] [RAM -> USB] {bytes_escritos/(1024*1024):.0f} MB | WriteFile: {dt_write*1000:5.0f} ms | Cola: {cola_bloques.qsize():3d}/{MAX_COLA}")
 
-                # Actualización de UI a 1Hz
                 now = time.time()
                 if progress_callback and eta_calc and (now - last_ui_update >= 1.0):
                     last_ui_update = now
@@ -830,10 +718,9 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
             logging.info("=======================================================\n")
 
     else:
-        # Modo Disco SSD
-        logging.info(f"=======================================================")
+        logging.info("=======================================================")
         logging.info(f"[DIAGNÓSTICO SSD] Iniciando descarga previa a disco para: {ruta_raw}")
-        logging.info(f"=======================================================")
+        logging.info("=======================================================")
 
         temp_dir = os.path.join(BASE_DIR, "engine", "temp_downloads")
         os.makedirs(temp_dir, exist_ok=True)
@@ -841,7 +728,6 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
 
         stream_gen, total_size = generar_stream_resiliente_v2(url, chunk_size=2*1024*1024, abort_check=abort_check)
 
-        # Paso 1: Descargar imagen a disco local (SSD)
         bytes_net = 0
         eta_calc_net = ETACalculator(total_size) if total_size else None
         last_ui_update = 0.0
@@ -862,7 +748,6 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
                         if mb_s is not None:
                             progress_callback(bytes_net, total_size, f"Descargando a SSD: {mb_s:.1f} MB/s | Faltan: {formatear_eta(eta_sec)}")
 
-        # Paso 2: Volcado RAW desde SSD hacia el USB
         logging.info(f"[DIAGNÓSTICO SSD] Descarga completada. Iniciando volcado RAW a USB: {ruta_raw}")
         handle = kernel32.CreateFileW(
             ruta_raw, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -929,7 +814,6 @@ def encontrar_letra_por_etiqueta_ps(label):
     except Exception as e: logging.error(f"Error detectando volumen '{label}': {e}")
     return None
 
-
 def asignar_letra_particion_ps(disk_index, part_number):
     """ Asigna una letra de unidad libre a la partición especificada usando diskpart """
     try:
@@ -957,7 +841,6 @@ def asignar_letra_particion_ps(disk_index, part_number):
     except Exception as e:
         logging.error(f"Fallo asignando letra a disco {disk_index} part {part_number}: {e}")
         return None
-
 
 def obtener_o_asignar_letras_cachyos_grub(disk_index):
     """ Garantiza que las particiones GRUB y CachyOS posean una letra de unidad válida """
@@ -987,7 +870,6 @@ def obtener_o_asignar_letras_cachyos_grub(disk_index):
 
     return letra_grub, letra_cachy
 
-
 def eliminar_particiones_cachy_diskpart(disk_index):
     try:
         script_path = os.path.join(BASE_DIR, "engine", "del_cachy.txt")
@@ -1012,7 +894,6 @@ def eliminar_particiones_cachy_diskpart(disk_index):
         logging.error(f"Error al eliminar particiones de CachyOS: {e}")
         return False
 
-
 def copiar_iso_ultrarrapido(origen, destino, callback_progreso=None, abort_check=None):
     """ Copia directa por bloques nativos de Python para un progreso 100% preciso """
     os.makedirs(os.path.dirname(destino), exist_ok=True)
@@ -1020,7 +901,7 @@ def copiar_iso_ultrarrapido(origen, destino, callback_progreso=None, abort_check
     bytes_copiados = 0
 
     with open(origen, "rb") as f_src, open(destino, "wb") as f_dst:
-        buffer_size = 2 * 1024 * 1024  # Buffer de 2MB
+        buffer_size = 2 * 1024 * 1024
         while True:
             if abort_check and abort_check():
                 f_dst.close()
@@ -1038,8 +919,9 @@ def copiar_iso_ultrarrapido(origen, destino, callback_progreso=None, abort_check
                 callback_progreso(bytes_copiados, total_size)
 
 # =====================================================================
-# 🖥️ INTERFAZ PRINCIPAL Y CONTROLADOR
+# 🖥️ COMPONENTES DE INTERFAZ Y CLASE PRINCIPAL
 # =====================================================================
+
 class ItemTareaProgreso:
     """ Representa una barra de progreso individual para una tarea en segundo plano """
     def __init__(self, contenedor, id_tarea, titulo, color_barra=AZUL_CIAN):
@@ -1064,6 +946,172 @@ class ItemTareaProgreso:
         self.frame.destroy()
 
 class SavinOceanicCommand(ctk.CTk):
+
+    def __init__(self):
+        super().__init__()
+        self.title(f"SAVIN SUPER_USB // V{VERSION_ACTUAL}")
+        
+        self.update_idletasks()
+        self.geometry(f"1000x870+{(self.winfo_screenwidth() // 2) - 500}+{(self.winfo_screenheight() // 2) - 435}")
+        self.resizable(False, False)  
+        
+        self.animacion_id = None
+        self.gif_after_id = None
+        self.gif_break_id = None
+        self.creciendo = True
+        self.tamaño_actual = 180
+        self.img_descarga_data = None
+        
+        self.en_proceso = False
+        self.abortar_proceso = False
+        self.widgets_interactivos = []
+        self.mostrar_internos = ctk.BooleanVar(value=False)
+        self.gb_totales = 0.0 
+        self.min_cachy = 20.0 
+        
+        self.instalar_bato = ctk.BooleanVar(value=False)
+        self.instalar_cachy = ctk.BooleanVar(value=False) 
+        self.bato_64_act = ctk.BooleanVar(value=True)
+        self.bato_32_act = ctk.BooleanVar(value=False)
+        self.preservar_espacio = ctk.BooleanVar(value=False)
+        self.descargar_pack_bato = ctk.BooleanVar(value=False)
+        self.descargar_pack_hollow = ctk.BooleanVar(value=True)
+        self.metodo_descarga = ctk.StringVar(value="ram")
+        self._bloqueo_rebalanceo = False
+        self.pestana_actual = "instalador"
+
+        self.tool_bato_img = ctk.BooleanVar(value=False)
+        self.tool_pack_bato = ctk.BooleanVar(value=False)
+        self.tool_pack_hollow = ctk.BooleanVar(value=False)
+        self.lista_discos_hollow = []
+
+        self.tamanos_reales = {"bato_64": 4.60, "bato_32": 1.0, "pack_bato": 37.8, "pack_hollow": 8.66}
+        self.tamanos_formateados = {"bato_64": "4.60GB", "bato_32": "1GB", "pack_bato": "37.8GB", "pack_hollow": "8.66GB"}
+
+        self.configure(fg_color=AZUL_FONDO) 
+        self.attributes("-alpha", 0.94)
+        
+        self.cargar_recursos() 
+        self.setup_ui()
+        
+        if HAS_WINDND:
+            self.after(500, lambda: enganchar_drag_drop_global_win32(self.winfo_id(), self.al_arrastrar_archivos_iso))
+
+        self.actualizar_estados_bato()
+        self.actualizar_estados_cachy()
+        self.refrescar_discos()
+
+        self.iniciar_carga_tamanos_reales()
+        self.after(100, self.mostrar_capa_descarga)
+        self.protocol("WM_DELETE_WINDOW", self.cerrar_aplicacion)
+        self.after(1000, lambda: threading.Thread(target=self.comprobar_actualizaciones, daemon=True).start())
+        self.after(1500, self.preguntar_telemetria_errores)
+
+    def descargar_y_extraer_batocera_pack(self, ruta_destino_batocera, callback_progreso_externo=None):
+        """
+        Lee las URLs de batocera_games (sea una sola URL o las partes .001..005)
+        y soporta tanto el modo streaming (RAM) como el modo clásico (Disco).
+        """
+        games_section = getattr(self, "mirrors", {}).get("batocera_games", MIRRORS_DATA.get("batocera_games", {}))
+        # Soporta tanto "parts" como "mirrors" de mirrors.json
+        mirrors_list = games_section.get("parts", games_section.get("mirrors", []))
+        urls = [m["url"] for m in mirrors_list if isinstance(m, dict) and "url" in m]
+        
+        if not urls:
+            raise ValueError("No se encontraron URLs válidas para batocera_games en mirrors.json")
+
+        modo = self.metodo_descarga.get() if hasattr(self, "metodo_descarga") else "ram"
+        total_size = int(self.tamanos_reales.get("pack_bato", 37.8) * (1024**3))
+
+        def progreso_ui(bytes_read, t_size, msg):
+            pct = bytes_read / t_size if t_size and t_size > 0 else 0
+            if callback_progreso_externo:
+                callback_progreso_externo(pct, msg)
+            elif hasattr(self, 'tareas_activas') and "pack_bato" in self.tareas_activas:
+                task = self.tareas_activas["pack_bato"]
+                self.after(0, lambda: task.actualizar(pct, msg))
+
+        if modo == "disco":
+            temp_dir = os.path.join(BASE_DIR, "engine", "temp_downloads")
+            os.makedirs(temp_dir, exist_ok=True)
+            archivos_temporales = []
+
+            try:
+                bytes_totales_descargados = 0
+                eta_calc = ETACalculator(total_size)
+                
+                for idx, url in enumerate(urls, start=1):
+                    if getattr(self, "abortar_proceso", False):
+                        raise InterruptedError()
+                    
+                    nombre_parte = f"batocera_part_{idx}.tmp"
+                    dest_path = os.path.join(temp_dir, nombre_parte)
+                    archivos_temporales.append(dest_path)
+                    
+                    logging.info(f"💾 Descargando parte {idx}/{len(urls)} a disco: {url}")
+                    
+                    stream_gen, _ = generar_stream_resiliente_v2(
+                        url, 
+                        abort_check=lambda: getattr(self, "abortar_proceso", False)
+                    )
+                    
+                    with open(dest_path, "wb") as f_out:
+                        for chunk in stream_gen:
+                            if getattr(self, "abortar_proceso", False):
+                                raise InterruptedError()
+                            f_out.write(chunk)
+                            bytes_totales_descargados += len(chunk)
+                            mb_s, eta_sec = eta_calc.update(bytes_totales_descargados)
+                            if mb_s is not None:
+                                progreso_ui(bytes_totales_descargados, total_size, f"Descargando ({idx}/{len(urls)}): {mb_s:.1f} MB/s | Faltan: {formatear_eta(eta_sec)}")
+
+                def stream_desde_disco():
+                    for temp_file in archivos_temporales:
+                        with open(temp_file, "rb") as f_in:
+                            while True:
+                                if getattr(self, "abortar_proceso", False):
+                                    return
+                                buf = f_in.read(4 * 1024 * 1024)
+                                if not buf:
+                                    break
+                                yield buf
+
+                stream_extract_tar(
+                    target_dir=ruta_destino_batocera,
+                    progress_callback=progreso_ui,
+                    abort_check=lambda: getattr(self, "abortar_proceso", False),
+                    method="ram",
+                    custom_stream=stream_desde_disco(),
+                    custom_total_size=total_size
+                )
+
+            finally:
+                for temp_file in archivos_temporales:
+                    if os.path.exists(temp_file):
+                        try: os.remove(temp_file)
+                        except Exception: pass
+
+        else:
+            def stream_multi_parte():
+                for index, url in enumerate(urls, start=1):
+                    logging.info(f"🔗 Extrayendo al vuelo parte {index}/{len(urls)}")
+                    stream_gen, _ = generar_stream_resiliente_v2(
+                        url, 
+                        abort_check=lambda: getattr(self, "abortar_proceso", False)
+                    )
+                    for chunk in stream_gen:
+                        if getattr(self, "abortar_proceso", False):
+                            return
+                        yield chunk
+
+            stream_extract_tar(
+                target_dir=ruta_destino_batocera,
+                progress_callback=progreso_ui,
+                abort_check=lambda: getattr(self, "abortar_proceso", False),
+                method="ram", 
+                custom_stream=stream_multi_parte(),
+                custom_total_size=total_size
+            )
 
     def verificar_conexion_servidores(self):
         urls = ["https://huggingface.co", "https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev"]
@@ -1100,7 +1148,7 @@ class SavinOceanicCommand(ctk.CTk):
     def clic_en_descarga(self):
         if self.animacion_id:
             try: self.after_cancel(self.animacion_id)
-            except: pass
+            except Exception: pass
             self.animacion_id = None
 
         if hasattr(self, 'lbl_btn_descarga'): self.lbl_btn_descarga.destroy()
@@ -1216,7 +1264,6 @@ class SavinOceanicCommand(ctk.CTk):
             if not self.f_progress.winfo_ismapped():
                 self.f_progress.pack(side="left", fill="both", expand=True, padx=(0, 10))
 
-            # Asegurar que el instalador principal usa sus barras estáticas (NO el Scroll de HT)
             self.f_tasks_scroll.pack_forget()
             if not self.lbl_status.winfo_ismapped():
                 self.lbl_status.pack(anchor="w", padx=5, pady=(2, 2))
@@ -1295,76 +1342,16 @@ class SavinOceanicCommand(ctk.CTk):
 
     def mostrar_info(self, titulo, mensaje): messagebox.showinfo(titulo, mensaje)
 
-    def __init__(self):
-        super().__init__()
-        self.title(f"SAVIN SUPER_USB // V{VERSION_ACTUAL}")
-        
-        self.update_idletasks()
-        self.geometry(f"1000x870+{(self.winfo_screenwidth() // 2) - 500}+{(self.winfo_screenheight() // 2) - 435}")
-        self.resizable(False, False)  
-        
-        self.animacion_id = None
-        self.gif_after_id = None
-        self.gif_break_id = None
-        self.creciendo = True
-        self.tamaño_actual = 180
-        self.img_descarga_data = None
-        
-        self.en_proceso = False
-        self.abortar_proceso = False
-        self.widgets_interactivos = []
-        self.mostrar_internos = ctk.BooleanVar(value=False)
-        self.gb_totales = 0.0 
-        self.min_cachy = 20.0 
-        
-        self.instalar_bato = ctk.BooleanVar(value=False)
-        self.instalar_cachy = ctk.BooleanVar(value=False) 
-        self.bato_64_act = ctk.BooleanVar(value=True)
-        self.bato_32_act = ctk.BooleanVar(value=False)
-        self.preservar_espacio = ctk.BooleanVar(value=False)
-        self.descargar_pack_bato = ctk.BooleanVar(value=False)
-        self.descargar_pack_hollow = ctk.BooleanVar(value=True)
-        self.metodo_descarga = ctk.StringVar(value="ram")
-        self._bloqueo_rebalanceo = False
-        self.pestana_actual = "instalador"
-
-        self.tool_bato_img = ctk.BooleanVar(value=False)
-        self.tool_pack_bato = ctk.BooleanVar(value=False)
-        self.tool_pack_hollow = ctk.BooleanVar(value=False)
-        self.lista_discos_hollow = []
-
-        self.tamanos_reales = {"bato_64": 4.60, "bato_32": 1.0, "pack_bato": 37.8, "pack_hollow": 8.66}
-        self.tamanos_formateados = {"bato_64": "4.60GB", "bato_32": "1GB", "pack_bato": "37.8GB", "pack_hollow": "8.66GB"}
-
-        self.configure(fg_color=AZUL_FONDO) 
-        self.attributes("-alpha", 0.94)
-        
-        self.cargar_recursos() 
-        self.setup_ui()
-        
-        if HAS_WINDND:
-            self.after(500, lambda: enganchar_drag_drop_global_win32(self.winfo_id(), self.al_arrastrar_archivos_iso))
-
-        self.actualizar_estados_bato()
-        self.actualizar_estados_cachy()
-        self.refrescar_discos()
-
-        self.iniciar_carga_tamanos_reales()
-        self.after(100, self.mostrar_capa_descarga)
-        self.protocol("WM_DELETE_WINDOW", self.cerrar_aplicacion)
-        self.after(1000, lambda: threading.Thread(target=self.comprobar_actualizaciones, daemon=True).start())
-        self.after(1500, self.preguntar_telemetria_errores)
-
     def cerrar_aplicacion(self):
         if self.en_proceso:
             if not messagebox.askyesno("⚠️ PROCESO EN CURSO", "¿Estás seguro de que quieres salir?\nLa instalación se interrumpirá."): return  
             self.abortar_proceso = True
         try: self.after_cancel(self.animacion_id)
-        except: pass
+        except Exception: pass
         try: self.after_cancel(self.gif_after_id)
-        except: pass
+        except Exception: pass
         try: self.after_cancel(self.gif_break_id)
-        except: pass
+        except Exception: pass
         self.destroy()
 
     def preguntar_telemetria_errores(self):
@@ -1401,7 +1388,6 @@ class SavinOceanicCommand(ctk.CTk):
                         f"❌ **Detalle:** `{mensaje_error}`"
                     )
                 }
-                # Buscar el archivo de log más reciente en la carpeta /logs
                 log_file_path = archivo_log if ('archivo_log' in globals() and os.path.exists(archivo_log)) else "savin_debug.log"
                 
                 if os.path.exists(log_file_path):
@@ -1442,25 +1428,33 @@ class SavinOceanicCommand(ctk.CTk):
             img_bato = Image.open(os.path.join(path_media, "batocera.png"))
             self.logo_batocera = ctk.CTkImage(light_image=img_bato, dark_image=img_bato, size=(125, 88))
             self.bato_size = (125, 88)
-        except: self.logo_batocera = None
+        except Exception: self.logo_batocera = None
         
         try: 
             img_cachy = Image.open(os.path.join(path_media, "cachy.png"))
             self.logo_cachy = ctk.CTkImage(light_image=img_cachy, dark_image=img_cachy, size=(280, 78))
             self.cachy_size = (280, 78)
-        except: self.logo_cachy = None
-        try: img_savin = Image.open(os.path.join(path_media, "Savin-2.png")); self.logo_savin = ctk.CTkImage(light_image=img_savin, dark_image=img_savin, size=(240, 135))
-        except: self.logo_savin = None
-        try: img_maker = Image.open(os.path.join(path_media, "HollowDrive-2.png")); self.logo_maker = ctk.CTkImage(light_image=img_maker, dark_image=img_maker, size=(520, 310))
-        except: self.logo_maker = None
+        except Exception: self.logo_cachy = None
+        try: 
+            img_savin = Image.open(os.path.join(path_media, "Savin-2.png"))
+            self.logo_savin = ctk.CTkImage(light_image=img_savin, dark_image=img_savin, size=(240, 135))
+        except Exception: self.logo_savin = None
+        try: 
+            img_maker = Image.open(os.path.join(path_media, "HollowDrive-2.png"))
+            self.logo_maker = ctk.CTkImage(light_image=img_maker, dark_image=img_maker, size=(520, 310))
+        except Exception: self.logo_maker = None
         try: 
             pil_instalar = Image.open(os.path.join(path_media, "instalar.png"))
             self.img_instalar = ctk.CTkImage(light_image=pil_instalar, dark_image=pil_instalar, size=(380, 75))
-        except: self.img_instalar = None
-        try: pil_image = Image.open(os.path.join(path_media, "descarga-morada.png")); self.img_descarga_data = ctk.CTkImage(light_image=pil_image, dark_image=pil_image, size=(350, 350))
-        except: self.img_descarga_data = None
-        try: pil_reload = Image.open(os.path.join(path_media, "reload.png")); self.img_reload = ctk.CTkImage(light_image=pil_reload, dark_image=pil_reload, size=(25, 25))
-        except: self.img_reload = None
+        except Exception: self.img_instalar = None
+        try: 
+            pil_image = Image.open(os.path.join(path_media, "descarga-morada.png"))
+            self.img_descarga_data = ctk.CTkImage(light_image=pil_image, dark_image=pil_image, size=(350, 350))
+        except Exception: self.img_descarga_data = None
+        try: 
+            pil_reload = Image.open(os.path.join(path_media, "reload.png"))
+            self.img_reload = ctk.CTkImage(light_image=pil_reload, dark_image=pil_reload, size=(25, 25))
+        except Exception: self.img_reload = None
         try: 
             img_isos_pil = Image.open(os.path.join(path_media, "ISOs.png"))
             self.img_isos = ctk.CTkImage(light_image=img_isos_pil, dark_image=img_isos_pil, size=(150, 150))
@@ -1470,10 +1464,7 @@ class SavinOceanicCommand(ctk.CTk):
 
         self.frames_linterna = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "hollow-linterna.gif"), size=(70, 70), espejo=True)
         self.frames_breakdance = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "breakdance.gif"), size=None)
-        
-        # [NUEVO] FIX: Imagen fantasma transparente para borrar el GIF al cancelar
         self.dummy_img = ctk.CTkImage(Image.new("RGBA", (1, 1), (0, 0, 0, 0)), size=(1, 1))
-        
 
     def al_clicar_pack_batocera(self):
         if self.descargar_pack_bato.get(): self.abrir_info_roms()
@@ -1498,14 +1489,15 @@ class SavinOceanicCommand(ctk.CTk):
         ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
-    def iniciar_carga_tamanos_reales(self): threading.Thread(target=self.cargar_tamanos_reales_hilo, daemon=True).start()
+    def iniciar_carga_tamanos_reales(self): 
+        threading.Thread(target=self.cargar_tamanos_reales_hilo, daemon=True).start()
 
     def consultar_tamano(self, clave, default_bytes):
         for var in [clave, clave.replace("bato", "batocera")]:
             try:
                 tam_bytes = resolver_tamano_pack(var)
                 if tam_bytes and tam_bytes > 0: return tam_bytes
-            except: continue
+            except Exception: continue
         return default_bytes
 
     def abrir_info_roms(self):
@@ -1540,18 +1532,16 @@ class SavinOceanicCommand(ctk.CTk):
             tam_bytes = self.consultar_tamano(clave, fb_val)
             self.tamanos_reales[clave] = tam_bytes / (1024**3) 
             try: self.tamanos_formateados[clave] = formatear_tamano(tam_bytes)
-            except: self.tamanos_formateados[clave] = f"{self.tamanos_reales[clave]:.2f}GB"
+            except Exception: self.tamanos_formateados[clave] = f"{self.tamanos_reales[clave]:.2f}GB"
         self.after(0, self.actualizar_labels_ui_con_tamanos_reales)
 
     def actualizar_labels_ui_con_tamanos_reales(self):
         self.ch_b64.configure(text=f"Batocera 64bits ({self.tamanos_formateados['bato_64']})")
-        # ELIMINA O COMENTA ESTA LÍNEA PARA QUE NO SOBRESCRIBA EL TEXTO:
-        # self.ch_b32.configure(text=f"Batocera 32bits ({self.tamanos_formateados['bato_32']})")
         self.ch_pack_bato.configure(text=f"PACK BATOCERA ({self.tamanos_formateados['pack_bato']})")
         self.ch_pack_hollow.configure(text=f"PACK HOLLOWDRIVE ({self.tamanos_formateados['pack_hollow']})")
         self.rebalancear()
 
-# =====================================================================
+    # =====================================================================
     # 🎛️ CONSTRUCCIÓN Y NAVEGACIÓN DE LA INTERFAZ
     # =====================================================================
 
@@ -1562,8 +1552,11 @@ class SavinOceanicCommand(ctk.CTk):
             self.img_info = ctk.CTkImage(light_image=img_i_pil, dark_image=img_i_pil, size=(100, 100))
             self.img_info_descarga = ctk.CTkImage(light_image=img_i_pil, dark_image=img_i_pil, size=(120, 120))
         
-        try: img_t_pil = Image.open(os.path.join(CARPETA_MEDIA, "triangulo.png")); self.img_triangulo = ctk.CTkImage(light_image=img_t_pil, dark_image=img_t_pil, size=(30, 30))
-        except: self.img_triangulo = None
+        try: 
+            img_t_pil = Image.open(os.path.join(CARPETA_MEDIA, "triangulo.png"))
+            self.img_triangulo = ctk.CTkImage(light_image=img_t_pil, dark_image=img_t_pil, size=(30, 30))
+        except Exception: 
+            self.img_triangulo = None
 
         # --- CABECERA ---
         self.header = ctk.CTkFrame(self, fg_color="transparent", height=110)
@@ -1623,12 +1616,12 @@ class SavinOceanicCommand(ctk.CTk):
 
         self.f_bato_opts = ctk.CTkFrame(f_bato_txt, fg_color="#0d141c", corner_radius=8)
         self.f_bato_opts.pack(fill="x", pady=5)
-        # --- CÓDIGO CORREGIDO ---
         self.ch_b64 = ctk.CTkCheckBox(self.f_bato_opts, text="Batocera 64bits (4.60GB)", variable=self.bato_64_act, command=self.rebalancear)
         self.ch_b64.pack(pady=2, padx=10, anchor="w")
         self.ch_b32 = ctk.CTkCheckBox(self.f_bato_opts, text="Batocera 32bits (Próximamente)", variable=self.bato_32_act, command=self.rebalancear, state="disabled")
         self.ch_b32.pack(pady=2, padx=10, anchor="w")
-        self.widgets_interactivos.append(self.ch_b64)  # Solo añadimos el de 64bits
+        self.widgets_interactivos.append(self.ch_b64)
+        
         if getattr(self, 'logo_batocera', None):
             f_bato_logo_container = ctk.CTkFrame(f_bato_master, width=135, height=95, fg_color="transparent")
             f_bato_logo_container.pack(side="right", padx=10)
@@ -1679,18 +1672,15 @@ class SavinOceanicCommand(ctk.CTk):
         self.widgets_interactivos.append(sw_cachy)
         self.crear_boton_info(f_cachy_h, self.abrir_info_cachyos).pack(side="left", padx=5)
 
-        # Contenedor para elegir escritorio de CachyOS
         self.cachy_flavor = ctk.StringVar(value="kde")
         self.f_cachy_opts = ctk.CTkFrame(f_cachy_master, fg_color="#0d141c", corner_radius=8)
         
-        # Opción KDE
         f_kde = ctk.CTkFrame(self.f_cachy_opts, fg_color="transparent")
         f_kde.pack(fill="x", padx=10, pady=2)
         r_kde = ctk.CTkRadioButton(f_kde, text="KDE Plasma", variable=self.cachy_flavor, value="kde", font=("Segoe UI", 12))
         r_kde.pack(side="left", pady=6)
         self.crear_boton_info(f_kde, self.abrir_info_kde).pack(side="right")
 
-        # Opción Hyprland
         f_hypr = ctk.CTkFrame(self.f_cachy_opts, fg_color="transparent")
         f_hypr.pack(fill="x", padx=10, pady=2)
         r_hypr = ctk.CTkRadioButton(f_hypr, text="Hyprland", variable=self.cachy_flavor, value="hyprland", font=("Segoe UI", 12))
@@ -1749,9 +1739,6 @@ class SavinOceanicCommand(ctk.CTk):
             btn.pack(side="left", padx=10, expand=True)
             self.dic_leyenda[nombre.lower()] = btn
 
-       # ---------------------------------------------------------------------
-        # 🚀 BOTÓN PRINCIPAL DE INICIO (Ubicado en el panel derecho p_right)
-        # ---------------------------------------------------------------------
         if getattr(self, 'img_instalar', None):
             self.btn_start = ctk.CTkButton(
                 self.p_right, 
@@ -1781,7 +1768,6 @@ class SavinOceanicCommand(ctk.CTk):
         # =====================================================================
         self.hollow_tools_container = ctk.CTkFrame(self, fg_color="transparent")
 
-        # CABECERA Y SELECTOR
         f_ht_top = ctk.CTkFrame(self.hollow_tools_container, fg_color=AZUL_CARD, corner_radius=12, border_width=1, border_color="#222")
         f_ht_top.pack(fill="x", padx=5, pady=(0, 10))
         
@@ -1794,13 +1780,10 @@ class SavinOceanicCommand(ctk.CTk):
         self.btn_ht_refresh = ctk.CTkButton(f_combo_ht, text="🔄 ESCANEAR", font=("Segoe UI", 12, "bold"), width=130, height=32, fg_color="#222", hover_color="#333", command=self.refrescar_discos_hollowtools)
         self.btn_ht_refresh.pack(side="left")
 
-        # PANEL PRINCIPAL DE 3 MÓDULOS
         f_ht_grid = ctk.CTkFrame(self.hollow_tools_container, fg_color="transparent")
         f_ht_grid.pack(fill="both", expand=True, padx=0, pady=0)
 
-        # ---------------------------------------------------------------------
-        # TARJETA 1: AÑADIR ISOs
-        # ---------------------------------------------------------------------
+        # TARJETA 1: GESTOR DE ISOs
         self.card_iso = ctk.CTkFrame(f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         self.card_iso.pack(side="left", fill="both", expand=True, padx=4)
 
@@ -1833,9 +1816,7 @@ class SavinOceanicCommand(ctk.CTk):
             )
             self.btn_plus_iso.place(relx=0.5, rely=0.5, anchor="center")
 
-        # ---------------------------------------------------------------------
-        # TARJETA 2: INYECTAR REPOSITORIOS
-        # ---------------------------------------------------------------------
+        # TARJETA 2: PAQUETES
         card_content = ctk.CTkFrame(f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         card_content.pack(side="left", fill="both", expand=True, padx=4)
 
@@ -1861,9 +1842,7 @@ class SavinOceanicCommand(ctk.CTk):
             fg_color=AZUL_ELECTRICO, hover_color="#0046c7", height=42, command=self.ht_inyectar_contenido
         ).pack(side="bottom", pady=12, padx=12, fill="x")
 
-        # ---------------------------------------------------------------------
-        # TARJETA 3: GESTIÓN CACHYOS
-        # ---------------------------------------------------------------------
+        # TARJETA 3: CACHYOS
         card_cachy = ctk.CTkFrame(f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         card_cachy.pack(side="left", fill="both", expand=True, padx=4)
 
@@ -1886,18 +1865,20 @@ class SavinOceanicCommand(ctk.CTk):
         self.seg_ht_cachy.set("🔄 Actualizar CachyOS")
         self.seg_ht_cachy.pack(fill="x", pady=(2, 8))
 
-        # NUEVO: Selector de KDE/Hyprland para HollowTools
         self.ht_cachy_flavor = ctk.StringVar(value="kde")
-        self.f_ht_flavor = ctk.CTkFrame(f_body_cachy, fg_color="#090d12", corner_radius=8, border_width=1, border_color="#1e293b")
-        self.f_ht_flavor.pack(fill="x", pady=(0, 8))
-        
-        ctk.CTkLabel(self.f_ht_flavor, text="Entorno:", font=("Segoe UI", 11, "bold"), text_color=AZUL_SUAVE).pack(side="left", padx=10, pady=6)
-        r_ht_kde = ctk.CTkRadioButton(self.f_ht_flavor, text="KDE", variable=self.ht_cachy_flavor, value="kde", font=("Segoe UI", 11))
-        r_ht_kde.pack(side="left", padx=5)
+        self.f_ht_flavor = ctk.CTkFrame(f_body_cachy, fg_color="#0d141c", corner_radius=8)
+        self.f_ht_flavor.pack(fill="x", pady=5)
+
+        ctk.CTkLabel(self.f_ht_flavor, text="Entorno:", font=("Segoe UI", 11, "bold"), text_color=AZUL_SUAVE).pack(side="left", padx=(10, 5), pady=6)
+
+        r_ht_kde = ctk.CTkRadioButton(self.f_ht_flavor, text="KDE Plasma", variable=self.ht_cachy_flavor, value="kde", font=("Segoe UI", 11))
+        r_ht_kde.pack(side="left", padx=5, pady=5)
+
         r_ht_hypr = ctk.CTkRadioButton(self.f_ht_flavor, text="Hyprland", variable=self.ht_cachy_flavor, value="hyprland", font=("Segoe UI", 11))
-        r_ht_hypr.pack(side="left", padx=5)
+        r_ht_hypr.pack(side="left", padx=5, pady=5)
 
         self.f_slider_sec = ctk.CTkFrame(f_body_cachy, fg_color="#090d12", corner_radius=10, border_width=1, border_color="#1e293b")
+        self.f_slider_sec.pack(fill="x", pady=5)
 
         ctk.CTkLabel(self.f_slider_sec, text="TAMAÑO CACHYOS (DERECHA):", font=("Segoe UI", 10, "bold"), text_color=AZUL_SUAVE).pack(pady=(6, 0))
         self.lbl_ht_right_space = ctk.CTkLabel(self.f_slider_sec, text="Disponible: 0.00 GB", font=("Consolas", 12, "bold"), text_color="white")
@@ -1912,13 +1893,10 @@ class SavinOceanicCommand(ctk.CTk):
         )
         self.btn_ht_ejecutar_cachy.pack(side="bottom", fill="x", pady=(8, 4))
 
-        # ---------------------------------------------------------------------
-        # BARRAS VISUALES COMPARATIVAS (ANTES / DESPUÉS)
-        # ---------------------------------------------------------------------
+        # COMPARATIVA VISUAL (ANTES / DESPUÉS)
         f_ht_preview = ctk.CTkFrame(self.hollow_tools_container, fg_color=AZUL_CARD, corner_radius=12, border_width=1, border_color="#222")
         f_ht_preview.pack(fill="x", padx=5, pady=(10, 0))
 
-        # Estado Actual (ANTES)
         f_p1 = ctk.CTkFrame(f_ht_preview, fg_color="transparent")
         f_p1.pack(fill="x", padx=12, pady=(6, 2))
         ctk.CTkLabel(f_p1, text="ANTES", font=("Segoe UI", 13, "bold"), text_color=AZUL_SUAVE).pack(side="left")
@@ -1930,7 +1908,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.lbl_ht_arrow = ctk.CTkLabel(f_ht_preview, text="⬇      ⬇      ⬇      ⬇      ⬇      ⬇      ⬇      ⬇", font=("Segoe UI", 12, "bold"), text_color=AZUL_CIAN)
         self.lbl_ht_arrow.pack(pady=1)
 
-        # Estado Futuro (DESPUÉS)
         f_p2 = ctk.CTkFrame(f_ht_preview, fg_color="transparent")
         f_p2.pack(fill="x", padx=12, pady=(2, 2))
         ctk.CTkLabel(f_p2, text="DESPUÉS", font=("Segoe UI", 13, "bold"), text_color=COLOR_CACHY).pack(side="left")
@@ -1947,10 +1924,8 @@ class SavinOceanicCommand(ctk.CTk):
         self.lbl_gif = ctk.CTkLabel(self.footer, text="")
         self.lbl_gif.pack(side="left", padx=10)
 
-        # Contenedor para progreso
         self.f_progress = ctk.CTkFrame(self.footer, fg_color="transparent")
 
-        # --- ETIQUETA DE ESTADO PRINCIPAL Y BARRAS GLOBALES ---
         self.lbl_status = ctk.CTkLabel(self.f_progress, text="ESPERANDO INICIO...", font=("Consolas", 12, "bold"), text_color=AZUL_SUAVE)
         self.lbl_status.pack(anchor="w", padx=5, pady=(2, 2))
 
@@ -1962,7 +1937,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.p_total.set(0)
         self.p_total.pack(fill="x", padx=5, pady=2)
         
-        # Contenedor desplazable para procesos dinámicos de HollowTools (Inicialmente SIN pack)
         self.f_tasks_scroll = ctk.CTkScrollableFrame(self.f_progress, height=70, fg_color="transparent", label_text="")
 
         self.btn_cancel = ctk.CTkButton(
@@ -1998,7 +1972,6 @@ class SavinOceanicCommand(ctk.CTk):
             self.f_selection.pack_forget()
             self.main_container.pack_forget()
             
-            # Ocultar el botón de inicio de p_right al pasar a HollowTools
             if hasattr(self, 'btn_start') and self.btn_start.winfo_exists():
                 self.btn_start.pack_forget()
 
@@ -2252,7 +2225,7 @@ class SavinOceanicCommand(ctk.CTk):
             libre_futuro = max(0.0, total_gb - size_h - size_g - size_c)
             info_fut_items = [f"CachyOS: {size_c:.1f}GB", f"Libre: {libre_futuro:.1f}GB"]
             self.lbl_ht_bar_futuro_info.configure(text=" | ".join(info_fut_items))
-            
+
     def ht_actualizar_cachyos(self):
         seleccion = self.combo_ht_disk.get()
         disco = next((d for d in self.lista_discos_hollow if d["display"] == seleccion), None)
@@ -2287,11 +2260,10 @@ class SavinOceanicCommand(ctk.CTk):
 
         self.crear_barra_tarea_dinamica(id_part, "Paso 1/3: Preparando y creando particiones...", color=AZUL_CIAN)
         self.crear_barra_tarea_dinamica(id_grub, "Paso 2/3: Volcado GRUB Bootloader (en espera)", color=COLOR_CACHY)
-        self.crear_barra_tarea_dinamica(id_sys, "Paso 3/3: Volcado CachyOS Btrfs (en espera)", color=COLOR_CACHY)
+        self.crear_barra_tarea_dinamica(id_sys, "Paso 3/3: Volcado CachyOS Ext4 (en espera)", color=COLOR_CACHY)
 
         def hilo():
             try:
-                # PASO 1: Particionado
                 self.actualizar_barra_tarea_dinamica(id_part, 0.1, "Eliminando particiones posteriores...")
                 if self.abortar_proceso: raise InterruptedError()
                 eliminar_particiones_cachy_diskpart(disco["device"])
@@ -2316,17 +2288,14 @@ class SavinOceanicCommand(ctk.CTk):
                 self.actualizar_barra_tarea_dinamica(id_part, 1.0, "✔ Particiones creadas correctamente")
 
                 metodo = self.metodo_descarga.get()
-                url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
-                
-                # SELECCIÓN DE ENTORNO EN HOLLOWTOOLS
                 sabor_ht = getattr(self, 'ht_cachy_flavor', ctk.StringVar(value="kde")).get()
                 if sabor_ht == "hyprland":
-                    try: url_cachy = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
-                    except KeyError: url_cachy = "AQUI_IRÁ_EL_FUTURO_LINK_DE_HYPRLAND"
+                    url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub_hyprland"]["mirrors"][0]["url"]
+                    url_cachy = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
                 else:
+                    url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
                     url_cachy = MIRRORS_DATA["cachyos_images"]["sistema"]["mirrors"][0]["url"]
 
-                # PASO 2: Flashear GRUB
                 self.actualizar_barra_tarea_dinamica(id_grub, 0.0, "Flasheando GRUB Bootloader...")
                 if self.abortar_proceso: raise InterruptedError()
 
@@ -2343,8 +2312,7 @@ class SavinOceanicCommand(ctk.CTk):
                 )
                 self.actualizar_barra_tarea_dinamica(id_grub, 1.0, "✔ GRUB Bootloader completado")
 
-                # PASO 3: Flashear CachyOS
-                self.actualizar_barra_tarea_dinamica(id_sys, 0.0, "Flasheando CachyOS Btrfs...")
+                self.actualizar_barra_tarea_dinamica(id_sys, 0.0, "Flasheando CachyOS Ext4...")
                 if self.abortar_proceso: raise InterruptedError()
 
                 def prog_cachy(written, total, fase="Flasheando", *args):
@@ -2358,7 +2326,7 @@ class SavinOceanicCommand(ctk.CTk):
                     abort_check=lambda: self.abortar_proceso, 
                     method=metodo
                 )
-                self.actualizar_barra_tarea_dinamica(id_sys, 1.0, "✔ CachyOS Btrfs completado")
+                self.actualizar_barra_tarea_dinamica(id_sys, 1.0, "✔ CachyOS Ext4 completado")
 
                 self.after(0, lambda: messagebox.showinfo("ÉXITO", "¡CachyOS instalado y configurado correctamente!"))
                 self.refrescar_discos_hollowtools()
@@ -2551,7 +2519,6 @@ class SavinOceanicCommand(ctk.CTk):
                         if total_bytes > 0:
                             pct_archivo = bytes_trans / total_bytes
                             pct_global = (i_local - 1 + pct_archivo) / total_archivos
-                            
                             txt = f"ISO ({i_local}/{total_archivos}): {n_local} | {pct_archivo*100:.1f}% | {mb_s:.1f} MB/s"
                             self.actualizar_barra_tarea_dinamica(id_tarea, pct_global, txt)
 
@@ -2626,19 +2593,16 @@ class SavinOceanicCommand(ctk.CTk):
 
         def hilo():
             try:
-                url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
                 metodo = self.metodo_descarga.get()
-
-                # SELECCIÓN DE ENTORNO EN HOLLOWTOOLS
                 sabor_ht = getattr(self, 'ht_cachy_flavor', ctk.StringVar(value="kde")).get()
                 if sabor_ht == "hyprland":
-                    try: url_cachy = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
-                    except KeyError: url_cachy = "AQUI_IRÁ_EL_FUTURO_LINK_DE_HYPRLAND"
+                    url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub_hyprland"]["mirrors"][0]["url"]
+                    url_cachy = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
                 else:
+                    url_grub = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
                     try: url_cachy = MIRRORS_DATA["cachyos_images"]["sistema"]["mirrors"][0]["url"]
                     except KeyError: url_cachy = "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img"
 
-                # PASO 1: Volcar GRUB Bootloader
                 def prog_grub(written, total, info_estado="Flasheando", *args):
                     if total and total > 0:
                         pct = written / total
@@ -2652,8 +2616,7 @@ class SavinOceanicCommand(ctk.CTk):
                 )
                 self.actualizar_barra_tarea_dinamica(id_grub, 1.0, "✔ GRUB Bootloader completado")
 
-                # PASO 2: Volcar Sistema CachyOS
-                self.actualizar_barra_tarea_dinamica(id_sys, 0.0, "Paso 2/2: Preparando CachyOS Btrfs...")
+                self.actualizar_barra_tarea_dinamica(id_sys, 0.0, "Paso 2/2: Preparando CachyOS Ext4...")
 
                 def prog_cachy(written, total, info_estado="Flasheando", *args):
                     if total and total > 0:
@@ -2852,14 +2815,17 @@ class SavinOceanicCommand(ctk.CTk):
         self.rebalancear()
 
     def crear_ocean_slider(self, parent, label, color, key, min_val=10):
-        f = ctk.CTkFrame(parent, fg_color="transparent"); f.pack(fill="x", padx=20, pady=5)
+        f = ctk.CTkFrame(parent, fg_color="transparent")
+        f.pack(fill="x", padx=20, pady=5)
         ctk.CTkLabel(f, text=f"❯ {label}", font=("Consolas", 11, "bold")).pack(anchor="w")
-        row = ctk.CTkFrame(f, fg_color="transparent"); row.pack(fill="x")
+        row = ctk.CTkFrame(f, fg_color="transparent")
+        row.pack(fill="x")
         s = ctk.CTkSlider(row, from_=min_val, to=1000, progress_color=color, command=lambda v, k=key: self.rebalancear(f"slider_{k}"))
         s.pack(side="left", fill="x", expand=True)
         setattr(self, f"slider_{key}", s)
         self.widgets_interactivos.append(s)
-        l_val = ctk.CTkLabel(row, text="0 GB", width=70, font=("Consolas", 14, "bold")); l_val.pack(side="right")
+        l_val = ctk.CTkLabel(row, text="0 GB", width=70, font=("Consolas", 14, "bold"))
+        l_val.pack(side="right")
         setattr(self, f"lbl_{key}_gb", l_val)
         return f
 
@@ -3079,7 +3045,7 @@ class SavinOceanicCommand(ctk.CTk):
             "descargar_pack_bato": self.descargar_pack_bato.get(),
             "instalar_bato": self.instalar_bato.get(),
             "metodo_descarga": self.metodo_descarga.get(),
-            "cachy_flavor": getattr(self, 'cachy_flavor', ctk.StringVar(value="kde")).get() # NUEVO
+            "cachy_flavor": getattr(self, 'cachy_flavor', ctk.StringVar(value="kde")).get()
         }
         
         self.hilo_instalacion = threading.Thread(target=self.proceso_instalacion_background, args=(config,), daemon=True)
@@ -3200,11 +3166,9 @@ class SavinOceanicCommand(ctk.CTk):
             def generar_mensaje_progreso(nombre_tarea, bytes_read, total_bytes, start_time, fase_str, override_start_time=None):
                 pct = (bytes_read / total_bytes) if (total_bytes and total_bytes > 0) else 0.0
 
-                # Si la fase ya viene formateada con velocidad en tiempo real y ETA desde ETACalculator
                 if "MB/s" in fase_str:
                     return pct, f"{nombre_tarea} | {pct*100:.1f}% | {fase_str}"
 
-                # Cálculo por defecto para tareas tradicionales que solo pasan palabras clave ("Descargando", "Extrayendo")
                 t_ref = override_start_time if override_start_time else start_time
                 elapsed = time.time() - t_ref
                 if elapsed > 0 and bytes_read > 0:
@@ -3266,24 +3230,24 @@ class SavinOceanicCommand(ctk.CTk):
                         letra_hollow = letra_alt
                         break
 
-            if not letra_hollow: raise RuntimeError("No se detectó la letra de unidad física para HOLLOWDRIVE.")
+            if letra_hollow:
+                agregar_exclusion_antivirus(letra_hollow)
+            else:
+                raise RuntimeError("No se detectó la letra de unidad física para HOLLOWDRIVE.")
 
-            # PASO PACK ROMS BATOCERA
+# PASO PACK ROMS BATOCERA
             if "pack_bato" in pasos_activos:
                 iniciar_cronometro("Pack Roms Batocera")
                 if self.abortar_proceso: raise InterruptedError()
                 self.after(0, lambda: self.alternar_gif_descarga(True))
-                actualizar_progreso_paso(0.0, "Descargando Pack Batocera...")
+                actualizar_progreso_paso(0.0, "Descargando e inyectando Pack Batocera...")
                 
-                try: url_pack_bato = MIRRORS_DATA["batocera_games"]["mirrors"][0]["url"]
-                except KeyError: url_pack_bato = "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/batocera-hollowpack.tar"
-                
-                t_start_bato_pack = time.time()
-                def progreso_batocera_pack(bytes_read, total_bytes, fase, override_start=None):
-                    pct, msg = generar_mensaje_progreso("Pack Batocera", bytes_read, total_bytes, t_start_bato_pack, fase, override_start)
-                    actualizar_progreso_paso(pct, msg)
+                # LLAMADA MULTIPARTE REAL:
+                self.descargar_y_extraer_batocera_pack(
+                    letra_hollow, 
+                    callback_progreso_externo=actualizar_progreso_paso
+                )
 
-                stream_extract_tar(url_pack_bato, letra_hollow, is_gdrive=False, progress_callback=progreso_batocera_pack, abort_check=lambda: self.abortar_proceso, method=metodo_ext)
                 self.after(0, lambda: self.alternar_gif_descarga(False))
                 detener_cronometro("Pack Roms Batocera")
                 paso_actual += 1
@@ -3369,8 +3333,12 @@ class SavinOceanicCommand(ctk.CTk):
                 self.after(0, lambda: self.alternar_gif_descarga(True))
                 actualizar_progreso_paso(0.0, "Flasheando GRUB...")
                 
-                try: url_grub_hf = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
-                except KeyError: url_grub_hf = "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img"
+                sabor_elegido = config.get("cachy_flavor", "kde")
+                if sabor_elegido == "hyprland":
+                    url_grub_hf = MIRRORS_DATA["cachyos_images"]["efi_grub_hyprland"]["mirrors"][0]["url"]
+                else:
+                    try: url_grub_hf = MIRRORS_DATA["cachyos_images"]["efi_grub"]["mirrors"][0]["url"]
+                    except KeyError: url_grub_hf = "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img"
                 
                 t_start_grub = time.time()
                 def progreso_grub(bytes_read, total_bytes, fase, override_start=None):
@@ -3379,9 +3347,11 @@ class SavinOceanicCommand(ctk.CTk):
 
                 if not letra_grub: letra_grub = encontrar_letra_por_etiqueta_ps("GRUB") or esperar_unidad_por_etiqueta("GRUB", intentos=6)
                 
+                # CORREGIDO: progreso_grub en lugar de prog_grub
                 stream_flash_image_direct(
                     url_grub_hf, letra_grub, 
-                    progress_callback=progreso_grub, abort_check=lambda: self.abortar_proceso, 
+                    progress_callback=progreso_grub, 
+                    abort_check=lambda: self.abortar_proceso, 
                     method=metodo_ext
                 )
                 self.after(0, lambda: self.alternar_gif_descarga(False))
@@ -3412,22 +3382,23 @@ class SavinOceanicCommand(ctk.CTk):
                 
                 sabor_elegido = config.get("cachy_flavor", "kde")
                 if sabor_elegido == "hyprland":
-                    try: url_cachy_hf = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
-                    except KeyError: url_cachy_hf = "AQUI_IRÁ_EL_FUTURO_LINK_DE_HYPRLAND"
+                    url_cachy_hf = MIRRORS_DATA["cachyos_images"]["hyprland"]["mirrors"][0]["url"]
                 else:
                     try: url_cachy_hf = MIRRORS_DATA["cachyos_images"]["sistema"]["mirrors"][0]["url"]
                     except KeyError: url_cachy_hf = "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img"
                 
                 t_start_cachy = time.time()
                 def progreso_cachy(bytes_read, total_bytes, fase, override_start=None):
-                    pct, msg = generar_mensaje_progreso("CachyOS (Btrfs)", bytes_read, total_bytes, t_start_cachy, fase, override_start)
+                    pct, msg = generar_mensaje_progreso("CachyOS (Ext4)", bytes_read, total_bytes, t_start_cachy, fase, override_start)
                     actualizar_progreso_paso(pct, msg)
 
                 if not letra_cachy: letra_cachy = encontrar_letra_por_etiqueta_ps("CachyOS") or esperar_unidad_por_etiqueta("CachyOS", intentos=6)
                 
+                # CORREGIDO: progreso_cachy en lugar de prog_cachy
                 stream_flash_image_direct(
                     url_cachy_hf, letra_cachy, 
-                    progress_callback=progreso_cachy, abort_check=lambda: self.abortar_proceso, 
+                    progress_callback=progreso_cachy, 
+                    abort_check=lambda: self.abortar_proceso, 
                     method=metodo_ext
                 )
                 self.after(0, lambda: self.alternar_gif_descarga(False))
@@ -3455,13 +3426,9 @@ class SavinOceanicCommand(ctk.CTk):
             limpiar_temporales()
             msg = str(e)
             logging.error(f"CRASH FATAL: {msg}", exc_info=True)
-            
-            # Notificar en la interfaz del programa
             self.after(0, lambda err_text=msg: messagebox.showerror("ERROR FATAL", f"Fallo de sistema:\n{err_text}"))
             self.after(0, lambda: self.p_total.set(0.0))
             self.after(0, lambda: self.p_task.set(0.0))
-            
-            # Enviar notificación automática a Discord
             self.enviar_reporte_error("System Crash / Unpack Error", msg)
             
         finally:
@@ -3511,10 +3478,10 @@ class SavinOceanicCommand(ctk.CTk):
 
     def actualizar_estados_cachy(self):
         if self.instalar_cachy.get():
-            self.f_cachy_opts.pack(fill="x", pady=5) # Aparecen las opciones de escritorio
+            self.f_cachy_opts.pack(fill="x", pady=5)
             self.f_row_c.pack(fill="x", padx=20, pady=5, before=self.canvas)
         else:
-            self.f_cachy_opts.pack_forget() # Desaparecen
+            self.f_cachy_opts.pack_forget()
             self.f_row_c.pack_forget()
         self.rebalancear()
 
@@ -3534,7 +3501,6 @@ class SavinOceanicCommand(ctk.CTk):
         if frames: 
             self.reproducir_gif(self.lbl_gif, frames, delay=80)
         else: 
-            # [CORREGIDO] Usar la imagen fantasma en lugar de None
             if hasattr(self, 'dummy_img'):
                 self.lbl_gif.configure(image=self.dummy_img)
                 self.lbl_gif.image = self.dummy_img
@@ -3656,11 +3622,21 @@ if __name__ == "__main__":
     if os.name == 'nt' and not es_administrador():
         root = tk.Tk()
         root.withdraw()
-        messagebox.showwarning("PERMISOS REQUERIDOS", "Savin Super USB necesita permisos de administrador para gestionar los discos.")
+        
+        respuesta = messagebox.askyesno(
+            "PERMISOS REQUERIDOS",
+            "Para obtener la MÁXIMA VELOCIDAD de instalación e I/O de archivos pequeños, "
+            "se recomienda ejecutar HollowDrive como Administrador.\n\n"
+            "¿Deseas reiniciar la aplicación con permisos de Administrador?"
+        )
         root.destroy()
-        try: ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-        except Exception as e: print(f"Error elevando permisos: {e}")
-        sys.exit()
+        
+        if respuesta:
+            try:
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+                sys.exit()
+            except Exception as e:
+                print(f"Error al elevar permisos: {e}")
 
     app = SavinOceanicCommand()
     app.mainloop()
