@@ -1,8 +1,108 @@
 import os
 import sys
 import time
-import io
+from datetime import datetime
+
+# =====================================================================
+# 📋 CAPTURA INTEGRAL DE TERMINAL Y LOGGING DESDE EL PRIMER INSTANTE
+# =====================================================================
+
+if hasattr(sys, 'frozen') or '__compiled__' in globals():
+    BASE_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+LOGS_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOGS_DIR, exist_ok=True)
+
+# Rotación de logs: conservar únicamente los 5 archivos más recientes
+try:
+    archivos_logs = [
+        os.path.join(LOGS_DIR, f) for f in os.listdir(LOGS_DIR)
+        if f.endswith(".log")
+    ]
+    archivos_logs.sort(key=os.path.getmtime)
+    while len(archivos_logs) > 4:
+        f_antiguo = archivos_logs.pop(0)
+        try: os.remove(f_antiguo)
+        except Exception: pass
+except Exception:
+    pass
+
+timestamp_inicio = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+archivo_log = os.path.join(LOGS_DIR, f"hollowdrive_{timestamp_inicio}.log")
+
+class TerminalCaptureStream:
+    """
+    Captura TODO lo que sale por la terminal (print, stdout, stderr, errores)
+    en tiempo real de principio a fin, escribiéndolo simultáneamente en pantalla y en el archivo log.
+    """
+    def __init__(self, original_stream, log_file_path):
+        self.original_stream = original_stream
+        self.log_file_path = log_file_path
+        self._f = open(log_file_path, "a", encoding="utf-8", buffering=1)
+
+    def write(self, message):
+        if self.original_stream is not None:
+            try:
+                self.original_stream.write(message)
+                self.original_stream.flush()
+            except Exception:
+                pass
+        if self._f and not self._f.closed:
+            try:
+                self._f.write(message)
+                self._f.flush()
+            except Exception:
+                pass
+
+    def flush(self):
+        if self.original_stream is not None:
+            try:
+                self.original_stream.flush()
+            except Exception:
+                pass
+        if self._f and not self._f.closed:
+            try:
+                self._f.flush()
+            except Exception:
+                pass
+
+    def isatty(self):
+        return getattr(self.original_stream, "isatty", lambda: False)()
+
+_orig_stdout = sys.__stdout__ if sys.__stdout__ is not None else sys.stdout
+_orig_stderr = sys.__stderr__ if sys.__stderr__ is not None else sys.stderr
+
+sys.stdout = TerminalCaptureStream(_orig_stdout, archivo_log)
+sys.stderr = TerminalCaptureStream(_orig_stderr, archivo_log)
+
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
+def unhandled_exception_handler(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    logging.critical("CRASH NO CONTROLADO (sys.excepthook):", exc_info=(exc_type, exc_value, exc_traceback))
+
+sys.excepthook = unhandled_exception_handler
+
 import threading
+if hasattr(threading, 'excepthook'):
+    def thread_exception_handler(args):
+        if issubclass(args.exc_type, KeyboardInterrupt):
+            return
+        logging.critical(f"CRASH EN HILO [{args.thread.name}] (threading.excepthook):", exc_info=(args.exc_type, args.exc_value, args.exc_traceback))
+    threading.excepthook = thread_exception_handler
+
+import io
 import queue
 import shutil  
 import webbrowser
@@ -11,14 +111,14 @@ import re
 import tarfile
 import requests
 import json
-import logging
 import ctypes
 from urllib.parse import urlparse
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Token de Acceso Hugging Face (Requerido para evitar límites anónimos en la CDN)
 HF_TOKEN = "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"
 from ctypes import wintypes
-from datetime import datetime
 from tkinter import messagebox, filedialog
 import tkinter as tk
 from PIL import Image, ImageSequence, ImageTk
@@ -31,17 +131,147 @@ try:
 except ImportError:
     HAS_WINDND = False
 
+import engine.i18n as i18n
+from engine.i18n import t
+
 # Importaciones del motor local
 from engine.download_manager import descargar_y_extraer_ventoy, resolver_tamano_pack
-
 try:
     from engine.download_manager import formatted_size as formatear_tamano
 except ImportError:
     from engine.download_manager import formatear_tamano
-from engine.disk_logic import obtener_unidades_usb, instalar_ventoy, crear_particion_adicional, obtener_estructura_disco_ps
+from engine.disk_logic import (
+    iniciar_escuchador_usb as iniciar_escuchador_usb_engine,
+    obtener_unidades_usb,
+    instalar_ventoy,
+    crear_particion_adicional,
+    obtener_estructura_disco_ps,
+    ejecutar_powershell_seguro,
+    _disk_query_lock
+)
 
 GITHUB_REPO = "MVP-Savyn/SAVIN-HOLLOWDRIVE"
 URL_MIRRORS_GITHUB = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/engine/mirrors.json"
+
+class CTkToolTip:
+    """
+    Muestra un tooltip flotante cuando el usuario mantiene el cursor sobre un widget
+    durante el tiempo especificado (500ms por defecto).
+    """
+    def __init__(self, widget, text="Recargar", delay_ms=500):
+        self.widget = widget
+        self.text = text
+        self.delay_ms = delay_ms
+        self.tooltip_window = None
+        self.after_id = None
+
+        self.widget.bind("<Enter>", self.on_enter, add="+")
+        self.widget.bind("<Leave>", self.on_leave, add="+")
+        self.widget.bind("<Button-1>", self.on_leave, add="+")
+
+    def on_enter(self, event=None):
+        self.schedule()
+
+    def on_leave(self, event=None):
+        self.unschedule()
+        self.hide_tooltip()
+
+    def schedule(self):
+        self.unschedule()
+        if hasattr(self.widget, "after"):
+            self.after_id = self.widget.after(self.delay_ms, self.show_tooltip)
+
+    def unschedule(self):
+        if self.after_id:
+            try:
+                self.widget.after_cancel(self.after_id)
+            except Exception:
+                pass
+            self.after_id = None
+
+    def show_tooltip(self):
+        if self.tooltip_window or not self.widget.winfo_exists():
+            return
+        
+        try:
+            x = self.widget.winfo_rootx() + (self.widget.winfo_width() // 2) - 30
+            y = self.widget.winfo_rooty() + self.widget.winfo_height() + 6
+
+            tw = tk.Toplevel(self.widget)
+            tw.wm_overrideredirect(True)
+            tw.wm_geometry(f"+{x}+{y}")
+            tw.attributes("-topmost", True)
+            tw.config(bg="#1e293b")
+
+            label = tk.Label(
+                tw,
+                text=self.text,
+                justify="left",
+                background="#0f172a",
+                foreground="#38bdf8",
+                relief="solid",
+                borderwidth=1,
+                font=("Segoe UI", 9, "bold"),
+                padx=8,
+                pady=4
+            )
+            label.pack()
+            self.tooltip_window = tw
+        except Exception:
+            pass
+
+    def hide_tooltip(self):
+        if self.tooltip_window:
+            try:
+                self.tooltip_window.destroy()
+            except Exception:
+                pass
+            self.tooltip_window = None
+
+
+def hacer_combobox_clicable_total(combobox):
+    """
+    Permite abrir y contraer (toggle) el menú desplegable al hacer clic sobre cualquier
+    parte del control (caja de entrada, flecha o fondo) con cursor hand2 de forma totalmente segura.
+    Si el menú ya está desplegado, el clic lo contrae en lugar de volver a abrirlo desde cero.
+    """
+    combobox._last_menu_close = 0.0
+
+    orig_menu_open = combobox._dropdown_menu.open
+    def safe_menu_open(x, y):
+        try:
+            orig_menu_open(x, y)
+        finally:
+            combobox._last_menu_close = time.time()
+            combobox._close_on_next_click = False
+
+    combobox._dropdown_menu.open = safe_menu_open
+
+    def toggle_dropdown(e=None):
+        if str(combobox.cget("state")) == "disabled":
+            return "break"
+        
+        now = time.time()
+        # Si el menú se acaba de cerrar (por este mismo clic del usuario que lo contrae), no volver a desplegar
+        if (now - getattr(combobox, "_last_menu_close", 0.0)) < 0.35:
+            return "break"
+        
+        if len(combobox._values) > 0:
+            combobox._open_dropdown_menu()
+        return "break"
+
+    combobox._clicked = toggle_dropdown
+
+    if hasattr(combobox, "_entry"):
+        combobox._entry.bind("<Button-1>", toggle_dropdown)
+        combobox._entry.configure(cursor="hand2")
+    
+    if hasattr(combobox, "_canvas"):
+        combobox._canvas.bind("<Button-1>", toggle_dropdown)
+        combobox._canvas.tag_bind("right_parts", "<Button-1>", toggle_dropdown)
+        combobox._canvas.tag_bind("dropdown_arrow", "<Button-1>", toggle_dropdown)
+
+    combobox.configure(cursor="hand2")
 
 # =====================================================================
 # 🛠️ UTILIDADES GLOBALES DE SISTEMA Y ENTORNO (COLUMNA 0)
@@ -102,9 +332,21 @@ def enganchar_drag_drop_global_win32(hwnd_tkinter, callback):
         logging.warning(f"Error al configurar enganche Win32 Drag&Drop: {e}")
 
 def resource_path(relative_path):
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
+    """
+    Resuelve la ruta a los recursos internos empaquetados por Nuitka (--onefile)
+    o el entorno de desarrollo local.
+    """
+    # 1. Nuitka en modo --onefile siempre expone esta variable con la ruta temporal real
+    if "NUITKA_ONEFILE_DIRECTORY" in os.environ:
+        base_path = os.environ["NUITKA_ONEFILE_DIRECTORY"]
+    # 2. PyInstaller (por compatibilidad)
+    elif hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    # 3. Modo script nativo (.py)
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        
+    return os.path.join(base_path, relative_path)
 
 if hasattr(sys, 'frozen') or '__compiled__' in globals():
     BASE_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -112,6 +354,42 @@ else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 CARPETA_MEDIA = resource_path("media")
+
+def asegurar_herramientas_externas():
+    """
+    Garantiza que la carpeta engine/ (con Ventoy y 7-Zip) exista físicamente
+    junto al ejecutable, extrayéndola del interior del .exe en el primer arranque.
+    """
+    destino_engine = os.path.join(BASE_DIR, "engine")
+    
+    # 1. Si ya existe en disco y tiene Ventoy2Disk.exe, arrancamos de inmediato
+    if os.path.exists(destino_engine):
+        for root, dirs, files in os.walk(destino_engine):
+            for f in files:
+                if f.lower() == "ventoy2disk.exe":
+                    return root
+
+    # 2. Localizar la carpeta engine interna que Nuitka extrajo en %TEMP%
+    origen_engine = resource_path("engine")
+    
+    # Verificamos que el origen exista y sea diferente al destino en disco
+    if os.path.exists(origen_engine) and os.path.normpath(origen_engine).lower() != os.path.normpath(destino_engine).lower():
+        logging.info(f"📦 [DESPLIEGUE] Copiando recursos desde {origen_engine} hacia {destino_engine}...")
+        try:
+            os.makedirs(destino_engine, exist_ok=True)
+            shutil.copytree(origen_engine, destino_engine, dirs_exist_ok=True)
+            logging.info(f"✔ [DESPLIEGUE] Carpeta engine desplegada con éxito en: {destino_engine}")
+        except Exception as e:
+            logging.error(f"Error desplegando engine: {e}")
+
+    # 3. Comprobar que tras la copia Ventoy está listo
+    if os.path.exists(destino_engine):
+        for root, dirs, files in os.walk(destino_engine):
+            for f in files:
+                if f.lower() == "ventoy2disk.exe":
+                    return root
+
+    return None
 
 def obtener_version_interna():
     """ Lee dinámicamente la versión del ejecutable desde sus propiedades de Windows """
@@ -147,70 +425,6 @@ def obtener_version_interna():
 
 VERSION_ACTUAL = obtener_version_interna()
 
-# =====================================================================
-# 📋 SISTEMA DE REGISTRO Y LOGGING
-# =====================================================================
-
-class TeeStream:
-    """ Redirige sys.stdout y sys.stderr hacia logging manteniendo la salida en pantalla """
-    def __init__(self, log_level_func, original_stream):
-        self.log_level_func = log_level_func
-        self.original_stream = original_stream
-        self._buffer = ""
-
-    def write(self, message):
-        self.original_stream.write(message)
-        self.original_stream.flush()
-        self._buffer += message
-        while "\n" in self._buffer:
-            line, self._buffer = self._buffer.split("\n", 1)
-            line_clean = line.rstrip("\r")
-            if line_clean.strip():
-                self.log_level_func(line_clean)
-
-    def flush(self):
-        if self._buffer.strip():
-            self.log_level_func(self._buffer.strip())
-            self._buffer = ""
-        self.original_stream.flush()
-
-def rotar_logs(carpeta_logs, max_archivos=5):
-    """ Borra los archivos de log más antiguos si sobrepasan el límite """
-    try:
-        archivos = [
-            os.path.join(carpeta_logs, f) for f in os.listdir(carpeta_logs)
-            if f.endswith(".log")
-        ]
-        archivos.sort(key=os.path.getmtime)
-        limite = max_archivos - 1
-        
-        while len(archivos) > limite:
-            f_a_borrar = archivos.pop(0)
-            try:
-                os.remove(f_a_borrar)
-            except Exception as ex:
-                print(f"No se pudo borrar {os.path.basename(f_a_borrar)} (posiblemente bloqueado): {ex}")
-    except Exception as e:
-        print(f"Aviso: Error general al rotar logs: {e}")
-
-LOGS_DIR = os.path.join(BASE_DIR, "logs")
-os.makedirs(LOGS_DIR, exist_ok=True)
-rotar_logs(LOGS_DIR, max_archivos=5)
-
-timestamp_inicio = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-archivo_log = os.path.join(LOGS_DIR, f"hollowdrive_{timestamp_inicio}.log")
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(archivo_log, mode='w', encoding='utf-8')
-    ]
-)
-
-sys.stdout = TeeStream(logging.info, sys.__stdout__)
-sys.stderr = TeeStream(logging.error, sys.__stderr__)
-
 logging.info(f"=== INICIANDO HOLLOWDRIVE V{VERSION_ACTUAL} ===")
 logging.info(f"Ruta base del programa: {BASE_DIR}")
 logging.info(f"Archivo de registro de la sesión: {archivo_log}")
@@ -241,17 +455,25 @@ try:
 except KeyError:
     URL_BATOCERA = "https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev/batocerumen.img" 
 
-# --- CONFIGURACIÓN ESTÉTICA ---
-AZUL_FONDO = "#05080a"  
-AZUL_CARD = "#0d1117"   
-AZUL_CIAN = "#00d4ff"       
-AZUL_ELECTRICO = "#005eff"  
-AZUL_SUAVE = "#70a1ff"
+# --- CONFIGURACIÓN ESTÉTICA ADAPTATIVA (CLARO / OSCURO) ---
+ctk.set_appearance_mode("Dark")  # Modo oscuro manual por defecto
+
+AZUL_FONDO = ("#e2e8f0", "#05080a")      # Fondo ventana principal
+AZUL_CARD = ("#ffffff", "#0d1117")       # Fondo de tarjetas / paneles
+AZUL_CARD_INNER = ("#f1f5f9", "#090d12") # Fondos de listas y subcuadros
+AZUL_CIAN = ("#0284c7", "#00d4ff")       # Acentos y títulos (azul profundo en claro, cian neón en oscuro)
+AZUL_ELECTRICO = ("#2563eb", "#005eff")  # Botones primarios
+AZUL_SUAVE = ("#1d4ed8", "#70a1ff")      # Subtítulos y textos de ayuda con contraste
+COLOR_BORDE = ("#cbd5e1", "#1e293b")     # Bordes sutiles
+
 COLOR_HOLLOW, COLOR_CACHY = "#1e3799", "#2ecc71"
 COLOR_LIMINE, COLOR_LIBRE = "#6c757d", "#444444"
 VERDE_EXITO = "#2ecc71"
 MODO_DEBUG = True
 
+def color_canvas_actual():
+    """ Devuelve el color de fondo en formato string simple para los Canvas de Tkinter """
+    return AZUL_CARD[0] if ctk.get_appearance_mode() == "Light" else AZUL_CARD[1]
 # =====================================================================
 # ⚡ MOTOR DE EXTRACCIÓN, RED Y ALMACENAMIENTO (COLUMNA 0)
 # =====================================================================
@@ -401,10 +623,13 @@ def obtener_stream_gdrive(file_id):
         
     return res
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
     """
     Motor de Red de Flujo Continuo:
-    Descarga una parte completa y permite encadenar múltiples partes continuas sin cortes.
+    Descarga una parte completa con bypass de certificados interceptados por antivirus (session.verify = False).
     """
     if not url or not isinstance(url, str) or not url.startswith("http"):
         raise ValueError(f"URL no válida: '{url}'")
@@ -412,17 +637,23 @@ def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
     domain = urlparse(url).netloc
     is_hf = "huggingface.co" in domain
 
+    # Sesión blindada contra interceptación SSL de antivirus
+    session = requests.Session()
+    session.verify = False
+
     headers_base = {
         "User-Agent": "HollowDrive-Installer/1.1", 
         "Connection": "keep-alive",
-        "Accept-Encoding": "identity"  # Evita compresiones automáticas intermedias
+        "Accept-Encoding": "identity"
     }
     if is_hf and HF_TOKEN:
         headers_base["Authorization"] = f"Bearer {HF_TOKEN}"
 
-    # 1. Obtener tamaño total de la parte (opcional para progreso)
+    session.headers.update(headers_base)
+
+    # 1. Petición HEAD sin verificación de certificado
     try:
-        head_res = requests.head(url, headers=headers_base, allow_redirects=True, timeout=6.0)
+        head_res = session.head(url, allow_redirects=True, timeout=6.0)
         total_size = int(head_res.headers.get('Content-Length', 0)) or None
     except Exception:
         total_size = None
@@ -436,21 +667,17 @@ def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
             if abort_check and abort_check():
                 raise InterruptedError()
 
-            headers = headers_base.copy()
+            req_headers = {}
             if bytes_read > 0:
-                headers["Range"] = f"bytes={bytes_read}-"
+                req_headers["Range"] = f"bytes={bytes_read}-"
                 logging.info(f"🔄 [RED] Reanudando descarga desde byte {bytes_read} ({bytes_read / (1024**2):.1f} MB)...")
 
             try:
-                with requests.get(url, headers=headers, stream=True, timeout=(6.0, 10.0)) as response:
-                    # Si pedimos rango y no nos da 206 ni 200, es error
+                # 2. GET con verify=False automático por la sesión
+                with session.get(url, headers=req_headers, stream=True, timeout=(6.0, 12.0)) as response:
                     if bytes_read > 0 and response.status_code not in (200, 206):
                         raise RuntimeError(f"El servidor rechazó el rango HTTP (Status: {response.status_code})")
                     response.raise_for_status()
-                    
-                    # Si no teníamos total_size del HEAD, lo leemos directamente del GET
-                    cl = response.headers.get('Content-Length')
-                    part_size = int(cl) if cl else total_size
 
                     retries = 0
 
@@ -462,12 +689,10 @@ def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
                             bytes_read += len(chunk)
                             yield chunk
 
-                    # Si el bucle iter_content terminó sin excepciones, la parte se completó al 100%
-                    logging.info(f"✔ Parte descargada con éxito ({bytes_read / (1024**2):.1f} MB). Pasando a la siguiente...")
+                    logging.info(f"✔ Parte descargada con éxito ({bytes_read / (1024**2):.1f} MB).")
                     return
 
             except (requests.RequestException, RuntimeError, TimeoutError) as e:
-                # Si el error es 416 (Range Not Satisfiable), significa que ya leímos todo el archivo
                 if hasattr(e, 'response') and e.response is not None and e.response.status_code == 416:
                     return
 
@@ -803,11 +1028,8 @@ def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_c
 
 def encontrar_letra_por_etiqueta_ps(label):
     try:
-        cmd = f'Get-Volume | Where-Object {{$_.FileSystemLabel -eq "{label}"}} | Select-Object -ExpandProperty DriveLetter'
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        si.wShowWindow = subprocess.SW_HIDE
-        output = subprocess.check_output(["powershell", "-NoProfile", "-Command", cmd], startupinfo=si, creationflags=subprocess.CREATE_NO_WINDOW, text=True, errors="ignore")
+        cmd = f'[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Volume | Where-Object {{$_.FileSystemLabel -eq "{label}"}} | Select-Object -ExpandProperty DriveLetter'
+        output = ejecutar_powershell_seguro(cmd)
         clean_output = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', output).strip()
         if clean_output and len(clean_output) == 1 and clean_output.isalpha():
             return f"{clean_output.upper()}:\\"
@@ -815,13 +1037,10 @@ def encontrar_letra_por_etiqueta_ps(label):
     return None
 
 def asignar_letra_particion_ps(disk_index, part_number):
-    """ Asigna una letra de unidad libre a la partición especificada usando diskpart """
+    """ Asigna una letra de unidad libre a la partición especificada usando diskpart de forma segura """
     try:
-        cmd_used = "Get-Volume | Select-Object -ExpandProperty DriveLetter"
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        si.wShowWindow = subprocess.SW_HIDE
-        out = subprocess.check_output(["powershell", "-NoProfile", "-Command", cmd_used], startupinfo=si, creationflags=subprocess.CREATE_NO_WINDOW, text=True, errors="ignore")
+        cmd_used = "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Volume | Select-Object -ExpandProperty DriveLetter"
+        out = ejecutar_powershell_seguro(cmd_used)
         used = set(re.findall(r'[A-Z]', out.upper()))
         
         free_letter = None
@@ -834,7 +1053,11 @@ def asignar_letra_particion_ps(disk_index, part_number):
         script = f"select disk {disk_index}\nselect partition {part_number}\nassign letter={free_letter}\nrescan\n"
         script_path = os.path.join(BASE_DIR, "engine", "assign_temp.txt")
         with open(script_path, "w") as f: f.write(script)
-        subprocess.run(["diskpart", "/s", script_path], startupinfo=si, creationflags=subprocess.CREATE_NO_WINDOW)
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        si.wShowWindow = subprocess.SW_HIDE
+        with _disk_query_lock:
+            subprocess.run(["diskpart", "/s", script_path], startupinfo=si, creationflags=subprocess.CREATE_NO_WINDOW)
         if os.path.exists(script_path): os.remove(script_path)
         time.sleep(1.5)
         return f"{free_letter}:\\"
@@ -947,6 +1170,14 @@ class ItemTareaProgreso:
 
 class SavinOceanicCommand(ctk.CTk):
 
+    def after(self, ms, func=None, *args):
+        try:
+            if self.winfo_exists():
+                return super().after(ms, func, *args)
+        except Exception:
+            pass
+        return None
+
     def __init__(self):
         super().__init__()
         self.title(f"SAVIN SUPER_USB // V{VERSION_ACTUAL}")
@@ -989,10 +1220,11 @@ class SavinOceanicCommand(ctk.CTk):
         self.tamanos_formateados = {"bato_64": "4.60GB", "bato_32": "1GB", "pack_bato": "37.8GB", "pack_hollow": "8.66GB"}
 
         self.configure(fg_color=AZUL_FONDO) 
-        self.attributes("-alpha", 0.94)
+        self.attributes("-alpha", 1.0)  # Ventana sólida, sin transparencias
         
         self.cargar_recursos() 
         self.setup_ui()
+        self.actualizar_textos_idioma()
         
         if HAS_WINDND:
             self.after(500, lambda: enganchar_drag_drop_global_win32(self.winfo_id(), self.al_arrastrar_archivos_iso))
@@ -1000,9 +1232,16 @@ class SavinOceanicCommand(ctk.CTk):
         self.actualizar_estados_bato()
         self.actualizar_estados_cachy()
         self.refrescar_discos()
+        self._iniciar_escuchador_usb_timer()
+        self.iniciar_watchdog()
 
         self.iniciar_carga_tamanos_reales()
-        self.after(100, self.mostrar_capa_descarga)
+        
+        # Despliegue seguro de Ventoy y bienvenida (con los widgets ya creados):
+        asegurar_herramientas_externas()
+        self.bloquear_ui(False)
+        self.after(250, self.abrir_ventana_info)
+        
         self.protocol("WM_DELETE_WINDOW", self.cerrar_aplicacion)
         self.after(1000, lambda: threading.Thread(target=self.comprobar_actualizaciones, daemon=True).start())
         self.after(1500, self.preguntar_telemetria_errores)
@@ -1123,7 +1362,8 @@ class SavinOceanicCommand(ctk.CTk):
         return False
 
     def verificar_herramientas(self):
-        engine_path = os.path.join(BASE_DIR, "engine")
+        """ Comprueba si Ventoy y 7-Zip están disponibles en los recursos empaquetados """
+        engine_path = resource_path("engine")
         if os.path.exists(engine_path):
             for root, dirs, files in os.walk(engine_path):
                 if "Ventoy2Disk.exe" in files:
@@ -1169,18 +1409,16 @@ class SavinOceanicCommand(ctk.CTk):
         else: self.after(0, lambda: self.prog_descarga.configure(progress_color="red"))
 
     def abrir_info_ventoy(self):
-        v = self.creventana_info_base("INFORMACIÓN DE COMPLEMENTOS", 640, 420)
+        v = self.creventana_info_base(t("modals.ventoy_core_title"), 640, 420)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🔧 COMPLEMENTO CORE: VENTOY", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        info = ("Ventoy es una herramienta open-source esencial que gestiona el entorno multi-boot de tu HollowDrive.\n\n"
-                "Permite arrancar múltiples sistemas operativos directamente desde archivos ISO sin formatear la unidad.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 17), justify="center", wraplength=560).pack(pady=5)
+        ctk.CTkLabel(frame_interno, text=t("modals.ventoy_core_header"), font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.ventoy_core_body"), font=("Segoe UI", 16), justify="center", wraplength=560).pack(pady=5)
         
         f_botones = ctk.CTkFrame(frame_interno, fg_color="transparent")
         f_botones.pack(pady=(20, 0))
-        ctk.CTkButton(f_botones, text="VISITAR VENTOY", font=("Segoe UI", 13, "bold"), fg_color=AZUL_CARD, border_width=1, border_color=AZUL_CIAN, height=42, width=180, command=lambda: self.abrir_url("https://www.ventoy.net")).pack(side="left", padx=10)
-        ctk.CTkButton(f_botones, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=140, command=v.destroy).pack(side="left", padx=10)
+        ctk.CTkButton(f_botones, text=f"{t('modals.initial.visit')} Ventoy", font=("Segoe UI", 13, "bold"), fg_color=AZUL_CARD, border_width=1, border_color=AZUL_CIAN, height=42, width=180, command=lambda: self.abrir_url("https://www.ventoy.net")).pack(side="left", padx=10)
+        ctk.CTkButton(f_botones, text=t("modals.btn_close"), font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=140, command=v.destroy).pack(side="left", padx=10)
         v.update(); v.grab_set()
 
     def mostrar_capa_descarga(self):
@@ -1221,10 +1459,71 @@ class SavinOceanicCommand(ctk.CTk):
         )
         self.lbl_info.place(relx=0.5, rely=0.85, anchor="center")
 
+    def iniciar_watchdog(self):
+        """ Inicia el proceso supervisor independiente en segundo plano para capturar crashes y enviar logs a Discord """
+        try:
+            watchdog_script = os.path.join(BASE_DIR, "engine", "watchdog.py")
+            if os.path.exists(watchdog_script):
+                subprocess.Popen(
+                    [sys.executable, watchdog_script, str(os.getpid()), archivo_log],
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
+                logging.info(f"✔ Proceso Watchdog de soporte iniciado para PID {os.getpid()}")
+        except Exception as e:
+            logging.warning(f"No se pudo iniciar el proceso Watchdog: {e}")
+
+    def _iniciar_escuchador_usb_timer(self):
+        """ Monitorea cambios de unidades en el bucle principal de Tkinter sin crear hilos demonio que puedan corromper el GIL en Python 3.13 """
+        if os.name != 'nt': return
+        try:
+            self._mask_drives_anterior = ctypes.windll.kernel32.GetLogicalDrives()
+        except Exception:
+            self._mask_drives_anterior = 0
+        self.after(1500, self._escuchar_usb_timer)
+
+    def _escuchar_usb_timer(self):
+        if not self.winfo_exists(): return
+        try:
+            mask_actual = ctypes.windll.kernel32.GetLogicalDrives()
+            if hasattr(self, '_mask_drives_anterior') and mask_actual != self._mask_drives_anterior:
+                self._mask_drives_anterior = mask_actual
+                self.auto_refrescar_unidades_usb()
+        except Exception:
+            pass
+        finally:
+            if not getattr(self, 'en_proceso', False):
+                self.after(1500, self._escuchar_usb_timer)
+
+    def auto_refrescar_unidades_usb(self):
+        """ Refresca las unidades detectadas automáticamente tras conectar o expulsar un dispositivo """
+        if getattr(self, 'en_proceso', False):
+            return
+        if getattr(self, '_refrescando_discos', False):
+            return
+        self.refrescar_discos()
+        if hasattr(self, 'refrescar_discos_hollowtools'):
+            self.refrescar_discos_hollowtools()
+
+    def ocultar_interfaz_instalador(self):
+        if hasattr(self, 'main_container'):
+            try:
+                self.main_container.pack_forget()
+            except Exception:
+                pass
+        if hasattr(self, 'footer') and not getattr(self, 'en_proceso', False):
+            try:
+                self.footer.pack_forget()
+            except Exception:
+                pass
+
     def refrescar_discos(self):
+        self.combo_disk.configure(values=[t("selector.searching")])
+        self.combo_disk.set(t("selector.searching"))
+        self.ocultar_interfaz_instalador()
+        if getattr(self, '_refrescando_discos', False):
+            return
+        self._refrescando_discos = True
         self.btn_refresh.configure(state="disabled")
-        self.combo_disk.configure(values=["Buscando unidades..."])
-        self.combo_disk.set("Buscando unidades...")
         incluir_internos = self.mostrar_internos.get()
         
         def run():
@@ -1236,16 +1535,23 @@ class SavinOceanicCommand(ctk.CTk):
                 
         threading.Thread(target=run, daemon=True).start()
 
+    def al_seleccionar_disco(self, seleccion=None):
+        if not seleccion:
+            seleccion = self.combo_disk.get()
+        self.activar_interfaz_completa(seleccion)
+
     def _finalizar_refresco_discos(self, discos):
+        self._refrescando_discos = False
         self.lista_discos_reales = discos
         self.btn_refresh.configure(state="normal")
+        self.ocultar_interfaz_instalador()
         if not self.lista_discos_reales:
-            self.combo_disk.configure(values=["⚠️ NO SE DETECTAN UNIDADES"])
-            self.combo_disk.set("⚠️ NO SE DETECTAN UNIDADES")
+            self.combo_disk.configure(values=[t("selector.no_units")])
+            self.combo_disk.set(t("selector.no_units"))
         else:
             nombres = [d["display"] for d in self.lista_discos_reales]
             self.combo_disk.configure(values=nombres)
-            self.combo_disk.set("--- Selecciona una unidad ---")
+            self.combo_disk.set(t("selector.select_placeholder"))
 
     def abrir_url(self, url): webbrowser.open_new_tab(url)
 
@@ -1289,7 +1595,7 @@ class SavinOceanicCommand(ctk.CTk):
 
             if getattr(self, 'pestana_actual', 'instalador') == 'instalador':
                 if hasattr(self, 'btn_start') and self.btn_start.winfo_exists():
-                    self.btn_start.pack(fill="x", padx=20, pady=(15, 10))
+                    self.btn_start.pack(side="bottom", pady=(10, 4))
 
     def confirmar_inicio(self):
         seleccion = self.combo_disk.get()
@@ -1340,6 +1646,11 @@ class SavinOceanicCommand(ctk.CTk):
                     self.lbl_status.pack(anchor="w", padx=5, pady=(2, 2))
                 self.lbl_status.configure(text="CANCELANDO Y LIMPIANDO... ESPERA POR FAVOR", text_color="#ff4d4d")
 
+    def mostrar_info_particion(self, key):
+        tit = t(f"storage.legend_{key}", size="").replace(" ()", "").strip()
+        msg = t(f"storage.desc_{key}")
+        self.mostrar_info(tit, msg)
+
     def mostrar_info(self, titulo, mensaje): messagebox.showinfo(titulo, mensaje)
 
     def cerrar_aplicacion(self):
@@ -1376,7 +1687,7 @@ class SavinOceanicCommand(ctk.CTk):
         except Exception: pass
 
     def enviar_reporte_error(self, tipo_falla, mensaje_error):
-        url_webhook = "https://discord.com/api/webhooks/1528755076339073034/M33425jD90QwjII-hH8r7TXh3DdV0hY9qTiEsj47QPvowKxgOuuSc8pFceIqgu0zay6T"
+        url_webhook = "https://hollowdrive-reporter.samucalata.workers.dev"
 
         def hilo_envio():
             try:
@@ -1445,7 +1756,7 @@ class SavinOceanicCommand(ctk.CTk):
         except Exception: self.logo_maker = None
         try: 
             pil_instalar = Image.open(os.path.join(path_media, "instalar.png"))
-            self.img_instalar = ctk.CTkImage(light_image=pil_instalar, dark_image=pil_instalar, size=(380, 75))
+            self.img_instalar = ctk.CTkImage(light_image=pil_instalar, dark_image=pil_instalar, size=(512, 120))
         except Exception: self.img_instalar = None
         try: 
             pil_image = Image.open(os.path.join(path_media, "descarga-morada.png"))
@@ -1453,7 +1764,7 @@ class SavinOceanicCommand(ctk.CTk):
         except Exception: self.img_descarga_data = None
         try: 
             pil_reload = Image.open(os.path.join(path_media, "reload.png"))
-            self.img_reload = ctk.CTkImage(light_image=pil_reload, dark_image=pil_reload, size=(25, 25))
+            self.img_reload = ctk.CTkImage(light_image=pil_reload, dark_image=pil_reload, size=(32, 32))
         except Exception: self.img_reload = None
         try: 
             img_isos_pil = Image.open(os.path.join(path_media, "ISOs.png"))
@@ -1471,22 +1782,12 @@ class SavinOceanicCommand(ctk.CTk):
         self.rebalancear()
 
     def abrir_info_motor(self):
-        v = self.creventana_info_base("MOTORES DE EXTRACCIÓN", 740, 600)
+        v = self.creventana_info_base(t("modals.motor_title"), 740, 540)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="⚙️ MOTORES DE INSTALACIÓN", font=("Impact", 30), text_color=AZUL_CIAN).pack(pady=(0, 10))
-        
-        info = ("HollowDrive te permite elegir cómo el sistema gestiona la red y los archivos pesados:\n\n"
-                "⚡ ASÍNCRONO (RAM - Recomendado): Descarga a máxima velocidad volcando los datos a un colchón temporal en tu memoria RAM. Extrae directamente al USB sin saturar el disco duro.\n\n"
-                "🛡️ CLÁSICO (Disco Local): Si el primer modo falla por algo, este método descargará el archivo a una carpeta oculta en tu disco SSD/HDD (temp_downloads), y después lo extraerá al USB.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=660).pack(pady=5)
-        
-        consejo = ("CONSEJO:\n"
-                   "• Usa \"Asíncrono\" si no te da fallos, simplemente es más rápido.\n"
-                   "• Usa \"Clásico\" si buscas máxima estabilidad ante cortes de red (requiere espacio libre en SSD).")
-        ctk.CTkLabel(frame_interno, text=consejo, font=("Segoe UI", 16, "bold"), text_color=AZUL_CIAN, justify="left", wraplength=660).pack(pady=10)
-
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.motor_header"), font=("Impact", 30), text_color=AZUL_CIAN).pack(pady=(0, 10))
+        ctk.CTkLabel(frame_interno, text=t("modals.motor_body"), font=("Segoe UI", 15), justify="left", wraplength=660).pack(pady=5)
+        ctk.CTkButton(frame_interno, text=t("modals.btn_close"), font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def iniciar_carga_tamanos_reales(self): 
@@ -1501,29 +1802,22 @@ class SavinOceanicCommand(ctk.CTk):
         return default_bytes
 
     def abrir_info_roms(self):
-        v = self.creventana_info_base("AVISO LEGAL", 620, 420)
+        v = self.creventana_info_base(t("modals.legal_title"), 620, 360)
         v.configure(fg_color="#1a0a0a") 
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="⚠️ AVISO LEGAL", font=("Impact", 32), text_color="#ff4d4d").pack(pady=(0, 15))
-        legal_text = ("Savin Super USB NO INCLUYE ROMS ni archivos de juegos\nprotegidos por derechos de autor.")
-        ctk.CTkLabel(frame_interno, text=legal_text, font=("Segoe UI", 16), justify="center", wraplength=550).pack(pady=10)
-        ctk.CTkButton(frame_interno, text="ACEPTO LOS RIESGOS", font=("Segoe UI", 14, "bold"), fg_color="#444", height=40, width=220, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.legal_header"), font=("Impact", 32), text_color="#ff4d4d").pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.legal_body"), font=("Segoe UI", 15), justify="center", wraplength=550).pack(pady=10)
+        ctk.CTkButton(frame_interno, text=t("modals.legal_accept"), font=("Segoe UI", 14, "bold"), fg_color="#444", height=40, width=220, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_pack_hollow(self):
-        v = self.creventana_info_base("PACK HOLLOWDRIVE INFO", 620, 400)
+        v = self.creventana_info_base(t("modals.pack_hollow_title"), 640, 420)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🛠️ PACK DE HERRAMIENTAS HOLLOWDRIVE", font=("Impact", 24), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        info = ("Este paquete inyecta una selección de entornos y utilidades de rescate "
-                "booteables listas para usar desde el menú principal:\n\n"
-                "• Herramientas avanzadas de particionado y gestión de discos.\n"
-                "• Utilidades de clonación, backup y recuperación de datos.\n"
-                "• Entornos Windows Live (WinPE) para reparar sistemas caídos.\n\n"
-                "Y mucho más...")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=550).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=180, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.pack_hollow_header"), font=("Impact", 24), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.pack_hollow_body"), font=("Segoe UI", 15), justify="left", wraplength=560).pack(pady=5)
+        ctk.CTkButton(frame_interno, text=t("modals.btn_close"), font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def cargar_tamanos_reales_hilo(self):
@@ -1536,9 +1830,14 @@ class SavinOceanicCommand(ctk.CTk):
         self.after(0, self.actualizar_labels_ui_con_tamanos_reales)
 
     def actualizar_labels_ui_con_tamanos_reales(self):
-        self.ch_b64.configure(text=f"Batocera 64bits ({self.tamanos_formateados['bato_64']})")
-        self.ch_pack_bato.configure(text=f"PACK BATOCERA ({self.tamanos_formateados['pack_bato']})")
-        self.ch_pack_hollow.configure(text=f"PACK HOLLOWDRIVE ({self.tamanos_formateados['pack_hollow']})")
+        if hasattr(self, 'ch_b64'):
+            self.ch_b64.configure(text=t("batocera.arch_64", size=self.tamanos_formateados['bato_64']))
+        if hasattr(self, 'ch_b32'):
+            self.ch_b32.configure(text=t("batocera.arch_32"))
+        if hasattr(self, 'ch_pack_bato'):
+            self.ch_pack_bato.configure(text=t("batocera.pack_bato", size=self.tamanos_formateados['pack_bato']))
+        if hasattr(self, 'ch_pack_hollow'):
+            self.ch_pack_hollow.configure(text=t("batocera.pack_hollow", size=self.tamanos_formateados['pack_hollow']))
         self.rebalancear()
 
     # =====================================================================
@@ -1576,46 +1875,122 @@ class SavinOceanicCommand(ctk.CTk):
         self.btn_modo_tools = ctk.CTkButton(self.nav_bar, text="🛠️ HOLLOWTOOLS (MANTENIMIENTO)", font=("Segoe UI", 12, "bold"), fg_color="transparent", border_width=1, border_color=AZUL_CIAN, text_color=AZUL_CIAN, width=260, command=lambda: self.cambiar_pestana("tools"))
         self.btn_modo_tools.pack(side="left", padx=5, pady=5)
 
+        # Selector de Idioma con Menú Desplegable y Flechita (Transparente)
+        saved_lang = i18n.get_current_language()
+        init_name = i18n.LANGUAGE_NAMES.get(saved_lang, "Español")
+        init_label = f"{init_name} ▾"
+        self.btn_idioma = ctk.CTkButton(
+            self.nav_bar,
+            text=f" {init_label}",
+            command=self.mostrar_menu_idioma,
+            font=("Segoe UI", 12, "bold"),
+            fg_color="transparent",
+            hover_color="#1e293b",
+            text_color=AZUL_CIAN,
+            width=130,
+            height=30,
+            cursor="hand2"
+        )
+        self.btn_idioma.pack(side="right", padx=10, pady=5)
+
+        self.menu_idioma = tk.Menu(
+            self.btn_idioma,
+            tearoff=0,
+            bg="#0f172a",
+            fg="#38bdf8",
+            activebackground="#1e293b",
+            activeforeground="#ffffff",
+            font=("Segoe UI", 11, "bold"),
+            bd=1,
+            relief="solid"
+        )
+        for lang_item in i18n.get_available_languages():
+            code = lang_item['code']
+            name = lang_item['name']
+            self.menu_idioma.add_command(
+                label=f"  {name}  ",
+                command=lambda c=code: self.al_cambiar_idioma(c)
+            )
+        
+        self._last_lang_close_time = 0.0
+
         # --- SELECTOR DE DISCOS (PERTENECE EXCLUSIVAMENTE AL INSTALADOR) ---
         self.f_selection = ctk.CTkFrame(self, fg_color=AZUL_CARD, border_width=1, border_color=AZUL_ELECTRICO)
         self.f_selection.pack(fill="x", padx=20, pady=(0, 5)) 
-        ctk.CTkLabel(self.f_selection, text="Selecciona un dispositivo para instalar HOLLOWDRIVE.", font=("Segoe UI", 14, "italic"), text_color=AZUL_SUAVE).pack(pady=(6,0))
+        self.lbl_select_disk = ctk.CTkLabel(self.f_selection, text=t("selector.title"), font=("Segoe UI", 14, "italic"), text_color=AZUL_SUAVE)
+        self.lbl_select_disk.pack(pady=(6,0))
         
         f_combo = ctk.CTkFrame(self.f_selection, fg_color="transparent")
         f_combo.pack(pady=10)
-        self.combo_disk = ctk.CTkComboBox(f_combo, values=["Buscando unidades..."], width=450, command=self.activar_interfaz_completa)
-        self.combo_disk.set("Buscando unidades...")
+        self.combo_disk = ctk.CTkComboBox(f_combo, values=[t("selector.searching")], width=450, command=self.al_seleccionar_disco)
+        self.combo_disk.set(t("selector.searching"))
         self.combo_disk.pack(side="left", padx=10)
         self.widgets_interactivos.append(self.combo_disk)
+        hacer_combobox_clicable_total(self.combo_disk)
 
-        self.btn_refresh = ctk.CTkButton(f_combo, image=getattr(self, 'img_reload', None), text="" if getattr(self, 'img_reload', None) else "🔄", width=40, height=40, fg_color="#222", command=self.refrescar_discos)
+        self.btn_refresh = ctk.CTkButton(f_combo, image=getattr(self, 'img_reload', None), text="" if getattr(self, 'img_reload', None) else "🔄", width=44, height=44, fg_color="transparent", hover_color="#1e293b", cursor="hand2", command=self.refrescar_discos)
         self.btn_refresh.pack(side="left", padx=5)
+        self.tooltip_refresh = CTkToolTip(self.btn_refresh, t("tooltips.reload"), delay_ms=500)
 
-        self.sw_internos = ctk.CTkCheckBox(f_combo, text="Mostrar discos internos", variable=self.mostrar_internos, command=self.toggle_discos_internos, text_color="#aa3333", font=("Segoe UI", 11, "bold"))
+        self.sw_internos = ctk.CTkCheckBox(f_combo, text=t("selector.show_internal"), variable=self.mostrar_internos, command=self.toggle_discos_internos, text_color="#aa3333", font=("Segoe UI", 11, "bold"))
         self.sw_internos.pack(side="left", padx=10)
 
         # --- CONTENEDOR INSTALADOR MAESTRO ---
         self.main_container = ctk.CTkFrame(self, fg_color="transparent")
         
+        # ---------------------------------------------------------------------
+        # 🚀 BOTÓN PRINCIPAL DE INICIO (RESERVA PRIORITARIA EN LA BASE)
+        # Al empaquetarlo con side="bottom" antes que los paneles, NUNCA se cortará.
+        # ---------------------------------------------------------------------
+        if getattr(self, 'img_instalar', None):
+            self.btn_start = ctk.CTkButton(
+                self.main_container, 
+                image=self.img_instalar, 
+                text="", 
+                fg_color="transparent", 
+                hover_color=AZUL_CARD, 
+                width=512,
+                height=120, 
+                cursor="hand2",
+                command=self.confirmar_inicio
+            )
+        else:
+            self.btn_start = ctk.CTkButton(
+                self.main_container, 
+                text="🚀 COMENZAR INSTALACIÓN", 
+                font=("Segoe UI", 15, "bold"), 
+                fg_color=AZUL_ELECTRICO, 
+                hover_color="#0046c7", 
+                width=440,
+                height=48, 
+                corner_radius=12,
+                command=self.confirmar_inicio
+            )
+        self.btn_start.pack(side="bottom", pady=(4, 2))
+        self.widgets_interactivos.append(self.btn_start)
+
+        # Marco horizontal superior que contiene los dos paneles (izquierdo y derecho)
+        self.f_panels = ctk.CTkFrame(self.main_container, fg_color="transparent")
+        self.f_panels.pack(fill="both", expand=True)
+
         # PANEL IZQUIERDO
-        self.p_left = ctk.CTkFrame(self.main_container, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
-        self.p_left.pack(side="left", fill="both", expand=True, padx=(0, 10))
+        self.p_left = ctk.CTkFrame(self.f_panels, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
+        self.p_left.pack(side="left", fill="both", expand=True, padx=(0, 8))
         
-        # SECCIÓN BATOCERA
+        # SECCIÓN BATOCERA (Márgenes optimizados)
         f_bato_master = ctk.CTkFrame(self.p_left, fg_color="transparent")
-        f_bato_master.pack(fill="x", padx=15, pady=10)
+        f_bato_master.pack(fill="x", padx=15, pady=(8, 4))
         f_bato_txt = ctk.CTkFrame(f_bato_master, fg_color="transparent")
         f_bato_txt.pack(side="left", fill="both", expand=True)
         f_bato_h = ctk.CTkFrame(f_bato_txt, fg_color="transparent")
         f_bato_h.pack(fill="x")
         
-        sw_bato = ctk.CTkSwitch(f_bato_h, text="¿Instalar Batocera?", font=("Segoe UI", 12, "bold"), variable=self.instalar_bato, command=self.actualizar_estados_bato, progress_color=AZUL_CIAN)
-        sw_bato.pack(side="left")
-        self.widgets_interactivos.append(sw_bato)
+        self.sw_bato = ctk.CTkSwitch(f_bato_h, text=t("batocera.switch"), font=("Segoe UI", 12, "bold"), variable=self.instalar_bato, command=self.actualizar_estados_bato, progress_color=AZUL_CIAN)
+        self.sw_bato.pack(side="left")
+        self.widgets_interactivos.append(self.sw_bato)
         self.crear_boton_info(f_bato_h, self.abrir_info_batocera).pack(side="left", padx=5)
 
-        self.f_bato_opts = ctk.CTkFrame(f_bato_txt, fg_color="#0d141c", corner_radius=8)
-        self.f_bato_opts.pack(fill="x", pady=5)
+        self.f_bato_opts = ctk.CTkFrame(f_bato_txt, fg_color=AZUL_CARD_INNER, corner_radius=8)
         self.ch_b64 = ctk.CTkCheckBox(self.f_bato_opts, text="Batocera 64bits (4.60GB)", variable=self.bato_64_act, command=self.rebalancear)
         self.ch_b64.pack(pady=2, padx=10, anchor="w")
         self.ch_b32 = ctk.CTkCheckBox(self.f_bato_opts, text="Batocera 32bits (Próximamente)", variable=self.bato_32_act, command=self.rebalancear, state="disabled")
@@ -1623,7 +1998,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.widgets_interactivos.append(self.ch_b64)
         
         if getattr(self, 'logo_batocera', None):
-            f_bato_logo_container = ctk.CTkFrame(f_bato_master, width=135, height=95, fg_color="transparent")
+            f_bato_logo_container = ctk.CTkFrame(f_bato_master, width=130, height=90, fg_color="transparent")
             f_bato_logo_container.pack(side="right", padx=10)
             f_bato_logo_container.pack_propagate(False)
             
@@ -1633,95 +2008,105 @@ class SavinOceanicCommand(ctk.CTk):
             lbl_img_bato.bind("<Enter>", lambda e: self.animar_zoom('logo_batocera', 'bato_size', (125, 88), (135, 95), True))
             lbl_img_bato.bind("<Leave>", lambda e: self.animar_zoom('logo_batocera', 'bato_size', (125, 88), (135, 95), False))
 
-        # SECCIÓN PACKS ADICIONALES
-        f_packs_container = ctk.CTkFrame(self.p_left, fg_color="#0d141c", corner_radius=8)
-        f_packs_container.pack(fill="x", padx=15, pady=5)
+        # SECCIÓN PACKS ADICIONALES (Márgenes optimizados)
+        f_packs_container = ctk.CTkFrame(self.p_left, fg_color=AZUL_CARD_INNER, corner_radius=8)
+        f_packs_container.pack(fill="x", padx=15, pady=4)
 
         f_pack_bato = ctk.CTkFrame(f_packs_container, fg_color="transparent")
-        f_pack_bato.pack(fill="x", padx=10, pady=6)
+        f_pack_bato.pack(fill="x", padx=10, pady=4)
         self.ch_pack_bato = ctk.CTkCheckBox(f_pack_bato, text="PACK BATOCERA (37.8GB)", variable=self.descargar_pack_bato, command=self.al_clicar_pack_batocera)
         self.ch_pack_bato.pack(side="left", anchor="w")
         self.widgets_interactivos.append(self.ch_pack_bato)
         self.crear_boton_info(f_pack_bato, self.abrir_info_roms).pack(side="left", padx=5)
 
         f_pack_hollow = ctk.CTkFrame(f_packs_container, fg_color="transparent")
-        f_pack_hollow.pack(fill="x", padx=10, pady=6)
+        f_pack_hollow.pack(fill="x", padx=10, pady=4)
         self.ch_pack_hollow = ctk.CTkCheckBox(f_pack_hollow, text="PACK HOLLOWDRIVE (8.06GB)", variable=self.descargar_pack_hollow, command=self.rebalancear)
         self.ch_pack_hollow.pack(side="left", anchor="w")
         self.widgets_interactivos.append(self.ch_pack_hollow)
         self.crear_boton_info(f_pack_hollow, self.abrir_info_pack_hollow).pack(side="left", padx=5)
 
-        # SECCIÓN CACHYOS
+        # SECCIÓN CACHYOS (Márgenes optimizados)
         f_cachy_master = ctk.CTkFrame(self.p_left, fg_color="transparent")
-        f_cachy_master.pack(fill="x", padx=15, pady=10)
+        f_cachy_master.pack(fill="x", padx=15, pady=(4, 6))
         if getattr(self, 'logo_cachy', None):
-            f_cachy_logo_container = ctk.CTkFrame(f_cachy_master, width=305, height=85, fg_color="transparent")
-            f_cachy_logo_container.pack(pady=(0, 5))
+            f_cachy_logo_container = ctk.CTkFrame(f_cachy_master, width=290, height=76, fg_color="transparent")
+            f_cachy_logo_container.pack(pady=(0, 4))
             f_cachy_logo_container.pack_propagate(False)
             
             lbl_img_cachy = ctk.CTkLabel(f_cachy_logo_container, image=self.logo_cachy, text="", cursor="hand2")
             lbl_img_cachy.place(relx=0.5, rely=0.5, anchor="center")
             lbl_img_cachy.bind("<Button-1>", lambda e: self.abrir_url("https://cachyos.org"))
-            lbl_img_cachy.bind("<Enter>", lambda e: self.animar_zoom('logo_cachy', 'cachy_size', (280, 78), (305, 85), True))
-            lbl_img_cachy.bind("<Leave>", lambda e: self.animar_zoom('logo_cachy', 'cachy_size', (280, 78), (305, 85), False))
+            lbl_img_cachy.bind("<Enter>", lambda e: self.animar_zoom('logo_cachy', 'cachy_size', (280, 78), (295, 82), True))
+            lbl_img_cachy.bind("<Leave>", lambda e: self.animar_zoom('logo_cachy', 'cachy_size', (280, 78), (295, 82), False))
 
         f_cachy_h = ctk.CTkFrame(f_cachy_master, fg_color="transparent")
         f_cachy_h.pack(fill="x")
-        sw_cachy = ctk.CTkSwitch(f_cachy_h, text="¿Instalar CachyOS?", font=("Segoe UI", 12, "bold"), variable=self.instalar_cachy, command=self.actualizar_estados_cachy, progress_color=AZUL_CIAN)
-        sw_cachy.pack(side="left")
-        self.widgets_interactivos.append(sw_cachy)
+        self.sw_cachy = ctk.CTkSwitch(f_cachy_h, text=t("cachyos.switch"), font=("Segoe UI", 12, "bold"), variable=self.instalar_cachy, command=self.actualizar_estados_cachy, progress_color=AZUL_CIAN)
+        self.sw_cachy.pack(side="left")
+        self.widgets_interactivos.append(self.sw_cachy)
         self.crear_boton_info(f_cachy_h, self.abrir_info_cachyos).pack(side="left", padx=5)
 
-        self.cachy_flavor = ctk.StringVar(value="kde")
-        self.f_cachy_opts = ctk.CTkFrame(f_cachy_master, fg_color="#0d141c", corner_radius=8)
+        self.cachy_flavor = ctk.StringVar(value="hyprland")  # Por defecto Hyprland
+        self.f_cachy_opts = ctk.CTkFrame(f_cachy_master, fg_color=AZUL_CARD_INNER, corner_radius=8)
         
         f_kde = ctk.CTkFrame(self.f_cachy_opts, fg_color="transparent")
         f_kde.pack(fill="x", padx=10, pady=2)
-        r_kde = ctk.CTkRadioButton(f_kde, text="KDE Plasma", variable=self.cachy_flavor, value="kde", font=("Segoe UI", 12))
-        r_kde.pack(side="left", pady=6)
+        self.r_kde = ctk.CTkRadioButton(
+            f_kde, 
+            text=f"{t('cachyos.kde')} (Próximamente)", 
+            variable=self.cachy_flavor, 
+            value="kde", 
+            font=("Segoe UI", 12),
+            state="disabled"  # Bloqueado
+        )
+        self.r_kde.pack(side="left", pady=4)
         self.crear_boton_info(f_kde, self.abrir_info_kde).pack(side="right")
 
         f_hypr = ctk.CTkFrame(self.f_cachy_opts, fg_color="transparent")
         f_hypr.pack(fill="x", padx=10, pady=2)
-        r_hypr = ctk.CTkRadioButton(f_hypr, text="Hyprland", variable=self.cachy_flavor, value="hyprland", font=("Segoe UI", 12))
-        r_hypr.pack(side="left", pady=6)
+        self.r_hypr = ctk.CTkRadioButton(f_hypr, text=t("cachyos.hyprland"), variable=self.cachy_flavor, value="hyprland", font=("Segoe UI", 12))
+        self.r_hypr.pack(side="left", pady=4)
         self.crear_boton_info(f_hypr, self.abrir_info_hyprland).pack(side="right")
 
-        self.widgets_interactivos.extend([r_kde, r_hypr])
+        # Solo agregamos r_hypr para que bloquear_ui no reactive r_kde
+        self.widgets_interactivos.append(self.r_hypr)
 
-        # PANEL DERECHO (CONTROL DE ESPACIO Y CONFIGURACIÓN)
-        self.p_right = ctk.CTkFrame(self.main_container, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
+        # PANEL DERECHO (Márgenes compactados y holgados)
+        self.p_right = ctk.CTkFrame(self.f_panels, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         self.p_right.pack(side="right", fill="both", expand=True)
 
-        self.f_motor = ctk.CTkFrame(self.p_right, fg_color="#0d141c", corner_radius=8, border_width=1, border_color="#222")
-        self.f_motor.pack(fill="x", padx=20, pady=(15, 5))
+        self.f_motor = ctk.CTkFrame(self.p_right, fg_color=AZUL_CARD_INNER, corner_radius=8, border_width=1, border_color=COLOR_BORDE)
+        self.f_motor.pack(fill="x", padx=20, pady=(10, 4))
         f_motor_h = ctk.CTkFrame(self.f_motor, fg_color="transparent")
-        f_motor_h.pack(fill="x", padx=10, pady=5)
-        ctk.CTkLabel(f_motor_h, text="⚙️ MOTOR DE EXTRACCIÓN:", font=("Consolas", 12, "bold"), text_color=AZUL_CIAN).pack(side="left")
+        f_motor_h.pack(fill="x", padx=10, pady=4)
+        self.lbl_motor = ctk.CTkLabel(f_motor_h, text=t("motor.title"), font=("Consolas", 12, "bold"), text_color=AZUL_CIAN)
+        self.lbl_motor.pack(side="left")
         self.crear_boton_info(f_motor_h, self.abrir_info_motor).pack(side="right")
         
         f_radios = ctk.CTkFrame(self.f_motor, fg_color="transparent")
-        f_radios.pack(fill="x", padx=10, pady=(0, 10))
-        r1 = ctk.CTkRadioButton(f_radios, text="Asíncrono (RAM) - Rápido", variable=self.metodo_descarga, value="ram", font=("Segoe UI", 11))
-        r1.pack(side="left", padx=(0, 10))
-        r2 = ctk.CTkRadioButton(f_radios, text="Clásico (Disco) - Seguro", variable=self.metodo_descarga, value="disco", font=("Segoe UI", 11))
-        r2.pack(side="left")
-        self.widgets_interactivos.extend([r1, r2])
+        f_radios.pack(fill="x", padx=10, pady=(0, 6))
+        self.r_motor_ram = ctk.CTkRadioButton(f_radios, text=t("motor.ram"), variable=self.metodo_descarga, value="ram", font=("Segoe UI", 11))
+        self.r_motor_ram.pack(side="left", padx=(0, 10))
+        self.r_motor_disco = ctk.CTkRadioButton(f_radios, text=t("motor.disk"), variable=self.metodo_descarga, value="disco", font=("Segoe UI", 11))
+        self.r_motor_disco.pack(side="left")
+        self.widgets_interactivos.extend([self.r_motor_ram, self.r_motor_disco])
 
-        self.sw_preservar = ctk.CTkSwitch(self.p_right, text="PRESERVAR ESPACIO LIBRE USB", variable=self.preservar_espacio, command=self.toggle_preservar_espacio, progress_color=AZUL_ELECTRICO)
-        self.sw_preservar.pack(pady=10)
+        self.sw_preservar = ctk.CTkSwitch(self.p_right, text=t("motor.preserve_space"), variable=self.preservar_espacio, command=self.toggle_preservar_espacio, progress_color=AZUL_ELECTRICO)
+        self.sw_preservar.pack(pady=6)
         self.widgets_interactivos.append(self.sw_preservar)
 
         self.f_row_h = self.crear_ocean_slider(self.p_right, "HOLLOWDRIVE STORAGE", COLOR_HOLLOW, "h", min_val=10)
         self.f_row_c = self.crear_ocean_slider(self.p_right, "CACHYOS PARTITION", COLOR_CACHY, "c", min_val=20)
+        self.f_row_c.pack_forget()
 
-        self.canvas = tk.Canvas(self.p_right, height=40, bg=AZUL_CARD, highlightthickness=0, borderwidth=0)
-        self.canvas.pack(fill="x", pady=(15, 5), padx=20)
+        self.canvas = tk.Canvas(self.p_right, height=40, bg=color_canvas_actual(), highlightthickness=0, borderwidth=0)
+        self.canvas.pack(fill="x", pady=(10, 4), padx=20)
         self.lbl_libre_info = ctk.CTkLabel(self.p_right, text="LIBRE: 0.00 GB", font=("Consolas", 18, "bold"), text_color=AZUL_CIAN)
         self.lbl_libre_info.pack()
 
         self.f_leyenda = ctk.CTkFrame(self.p_right, fg_color="transparent")
-        self.f_leyenda.pack(pady=10, fill="x", padx=15)
+        self.f_leyenda.pack(pady=6, fill="x", padx=15)
         self.dic_leyenda = {}
         info_textos = {
             "Hollow": ("Partición HOLLOWDRIVE", "Espacio principal multi-boot (Ventoy). Incluye Batocera y packs de herramientas."),
@@ -1729,39 +2114,15 @@ class SavinOceanicCommand(ctk.CTk):
             "Cachy": ("Sistema CACHYOS", "Distribución Linux portable optimizada para alto rendimiento.")
         }
 
-        for nombre, color in [("Hollow", COLOR_HOLLOW), ("GRUB", COLOR_LIMINE), ("Cachy", COLOR_CACHY)]:
-            tit, msg = info_textos[nombre]
+        for nombre_key, color in [("hollow", COLOR_HOLLOW), ("grub", COLOR_LIMINE), ("cachy", COLOR_CACHY)]:
             btn = ctk.CTkButton(
-                self.f_leyenda, text=f"{nombre} (0GB)", fg_color=color,
+                self.f_leyenda, text=t(f"storage.legend_{nombre_key}", size="0"), fg_color=color,
                 width=140, height=28, corner_radius=15, text_color="white", font=("Segoe UI Bold", 11),
-                command=lambda t=tit, m=msg: self.mostrar_info(t, m)
+                command=lambda k=nombre_key: self.mostrar_info_particion(k)
             )
             btn.pack(side="left", padx=10, expand=True)
-            self.dic_leyenda[nombre.lower()] = btn
-
-        if getattr(self, 'img_instalar', None):
-            self.btn_start = ctk.CTkButton(
-                self.p_right, 
-                image=self.img_instalar, 
-                text="", 
-                fg_color="transparent", 
-                hover_color="#0d141c", 
-                height=75, 
-                cursor="hand2",
-                command=self.confirmar_inicio
-            )
-        else:
-            self.btn_start = ctk.CTkButton(
-                self.p_right, 
-                text="🚀 COMENZAR INSTALACIÓN", 
-                font=("Segoe UI", 14, "bold"), 
-                fg_color=AZUL_ELECTRICO, 
-                hover_color="#0046c7", 
-                height=45, 
-                command=self.confirmar_inicio
-            )
-        self.btn_start.pack(fill="x", padx=20, pady=(15, 10))
-        self.widgets_interactivos.append(self.btn_start)
+            self.dic_leyenda[nombre_key] = btn
+        
 
         # =====================================================================
         # 🛠️ PANEL MÓDULO HOLLOWTOOLS
@@ -1771,31 +2132,35 @@ class SavinOceanicCommand(ctk.CTk):
         f_ht_top = ctk.CTkFrame(self.hollow_tools_container, fg_color=AZUL_CARD, corner_radius=12, border_width=1, border_color="#222")
         f_ht_top.pack(fill="x", padx=5, pady=(0, 10))
         
-        ctk.CTkLabel(f_ht_top, text="🛠️ MANTENIMIENTO Y GESTIÓN HOLLOWDRIVE", font=("Impact", 22), text_color=AZUL_CIAN).pack(pady=(10, 2))
+        self.lbl_ht_title = ctk.CTkLabel(f_ht_top, text=t("hollowtools.header_title"), font=("Impact", 22), text_color=AZUL_CIAN)
+        self.lbl_ht_title.pack(pady=(10, 2))
         
         f_combo_ht = ctk.CTkFrame(f_ht_top, fg_color="transparent")
         f_combo_ht.pack(pady=(2, 10))
         self.combo_ht_disk = ctk.CTkComboBox(f_combo_ht, values=["Buscando HOLLOWDRIVES..."], width=460, font=("Segoe UI", 12), command=self.al_seleccionar_disco_hollowtools)
         self.combo_ht_disk.pack(side="left", padx=10)
-        self.btn_ht_refresh = ctk.CTkButton(f_combo_ht, text="🔄 ESCANEAR", font=("Segoe UI", 12, "bold"), width=130, height=32, fg_color="#222", hover_color="#333", command=self.refrescar_discos_hollowtools)
-        self.btn_ht_refresh.pack(side="left")
-
-        f_ht_grid = ctk.CTkFrame(self.hollow_tools_container, fg_color="transparent")
-        f_ht_grid.pack(fill="both", expand=True, padx=0, pady=0)
+        hacer_combobox_clicable_total(self.combo_ht_disk)
+        self.btn_ht_refresh = ctk.CTkButton(f_combo_ht, image=getattr(self, 'img_reload', None), text="" if getattr(self, 'img_reload', None) else "🔄", width=44, height=44, fg_color="transparent", hover_color="#1e293b", cursor="hand2", command=self.refrescar_discos_hollowtools)
+        self.btn_ht_refresh.pack(side="left", padx=5)
+        self.tooltip_ht_refresh = CTkToolTip(self.btn_ht_refresh, t("tooltips.reload"), delay_ms=500)
+        self.f_ht_grid = ctk.CTkFrame(self.hollow_tools_container, fg_color="transparent")
+        # Se empaqueta solo al seleccionar una unidad válida
+        # self.f_ht_grid.pack(fill="both", expand=True, padx=0, pady=0)
 
         # TARJETA 1: GESTOR DE ISOs
-        self.card_iso = ctk.CTkFrame(f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
+        self.card_iso = ctk.CTkFrame(self.f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         self.card_iso.pack(side="left", fill="both", expand=True, padx=4)
 
         f_head_iso = ctk.CTkFrame(self.card_iso, fg_color="transparent")
         f_head_iso.pack(fill="x", padx=12, pady=(12, 4))
-        ctk.CTkLabel(f_head_iso, text="CD GESTOR DE ISOs", font=("Segoe UI", 16, "bold"), text_color=AZUL_CIAN).pack(side="left")
+        self.lbl_card_iso = ctk.CTkLabel(f_head_iso, text=t("hollowtools.card_iso_title"), font=("Segoe UI", 16, "bold"), text_color=AZUL_CIAN)
+        self.lbl_card_iso.pack(side="left")
         self.crear_boton_info(f_head_iso, self.abrir_info_ht_isos).pack(side="right")
 
         self.f_drop_area = ctk.CTkFrame(self.card_iso, fg_color="#090d12", corner_radius=12, border_width=1, border_color="#1e293b")
         self.f_drop_area.pack(fill="both", expand=True, padx=12, pady=10)
 
-        self.lbl_drag_msg = ctk.CTkLabel(self.f_drop_area, text="Arrastra tus .ISO a cualquier punto\nde este recuadro o haz clic abajo", font=("Segoe UI", 12), text_color=AZUL_SUAVE, justify="center")
+        self.lbl_drag_msg = ctk.CTkLabel(self.f_drop_area, text=t("hollowtools.drop_msg"), font=("Segoe UI", 12), text_color=AZUL_SUAVE, justify="center")
         self.lbl_drag_msg.pack(pady=(10, 2))
 
         self.f_iso_logo_container = ctk.CTkFrame(self.f_drop_area, width=170, height=170, fg_color="transparent")
@@ -1817,7 +2182,7 @@ class SavinOceanicCommand(ctk.CTk):
             self.btn_plus_iso.place(relx=0.5, rely=0.5, anchor="center")
 
         # TARJETA 2: PAQUETES
-        card_content = ctk.CTkFrame(f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
+        card_content = ctk.CTkFrame(self.f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         card_content.pack(side="left", fill="both", expand=True, padx=4)
 
         f_head_content = ctk.CTkFrame(card_content, fg_color="transparent")
@@ -1843,7 +2208,7 @@ class SavinOceanicCommand(ctk.CTk):
         ).pack(side="bottom", pady=12, padx=12, fill="x")
 
         # TARJETA 3: CACHYOS
-        card_cachy = ctk.CTkFrame(f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
+        card_cachy = ctk.CTkFrame(self.f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         card_cachy.pack(side="left", fill="both", expand=True, padx=4)
 
         f_head_cachy = ctk.CTkFrame(card_cachy, fg_color="transparent")
@@ -1865,13 +2230,20 @@ class SavinOceanicCommand(ctk.CTk):
         self.seg_ht_cachy.set("🔄 Actualizar CachyOS")
         self.seg_ht_cachy.pack(fill="x", pady=(2, 8))
 
-        self.ht_cachy_flavor = ctk.StringVar(value="kde")
+        self.ht_cachy_flavor = ctk.StringVar(value="hyprland")  # Por defecto Hyprland
         self.f_ht_flavor = ctk.CTkFrame(f_body_cachy, fg_color="#0d141c", corner_radius=8)
         self.f_ht_flavor.pack(fill="x", pady=5)
 
         ctk.CTkLabel(self.f_ht_flavor, text="Entorno:", font=("Segoe UI", 11, "bold"), text_color=AZUL_SUAVE).pack(side="left", padx=(10, 5), pady=6)
 
-        r_ht_kde = ctk.CTkRadioButton(self.f_ht_flavor, text="KDE Plasma", variable=self.ht_cachy_flavor, value="kde", font=("Segoe UI", 11))
+        r_ht_kde = ctk.CTkRadioButton(
+            self.f_ht_flavor, 
+            text="KDE Plasma (Próximamente)", 
+            variable=self.ht_cachy_flavor, 
+            value="kde", 
+            font=("Segoe UI", 11),
+            state="disabled"  # Bloqueado
+        )
         r_ht_kde.pack(side="left", padx=5, pady=5)
 
         r_ht_hypr = ctk.CTkRadioButton(self.f_ht_flavor, text="Hyprland", variable=self.ht_cachy_flavor, value="hyprland", font=("Segoe UI", 11))
@@ -1893,27 +2265,30 @@ class SavinOceanicCommand(ctk.CTk):
         )
         self.btn_ht_ejecutar_cachy.pack(side="bottom", fill="x", pady=(8, 4))
 
-        # COMPARATIVA VISUAL (ANTES / DESPUÉS)
-        f_ht_preview = ctk.CTkFrame(self.hollow_tools_container, fg_color=AZUL_CARD, corner_radius=12, border_width=1, border_color="#222")
-        f_ht_preview.pack(fill="x", padx=5, pady=(10, 0))
+       # COMPARATIVA VISUAL (ANTES / DESPUÉS)
+        self.f_ht_preview = ctk.CTkFrame(self.hollow_tools_container, fg_color=AZUL_CARD, corner_radius=12, border_width=1, border_color="#222")
+        # Se empaqueta solo al seleccionar una unidad válida
+        # self.f_ht_preview.pack(fill="x", padx=5, pady=(10, 0))
 
-        f_p1 = ctk.CTkFrame(f_ht_preview, fg_color="transparent")
+        # 1. Estado Actual (ANTES)
+        f_p1 = ctk.CTkFrame(self.f_ht_preview, fg_color="transparent")
         f_p1.pack(fill="x", padx=12, pady=(6, 2))
         ctk.CTkLabel(f_p1, text="ANTES", font=("Segoe UI", 13, "bold"), text_color=AZUL_SUAVE).pack(side="left")
         self.lbl_ht_bar_actual_info = ctk.CTkLabel(f_p1, text="", font=("Consolas", 13, "bold"), text_color="#ffffff")
         self.lbl_ht_bar_actual_info.pack(side="right")
-        self.canvas_ht_actual = tk.Canvas(f_ht_preview, height=26, bg=AZUL_CARD, highlightthickness=0, borderwidth=0)
+        self.canvas_ht_actual = tk.Canvas(self.f_ht_preview, height=26, bg=color_canvas_actual(), highlightthickness=0, borderwidth=0)
         self.canvas_ht_actual.pack(fill="x", padx=12, pady=(0, 2))
 
-        self.lbl_ht_arrow = ctk.CTkLabel(f_ht_preview, text="⬇      ⬇      ⬇      ⬇      ⬇      ⬇      ⬇      ⬇", font=("Segoe UI", 12, "bold"), text_color=AZUL_CIAN)
+        self.lbl_ht_arrow = ctk.CTkLabel(self.f_ht_preview, text="⬇      ⬇      ⬇      ⬇      ⬇      ⬇      ⬇      ⬇", font=("Segoe UI", 12, "bold"), text_color=AZUL_CIAN)
         self.lbl_ht_arrow.pack(pady=1)
 
-        f_p2 = ctk.CTkFrame(f_ht_preview, fg_color="transparent")
+        # 2. Estado Futuro (DESPUÉS)
+        f_p2 = ctk.CTkFrame(self.f_ht_preview, fg_color="transparent")
         f_p2.pack(fill="x", padx=12, pady=(2, 2))
         ctk.CTkLabel(f_p2, text="DESPUÉS", font=("Segoe UI", 13, "bold"), text_color=COLOR_CACHY).pack(side="left")
         self.lbl_ht_bar_futuro_info = ctk.CTkLabel(f_p2, text="", font=("Consolas", 13, "bold"), text_color="#ffffff")
         self.lbl_ht_bar_futuro_info.pack(side="right")
-        self.canvas_ht_futuro = tk.Canvas(f_ht_preview, height=26, bg=AZUL_CARD, highlightthickness=0, borderwidth=0)
+        self.canvas_ht_futuro = tk.Canvas(self.f_ht_preview, height=26, bg=color_canvas_actual(), highlightthickness=0, borderwidth=0)
         self.canvas_ht_futuro.pack(fill="x", padx=12, pady=(0, 8))
 
         # =====================================================================
@@ -1962,7 +2337,7 @@ class SavinOceanicCommand(ctk.CTk):
             
             if not self.en_proceso:
                 if hasattr(self, 'btn_start') and self.btn_start.winfo_exists():
-                    self.btn_start.pack(fill="x", padx=20, pady=(15, 10))
+                    self.btn_start.pack(side="bottom", pady=(10, 4))
                 self.f_progress.pack_forget()
                 self.btn_cancel.pack_forget()
                 
@@ -1986,46 +2361,68 @@ class SavinOceanicCommand(ctk.CTk):
             self.btn_modo_installer.configure(fg_color="transparent", text_color=AZUL_CIAN)
             self.refrescar_discos_hollowtools()
 
+    def ocultar_interfaz_hollowtools(self):
+        if hasattr(self, 'f_ht_grid'):
+            try:
+                self.f_ht_grid.pack_forget()
+            except Exception:
+                pass
+        if hasattr(self, 'f_ht_preview'):
+            try:
+                self.f_ht_preview.pack_forget()
+            except Exception:
+                pass
+
     def refrescar_discos_hollowtools(self):
+        self.combo_ht_disk.configure(values=[t("hollowtools.searching")])
+        self.combo_ht_disk.set(t("hollowtools.searching"))
+        self.ocultar_interfaz_hollowtools()
+        if getattr(self, '_refrescando_ht', False):
+            return
+        self._refrescando_ht = True
         self.btn_ht_refresh.configure(state="disabled")
-        self.combo_ht_disk.configure(values=["Buscando HOLLOWDRIVES..."])
-        self.combo_ht_disk.set("Buscando HOLLOWDRIVES...")
         
         def run():
-            unidades = obtener_unidades_usb(incluir_internos=False)
-            filtradas = []
-            for u in unidades:
-                particiones = obtener_estructura_disco_ps(u["device"])
-                es_hollow = False
-                for p in particiones:
-                    lbl = (p.get("Label") or "").upper()
-                    letra = p.get("Letter")
-                    if "HOLLOW" in lbl or "VENTOY" in lbl or (letra and os.path.exists(f"{letra}:\\HOLLOWDRIVE")):
-                        es_hollow = True
-                        break
-                if es_hollow:
-                    filtradas.append(u)
+            try:
+                unidades = obtener_unidades_usb(incluir_internos=False)
+                filtradas = [u for u in unidades if u.get("is_hollow")]
+            except Exception as ex:
+                logging.warning(f"Aviso escaneando unidades HollowTools: {ex}")
+                filtradas = []
 
-            lista_final = filtradas if filtradas else unidades
-            self.after(0, lambda: self._finalizar_refresco_ht(lista_final))
+            self.after(0, lambda: self._finalizar_refresco_ht(filtradas))
             
         threading.Thread(target=run, daemon=True).start()
 
     def _finalizar_refresco_ht(self, discos):
+        self._refrescando_ht = False
         self.lista_discos_hollow = discos
         self.btn_ht_refresh.configure(state="normal")
+        self.ocultar_interfaz_hollowtools()
         if not discos:
-            self.combo_ht_disk.configure(values=["⚠️ NO SE DETECTAN UNIDADES HOLLOWDRIVE"])
-            self.combo_ht_disk.set("⚠️ NO SE DETECTAN UNIDADES HOLLOWDRIVE")
+            self.combo_ht_disk.configure(values=[t("hollowtools.no_units")])
+            self.combo_ht_disk.set(t("hollowtools.no_units"))
         else:
             nombres = [d["display"] for d in discos]
             self.combo_ht_disk.configure(values=nombres)
-            self.combo_ht_disk.set(nombres[0])
-            self.al_seleccionar_disco_hollowtools(nombres[0])
+            self.combo_ht_disk.set(t("selector.select_placeholder"))
 
-    def al_seleccionar_disco_hollowtools(self, seleccion):
-        disco = next((d for d in self.lista_discos_hollow if d["display"] == seleccion), None)
-        if not disco: return
+    def al_seleccionar_disco_hollowtools(self, seleccion=None):
+        if not seleccion:
+            seleccion = self.combo_ht_disk.get()
+        if not seleccion or any(k in seleccion for k in ["---", "Buscando", "NO SE DETECTAN", "Searching", "Select", "Selecciona", t("hollowtools.searching"), t("hollowtools.no_units"), t("selector.select_placeholder")]):
+            self.ocultar_interfaz_hollowtools()
+            return
+
+        disco = next((d for d in getattr(self, 'lista_discos_hollow', []) if d.get("display") == seleccion), None)
+        if not disco:
+            self.ocultar_interfaz_hollowtools()
+            return
+            
+        if hasattr(self, 'f_ht_grid') and not self.f_ht_grid.winfo_ismapped():
+            self.f_ht_grid.pack(fill="both", expand=True, padx=0, pady=0)
+        if hasattr(self, 'f_ht_preview') and not self.f_ht_preview.winfo_ismapped():
+            self.f_ht_preview.pack(fill="x", padx=5, pady=(10, 0))
         
         self.seg_ht_cachy.configure(state="disabled")
         self.btn_ht_ejecutar_cachy.configure(state="disabled")
@@ -2109,7 +2506,7 @@ class SavinOceanicCommand(ctk.CTk):
         w_fut = self.canvas_ht_futuro.winfo_width()
 
         if w_act <= 1 or w_fut <= 1:
-            self.after(100, self.actualizar_preview_barras_ht)
+            self.bloquear_ui(False)
             return
 
         # BARRA ANTES
@@ -2553,12 +2950,12 @@ class SavinOceanicCommand(ctk.CTk):
         letra_grub, letra_cachy = obtener_o_asignar_letras_cachyos_grub(disco["device"])
 
         if letra_grub and letra_cachy:
-            v = self.creventana_info_base("GESTIÓN CACHYOS DETECTADO", 540, 360)
+            v = self.creventana_info_base(t("modals.cachy_manage_title"), 540, 360)
             f_in = ctk.CTkFrame(v, fg_color="transparent")
             f_in.pack(expand=True, fill="both", padx=20, pady=20)
 
-            ctk.CTkLabel(f_in, text="🚀 CACHYOS DETECTADO", font=("Impact", 28), text_color=COLOR_CACHY).pack(pady=(0, 10))
-            msg = "Se han detectado particiones de CachyOS existentes en esta unidad.\n¿Qué acción deseas realizar?"
+            ctk.CTkLabel(f_in, text=t("modals.cachy_manage_header"), font=("Impact", 28), text_color=COLOR_CACHY).pack(pady=(0, 10))
+            msg = t("modals.cachy_manage_body")
             ctk.CTkLabel(f_in, text=msg, font=("Segoe UI", 15), justify="center", wraplength=480).pack(pady=10)
 
             def opt_actualizar():
@@ -2567,16 +2964,16 @@ class SavinOceanicCommand(ctk.CTk):
 
             def opt_borrar():
                 v.destroy()
-                if messagebox.askyesno("CONFIRMAR BORRADO", "¿Seguro que quieres eliminar las particiones de CachyOS y liberar su espacio?"):
+                if messagebox.askyesno(t("modals.cachy_del_confirm_title"), t("modals.cachy_del_confirm_msg")):
                     if eliminar_particiones_cachy_diskpart(disco["device"]):
-                        messagebox.showinfo("ÉXITO", "Particiones eliminadas. Ahora puedes redimensionar el espacio unallocated.")
+                        messagebox.showinfo(t("modals.cachy_del_confirm_title"), t("modals.cachy_del_success"))
                         self.refrescar_discos_hollowtools()
                     else:
-                        messagebox.showerror("ERROR", "No se pudieron eliminar las particiones.")
+                        messagebox.showerror("ERROR", "Error")
 
-            ctk.CTkButton(f_in, text="🔄 ACTUALIZAR / REINSTALAR", font=("Segoe UI", 12, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=opt_actualizar).pack(fill="x", pady=5)
-            ctk.CTkButton(f_in, text="🗑️ BORRAR PARTICIONES Y LIBERAR ESPACIO", font=("Segoe UI", 12, "bold"), fg_color="#aa3333", height=40, command=opt_borrar).pack(fill="x", pady=5)
-            ctk.CTkButton(f_in, text="CANCELAR", font=("Segoe UI", 11), fg_color="#333", height=30, command=v.destroy).pack(pady=5)
+            ctk.CTkButton(f_in, text=t("modals.cachy_opt_update"), font=("Segoe UI", 12, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=opt_actualizar).pack(fill="x", pady=5)
+            ctk.CTkButton(f_in, text=t("modals.cachy_opt_delete"), font=("Segoe UI", 12, "bold"), fg_color="#aa3333", height=40, command=opt_borrar).pack(fill="x", pady=5)
+            ctk.CTkButton(f_in, text=t("modals.btn_close"), font=("Segoe UI", 11), fg_color="#333", height=30, command=v.destroy).pack(pady=5)
             v.update(); v.grab_set()
 
         else:
@@ -2644,7 +3041,48 @@ class SavinOceanicCommand(ctk.CTk):
 
         threading.Thread(target=hilo, daemon=True).start()
 
-    def toggle_preservar_espacio(self): self.rebalancear()
+    def toggle_preservar_espacio(self):
+        if self.gb_totales <= 0:
+            return
+        
+        espacio_grub = GB_GRUB if self.instalar_cachy.get() else 0.0
+        base_hollow = 10.0 if self.descargar_pack_hollow.get() else 3.0
+        gb_bato_interno = (self.tamanos_reales.get("bato_64", 0.0) if self.bato_64_act.get() else 0.0) + \
+                          (self.tamanos_reales.get("bato_32", 0.0) if self.bato_32_act.get() else 0.0) \
+                          if self.instalar_bato.get() else 0.0
+        val_pack_bato = self.tamanos_reales.get("pack_bato", 0.0) if self.descargar_pack_bato.get() else 0.0
+        min_hollow = base_hollow + gb_bato_interno + val_pack_bato
+
+        if self.preservar_espacio.get():
+            # El usuario activó PRESERVAR ESPACIO -> Dejar espacio libre al final del disco
+            if self.instalar_cachy.get():
+                val_h = self.slider_h.get()
+                val_c = self.slider_c.get()
+                libre = self.gb_totales - (val_h + val_c + espacio_grub)
+                if libre <= 0.5:
+                    margen = max(5.0, round(self.gb_totales * 0.15, 1))
+                    if val_c - margen >= self.min_cachy:
+                        self.slider_c.set(round(val_c - margen, 1))
+                    elif val_h - margen >= min_hollow:
+                        self.slider_h.set(round(val_h - margen, 1))
+                    else:
+                        self.slider_c.set(self.min_cachy)
+                        self.slider_h.set(min_hollow)
+            else:
+                val_h = self.slider_h.get()
+                if val_h >= self.gb_totales - 0.5:
+                    libre_defecto = max(5.0, round(self.gb_totales * 0.20, 1))
+                    self.slider_h.set(max(min_hollow, round(self.gb_totales - libre_defecto, 1)))
+        else:
+            # El usuario desactivó PRESERVAR ESPACIO -> Llenar el 100% del disco
+            if self.instalar_cachy.get():
+                val_h = self.slider_h.get()
+                val_c = max(self.min_cachy, self.gb_totales - val_h - espacio_grub)
+                self.slider_c.set(round(val_c, 1))
+            else:
+                self.slider_h.set(self.gb_totales)
+
+        self.rebalancear()
 
     def bloquear_ui(self, bloquear=True):
         st = "disabled" if bloquear else "normal"
@@ -2668,72 +3106,68 @@ class SavinOceanicCommand(ctk.CTk):
         return v
 
     def abrir_info_batocera(self):
-        v = self.creventana_info_base("¿QUÉ ES BATOCERA?", 640, 360)
+        v = self.creventana_info_base(t("modals.batocera_title"), 640, 360)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🎮 SOBRE BATOCERA", font=("Impact", 30), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        info = ("Batocera es un sistema de emulación que puede convertir cualquier ordenador en una consola de videojuegos.\n\n🛡️ SEGURIDAD DE DATOS:\nAunque inicies Batocera, NUNCA perderás los datos del ordenador.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="center", wraplength=560).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.batocera_header"), font=("Impact", 30), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.batocera_body"), font=("Segoe UI", 16), justify="center", wraplength=560).pack(pady=5)
+        ctk.CTkButton(frame_interno, text=t("modals.btn_close"), font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_cachyos(self):
-        v = self.creventana_info_base("¿QUÉ ES CACHYOS?", 700, 480)
+        v = self.creventana_info_base(t("modals.cachyos_title"), 700, 480)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🚀 CACHYOS: ARCH LINUX OPTIMIZADO", font=("Impact", 30), text_color=COLOR_CACHY).pack(pady=(0, 15))
-        info = ("He preparado una versión personalizada de CachyOS (Arch Linux) diseñada específicamente para ser rápida y fácil de usar.\n\n⚡ CARACTERÍSTICAS PRINCIPALES:\n• Universal: Funciona en casi cualquier PC moderno.\n• Rendimiento: Optimizado para sacar el máximo provecho al hardware.\n• Portable: Llevas tu sistema operativo, archivos y apps siempre contigo.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="center", wraplength=620).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="¡EXCELENTE!", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.cachyos_header"), font=("Impact", 30), text_color=COLOR_CACHY).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.cachyos_body"), font=("Segoe UI", 16), justify="center", wraplength=620).pack(pady=5)
+        ctk.CTkButton(frame_interno, text=t("modals.btn_close"), font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=42, width=180, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
         
     def abrir_info_kde(self):
-        v = self.creventana_info_base("INFO: KDE PLASMA", 540, 300)
+        v = self.creventana_info_base(t("modals.kde_title"), 540, 300)
         f = ctk.CTkFrame(v, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(f, text="❄️ KDE PLASMA", font=("Impact", 26), text_color=AZUL_CIAN).pack(pady=(0, 10))
-        info = "Es perfecto para los que quieren algo familiar como Windows. Es el entorno más fácil de usar de primeras, aunque ocupa algo más que Hyprland."
-        ctk.CTkLabel(f, text=info, font=("Segoe UI", 16), justify="center", wraplength=480).pack(pady=5)
-        ctk.CTkButton(f, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=v.destroy).pack(pady=(15,0))
+        ctk.CTkLabel(f, text=t("modals.kde_header"), font=("Impact", 26), text_color=AZUL_CIAN).pack(pady=(0, 10))
+        ctk.CTkLabel(f, text=t("modals.kde_body"), font=("Segoe UI", 16), justify="center", wraplength=480).pack(pady=5)
+        ctk.CTkButton(f, text=t("modals.btn_close"), font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=v.destroy).pack(pady=(15,0))
         v.update(); v.grab_set()
 
     def abrir_info_hyprland(self):
-        v = self.creventana_info_base("INFO: HYPRLAND", 620, 340)
+        v = self.creventana_info_base(t("modals.hyprland_title"), 620, 340)
         f = ctk.CTkFrame(v, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(f, text="🌀 HYPRLAND", font=("Impact", 26), text_color=COLOR_CACHY).pack(pady=(0, 10))
-        info = "Uno de los escritorios más bonitos y fluidos para Linux. Es ideal para máxima productividad, consume poquísimos recursos y ofrece un control total del sistema."
-        ctk.CTkLabel(f, text=info, font=("Segoe UI", 16), justify="center", wraplength=550).pack(pady=5)
-        ctk.CTkButton(f, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=v.destroy).pack(pady=(15,0))
+        ctk.CTkLabel(f, text=t("modals.hyprland_header"), font=("Impact", 26), text_color=COLOR_CACHY).pack(pady=(0, 10))
+        ctk.CTkLabel(f, text=t("modals.hyprland_body"), font=("Segoe UI", 16), justify="center", wraplength=550).pack(pady=5)
+        ctk.CTkButton(f, text=t("modals.btn_close"), font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, command=v.destroy).pack(pady=(15,0))
         v.update(); v.grab_set()
 
     def abrir_ventana_info(self):
-        v = self.creventana_info_base("SAVIN CORE INFO", 750, 780)
-        frame_interno = ctk.CTkFrame(v, fg_color="transparent")
-        frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
+        v = self.creventana_info_base(t("modals.initial.title"), 760, 780)
+        
+        # Contenedor con scroll para evitar que se corte en pantallas con poca altura
+        scroll_container = ctk.CTkScrollableFrame(v, fg_color="transparent")
+        scroll_container.pack(expand=True, fill="both", padx=15, pady=15)
 
-        ctk.CTkLabel(frame_interno, text="👑 SAVIN HOLLOWDRIVE 👑", font=("Impact", 38), text_color=AZUL_CIAN).pack(pady=(0, 10))
+        # 1. TÍTULO PRINCIPAL
+        ctk.CTkLabel(scroll_container, text=t("modals.initial.header"), font=("Impact", 38), text_color=AZUL_CIAN).pack(pady=(5, 5))
 
-        ctk.CTkLabel(frame_interno, text="◈ MIS PLATAFORMAS ◈", font=("Consolas", 16, "bold"), text_color=AZUL_SUAVE).pack(pady=5)
-        f_social = ctk.CTkFrame(frame_interno, fg_color="transparent")
-        f_social.pack(pady=5)
+        # 2. MENSAJE DE BIENVENIDA
+        ctk.CTkLabel(
+            scroll_container, 
+            text=t("modals.initial.welcome"), 
+            font=("Segoe UI", 15),
+            text_color=("#0284c7", "#38bdf8"),
+            wraplength=660, 
+            justify="center"
+        ).pack(padx=20, pady=(5, 15))
 
-        socials = [
-            ("💬 DISCORD", "https://discord.gg/HJvgmCRpGm"), 
-            ("📂 GITHUB", "https://github.com/MVP-Savyn"), 
-            ("📺 YOUTUBE", "https://youtube.com/@T0xicArea")
-        ]
-        for texto, url in socials:
-            ctk.CTkButton(f_social, text=texto, font=("Consolas", 12, "bold"), 
-                          fg_color=AZUL_CARD, border_width=1, border_color=AZUL_ELECTRICO, 
-                          width=140, height=35, command=lambda u=url: webbrowser.open_new_tab(u)).pack(side="left", padx=8)
-
-        ctk.CTkLabel(frame_interno, text="◈ ¡MIRA ESTE VÍDEO PARA SABER CÓMO FUNCIONA! ◈", font=("Consolas", 16, "bold"), text_color=AZUL_SUAVE).pack(pady=(15, 5))
+        # 3. VÍDEO EXPLICATIVO
+        ctk.CTkLabel(scroll_container, text=t("modals.initial.video_prompt"), font=("Consolas", 15, "bold"), text_color=AZUL_SUAVE).pack(pady=(5, 5))
         url_video_youtube = "https://youtu.be/oHg5SJYRHA0?si=7nL_H5sIWuiLM4dp"
 
-        f_video = ctk.CTkFrame(frame_interno, fg_color=AZUL_CARD, border_width=2, border_color=AZUL_ELECTRICO, width=480, height=270, corner_radius=15)
+        f_video = ctk.CTkFrame(scroll_container, fg_color=AZUL_CARD, border_width=2, border_color=AZUL_ELECTRICO, width=480, height=270, corner_radius=15)
         f_video.pack_propagate(False)
-        f_video.pack(pady=10)
+        f_video.pack(pady=8)
 
         ruta_miniatura = resource_path("miniatura.png")
         try:
@@ -2777,317 +3211,326 @@ class SavinOceanicCommand(ctk.CTk):
         lbl_play.bind("<Enter>", animacion_entrar)
         lbl_play.bind("<Leave>", animacion_salir)
 
-        ctk.CTkLabel(frame_interno, text="◈ CONTENIDO UTILIZADO Y RECURSOS ◈", font=("Consolas", 16, "bold"), text_color=AZUL_SUAVE).pack(pady=(15, 5))
+        # 4. REDES SOCIALES
+        ctk.CTkLabel(scroll_container, text=t("modals.initial.platforms"), font=("Consolas", 15, "bold"), text_color=AZUL_SUAVE).pack(pady=(15, 5))
+        f_social = ctk.CTkFrame(scroll_container, fg_color="transparent")
+        f_social.pack(pady=5)
 
-        credits = [
-            ("CACHY OS", "https://cachyos.org"),
-            ("BATOCERA LINUX", "https://batocera.org"),
-            ("VENTOY CORE", "https://www.ventoy.net")
+        socials = [
+            ("💬 DISCORD", "https://discord.gg/HJvgmCRpGm"), 
+            ("📂 GITHUB", "https://github.com/MVP-Savyn"), 
+            ("📺 YOUTUBE", "https://youtube.com/@T0xicArea")
+        ]
+        for texto, url in socials:
+            ctk.CTkButton(
+                f_social, text=texto, font=("Consolas", 12, "bold"), 
+                fg_color=AZUL_CARD, border_width=1, border_color=AZUL_ELECTRICO, 
+                width=140, height=35, command=lambda u=url: webbrowser.open_new_tab(u)
+            ).pack(side="left", padx=6)
+
+        # 5. CRÉDITOS Y LICENCIAS DE CÓDIGO ABIERTO
+        ctk.CTkLabel(scroll_container, text=t("modals.initial.resources"), font=("Consolas", 15, "bold"), text_color=AZUL_SUAVE).pack(pady=(20, 5))
+
+        credits_licencias = [
+            ("VENTOY CORE (GNU GPLv3)", "https://github.com/ventoy/Ventoy"),
+            ("7-ZIP ENGINE (GNU LGPL)", "https://www.7-zip.org"),
+            ("CACHY OS (GNU GPLv3)", "https://cachyos.org"),
+            ("BATOCERA LINUX (GPLv2)", "https://batocera.org")
         ]
 
-        f_credits = ctk.CTkFrame(frame_interno, fg_color="transparent")
-        f_credits.pack(fill="x", padx=100, pady=2)
+        f_credits = ctk.CTkFrame(scroll_container, fg_color=AZUL_CARD, corner_radius=10, border_width=1, border_color=COLOR_BORDE)
+        f_credits.pack(fill="x", padx=40, pady=8)
 
-        for name, link in credits:
+        for name, link in credits_licencias:
             row = ctk.CTkFrame(f_credits, fg_color="transparent")
-            row.pack(fill="x", pady=2)
-            ctk.CTkLabel(row, text=f"• {name}", font=("Consolas", 13)).pack(side="left")
-            ctk.CTkButton(row, text="Visitar", width=80, height=20, fg_color=AZUL_CARD, border_width=1, border_color=AZUL_ELECTRICO, command=lambda l=link: webbrowser.open_new_tab(l)).pack(side="right")
+            row.pack(fill="x", padx=15, pady=4)
+            ctk.CTkLabel(row, text=f"• {name}", font=("Consolas", 12, "bold")).pack(side="left")
+            ctk.CTkButton(
+                row, text=t("modals.initial.code_web"), width=105, height=22, font=("Segoe UI", 10, "bold"),
+                fg_color=AZUL_ELECTRICO, command=lambda l=link: webbrowser.open_new_tab(l)
+            ).pack(side="right")
 
-        f_medicat = ctk.CTkFrame(frame_interno, fg_color="#181824", border_width=1, border_color=AZUL_ELECTRICO, corner_radius=6)
-        f_medicat.pack(fill="x", padx=100, pady=(15, 10))
+        lbl_legal = ctk.CTkLabel(
+            f_credits,
+            text=t("modals.initial.third_party_notice"),
+            font=("Segoe UI", 10, "italic"),
+            text_color="#888888",
+            wraplength=600,
+            justify="center"
+        )
+        lbl_legal.pack(padx=10, pady=(6, 8))
 
-        lbl_thanks = ctk.CTkLabel(f_medicat, text="💖 Gracias a MediCat USB, que me inspiró a crear un USB cercano a la perfección✨.", 
-                                  font=("Consolas", 11, "italic"), text_color="#dddddd", wraplength=480)
+        # 6. AGRADECIMIENTOS MEDICAT
+        f_medicat = ctk.CTkFrame(scroll_container, fg_color="#181824", border_width=1, border_color=AZUL_ELECTRICO, corner_radius=8)
+        f_medicat.pack(fill="x", padx=40, pady=(10, 10))
+
+        lbl_thanks = ctk.CTkLabel(
+            f_medicat, 
+            text=t("modals.initial.thanks"), 
+            font=("Consolas", 11, "italic"), 
+            text_color="#dddddd", 
+            wraplength=520
+        )
         lbl_thanks.pack(pady=8, padx=15)
 
-        ctk.CTkButton(frame_interno, text="CERRAR", width=200, height=35, command=v.destroy).pack(pady=(15, 0))
-        v.update(); v.grab_set()
+        # 7. BOTÓN DE CIERRE
+        ctk.CTkButton(
+            scroll_container, 
+            text=t("modals.initial.enter_btn"), 
+            font=("Segoe UI", 13, "bold"), 
+            fg_color=AZUL_ELECTRICO, 
+            width=240, 
+            height=38, 
+            command=v.destroy
+        ).pack(pady=(15, 10))
+        
+        v.update()
+        v.grab_set()
 
     def activar_interfaz_completa(self, seleccion):
-        if "---" in seleccion or "Buscando" in seleccion or "NO SE DETECTAN" in seleccion: return
-        disco_elegido = next((d for d in self.lista_discos_reales if d["display"] == seleccion), None)
-        if disco_elegido: self.gb_totales = disco_elegido["size"]
+        if not seleccion:
+            return
+        if "---" in seleccion or "Buscando" in seleccion or "NO SE DETECTAN" in seleccion or t("selector.searching") in seleccion or t("selector.no_units") in seleccion or t("selector.select_placeholder") in seleccion:
+            return
+
+        disco_elegido = next((d for d in getattr(self, 'lista_discos_reales', []) if d.get("display") == seleccion), None)
+        if disco_elegido:
+            self.gb_totales = float(disco_elegido.get("size", disco_elegido.get("size_gb", 0.0)))
+
         self.footer.pack(fill="x", side="bottom", padx=20, pady=10)
         self.main_container.pack(fill="both", expand=True, padx=20, pady=5)
-        self.slider_h.set(self.gb_totales)
-        if hasattr(self, 'slider_c'): self.slider_c.set(0.0)
+        if self.preservar_espacio.get():
+            self.slider_h.set(max(10.0, round(self.gb_totales * 0.8, 1)))
+        else:
+            self.slider_h.set(self.gb_totales)
+        if hasattr(self, 'slider_c'):
+            self.slider_c.set(0.0)
         self.rebalancear()
 
-    def crear_ocean_slider(self, parent, label, color, key, min_val=10):
-        f = ctk.CTkFrame(parent, fg_color="transparent")
-        f.pack(fill="x", padx=20, pady=5)
-        ctk.CTkLabel(f, text=f"❯ {label}", font=("Consolas", 11, "bold")).pack(anchor="w")
-        row = ctk.CTkFrame(f, fg_color="transparent")
-        row.pack(fill="x")
-        s = ctk.CTkSlider(row, from_=min_val, to=1000, progress_color=color, command=lambda v, k=key: self.rebalancear(f"slider_{k}"))
-        s.pack(side="left", fill="x", expand=True)
-        setattr(self, f"slider_{key}", s)
-        self.widgets_interactivos.append(s)
-        l_val = ctk.CTkLabel(row, text="0 GB", width=70, font=("Consolas", 14, "bold"))
-        l_val.pack(side="right")
-        setattr(self, f"lbl_{key}_gb", l_val)
-        return f
+    def alternar_gif_descarga(self, activo=True):
 
-    def rebalancear(self, source=None):
-        if self.gb_totales <= 0: return
-        if getattr(self, '_bloqueo_rebalanceo', False): return
-        self._bloqueo_rebalanceo = True
+            if getattr(self, 'abortar_proceso', False):
 
-        try:
-            espacio_grub = GB_GRUB if self.instalar_cachy.get() else 0.0
-            gb_bato_interno = (self.tamanos_reales["bato_64"] if self.bato_64_act.get() else 0.0) + \
-                              (self.tamanos_reales["bato_32"] if self.bato_32_act.get() else 0.0) \
-                              if self.instalar_bato.get() else 0.0
-                    
-            base_hollow = 10.0 if self.descargar_pack_hollow.get() else 3.0
-            base_obligatoria = base_hollow
-            if self.instalar_cachy.get(): base_obligatoria += self.min_cachy  
-                
-            espacio_libre_para_packs = self.gb_totales - base_obligatoria - gb_bato_interno - espacio_grub
-            bato_disponible = self.instalar_bato.get() and (self.bato_64_act.get() or self.bato_32_act.get())
-            val_pack_bato = 0.0
-            
-            if bato_disponible:
-                self.ch_pack_bato.configure(state="normal")
-                if self.descargar_pack_bato.get():
-                    if espacio_libre_para_packs >= self.tamanos_reales["pack_bato"]:
-                        val_pack_bato = self.tamanos_reales["pack_bato"]
-                    else:
-                        messagebox.showwarning("Espacio Insuficiente", "El pack de batocera no cabe en tu configuración.")
-                        self.descargar_pack_bato.set(False)
-                        self.ch_pack_bato.deselect()
-            else:
-                self.ch_pack_bato.configure(state="disabled")
-                self.descargar_pack_bato.set(False)
-                self.ch_pack_bato.deselect()
+                self.after(0, lambda: self.cambiar_gif(None))
 
-            min_h = base_hollow + gb_bato_interno + val_pack_bato
-            min_c = self.min_cachy if self.instalar_cachy.get() else 0.0
-            disp = self.gb_totales - espacio_grub
-
-            if min_h + min_c > disp:
-                min_h = min(min_h, disp)
-                min_c = max(0.0, disp - min_h)
-
-            self.slider_h.configure(state="normal")
-            self.slider_c.configure(state="normal" if self.instalar_cachy.get() else "disabled")
-
-            h = self.slider_h.get()
-            c = self.slider_c.get() if self.instalar_cachy.get() else 0.0
-
-            if h < min_h: h = min_h
-            if self.instalar_cachy.get() and c < min_c: c = min_c
-
-            if self.preservar_espacio.get():
-                if source == "slider_h":
-                    if h + c > disp:
-                        c = max(min_c, disp - h)
-                        if h + c > disp: h = disp - c
-                elif source == "slider_c":
-                    if h + c > disp:
-                        h = max(min_h, disp - c)
-                        if h + c > disp: c = disp - h
-                else:
-                    if h + c > disp:
-                        h = max(min_h, disp - c)
-                        if h + c > disp:
-                            c = max(min_c, disp - h)
-                            h = disp - c
-            else:
-                if self.instalar_cachy.get():
-                    if source == "slider_h":
-                        c = disp - h
-                        if c < min_c:
-                            c = min_c
-                            h = disp - min_c
-                    elif source == "slider_c":
-                        h = disp - c
-                        if h < min_h:
-                            h = min_h
-                            c = disp - min_h
-                    else:
-                        c = disp - h
-                        if c < min_c:
-                            c = min_c
-                            h = disp - min_c
-                        if h < min_h:
-                            h = min_h
-                            c = disp - min_h
-                else:
-                    c = 0.0
-                    h = disp
-                    self.slider_h.configure(state="disabled")
-
-            max_h_slider = (disp - min_c) if self.instalar_cachy.get() else disp
-            
-            if source != "slider_h":
-                self.slider_h.configure(from_=base_hollow, to=max(base_hollow + 0.1, max_h_slider))
-                self.slider_h.set(h)  
-            elif abs(self.slider_h.get() - h) > 0.05:
-                self.slider_h.set(h)
-                
-            self.lbl_h_gb.configure(text=f"{h:.1f} GB")
-            
-            if self.instalar_cachy.get():
-                from_c = min_c
-                to_c = max(from_c + 1.0, disp - min_h)
-                if source != "slider_c":
-                    self.slider_c.configure(from_=from_c, to=to_c)
-                    self.slider_c.set(c)  
-                elif abs(self.slider_c.get() - c) > 0.05:
-                    self.slider_c.set(c)
-                self.lbl_c_gb.configure(text=f"{c:.1f} GB")
-
-            libre_calculado = max(0.0, disp - (h + c))
-            self.lbl_libre_info.configure(text=f"LIBRE: {libre_calculado:.2f} GB")
-
-            self.dic_leyenda["hollow"].configure(text=f"Hollow ({h:.1f}GB)")
-            if self.instalar_cachy.get():
-                self.dic_leyenda["grub"].configure(text=f"GRUB ({espacio_grub:.1f}GB)")
-                self.dic_leyenda["cachy"].configure(text=f"Cachy ({c:.1f}GB)")
-            else:
-                self.dic_leyenda["grub"].configure(text="GRUB (0GB)")
-                self.dic_leyenda["cachy"].configure(text="Cachy (0GB)")
-
-            self.actualizar_barra_visual(h, espacio_grub, c)
-            
-        finally:
-            self._bloqueo_rebalanceo = False
-    
-    def comprobar_actualizaciones(self):
-        url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
-        try:
-            response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                tag_remoto = data["tag_name"].strip().lower().replace("v", "")
-                version_local = VERSION_ACTUAL.strip().lower().replace("v", "")
-                if tag_remoto != version_local:
-                    url_exe_descarga = None
-                    for asset in data.get("assets", []):
-                        if asset["name"] == "HollowDrive.exe":
-                            url_exe_descarga = asset["browser_download_url"]
-                            break
-                    if url_exe_descarga:
-                        self.after(0, lambda: self.notificar_actualizacion(data["tag_name"], url_exe_descarga))
-        except Exception: pass
-
-    def notificar_actualizacion(self, nueva_version, url_descarga):
-        msg = f"¡Hay una nueva versión disponible de HollowDrive ({nueva_version})!\n\n¿Deseas descargarla e instalarla ahora automáticamente?"
-        if messagebox.askyesno("ACTUALIZACIÓN DETECTADA", msg):
-            self.bloquear_ui(True)
-            self.lbl_status.configure(text="DESCARGANDO NUEVA VERSIÓN... POR FAVOR ESPERA", text_color=AZUL_CIAN)
-            threading.Thread(target=self.ejecutar_auto_update, args=(url_descarga,), daemon=True).start()
-
-    def ejecutar_auto_update(self, url_descarga):
-        try:
-            exe_actual = os.path.abspath(sys.argv[0])
-            if not exe_actual.endswith(".exe"):
-                self.after(0, lambda: messagebox.showinfo("MODO DESARROLLO", f"Actualización ({GITHUB_REPO}) disponible.\nSaltando reemplazo físico porque estás ejecutando el script nativo de Python."))
-                self.after(0, lambda: self.bloquear_ui(False))
-                self.after(0, lambda: self.lbl_status.configure(text="ESPERANDO INICIO...", text_color=AZUL_SUAVE))
                 return
 
-            ruta_temporal_exe = exe_actual + ".tmp"
-            response = requests.get(url_descarga, stream=True)
-            if response.status_code != 200: raise RuntimeError(f"HTTP {response.status_code}")
-                
-            with open(ruta_temporal_exe, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk: f.write(chunk)
+            if activo: 
 
-            ruta_bat = os.path.join(os.path.dirname(exe_actual), "hollow_updater.bat")
-            with open(ruta_bat, "w", encoding="ansi") as f:
-                f.write('@echo off\n')
-                f.write('timeout /t 1 /nobreak > nul\n')
-                f.write(f'del "{exe_actual}"\n')
-                f.write(f'move "{ruta_temporal_exe}" "{exe_actual}"\n')
-                f.write(f'start "" "{exe_actual}"\n')
-                f.write('del "%~f0"\n')
+                self.after(0, lambda: self.cambiar_gif(self.frames_breakdance))
 
-            subprocess.Popen(["cmd.exe", "/c", ruta_bat], creationflags=subprocess.CREATE_NO_WINDOW)
-            self.after(0, self.destroy)
+            else: 
 
-        except Exception as e:
-            logging.error(f"Fallo crítico en el proceso de auto-actualización: {e}")
-            err_msg = str(e)
-            self.after(0, lambda msg=err_msg: messagebox.showerror("ERROR DE ACTUALIZACIÓN", f"No se pudo completar la instalación de la nueva versión:\n{msg}"))
-            self.after(0, lambda: self.bloquear_ui(False))
-            self.after(0, lambda: self.lbl_status.configure(text="FALLO AL ACTUALIZAR", text_color="#aa3333"))
+                self.after(0, lambda: self.cambiar_gif(self.frames_linterna))
 
     def comenzar_instalacion(self):
-        if self.en_proceso: return
-        self.en_proceso = True
-        self.abortar_proceso = False
-        
-        self.bloquear_ui(True)
-        self.alternar_modo_instalacion(True)
-        
-        seleccion = self.combo_disk.get()
-        disco_elegido = next((d for d in self.lista_discos_reales if d["display"] == seleccion), None)
-        
-        if not disco_elegido:
-            messagebox.showerror("Error", "No se pudo identificar la unidad seleccionada.")
-            self.en_proceso = False
-            self.bloquear_ui(False)
-            self.alternar_modo_instalacion(False)
-            return
 
-        config = {
-            "disk_index": disco_elegido["device"],
-            "cachy_gb": self.slider_c.get() if self.instalar_cachy.get() else 0.0,
-            "hollow_gb": self.slider_h.get(),                  
-            "gb_totales": self.gb_totales,                     
-            "preservar_espacio": self.preservar_espacio.get(), 
-            "instalar_cachy": self.instalar_cachy.get(),
-            "descargar_pack_hollow": self.descargar_pack_hollow.get(),
-            "descargar_pack_bato": self.descargar_pack_bato.get(),
-            "instalar_bato": self.instalar_bato.get(),
-            "metodo_descarga": self.metodo_descarga.get(),
-            "cachy_flavor": getattr(self, 'cachy_flavor', ctk.StringVar(value="kde")).get()
-        }
-        
-        self.hilo_instalacion = threading.Thread(target=self.proceso_instalacion_background, args=(config,), daemon=True)
-        self.hilo_instalacion.start()
+            if self.en_proceso: return
 
-    def alternar_gif_descarga(self, activo=True):
-        if getattr(self, 'abortar_proceso', False):
-            self.after(0, lambda: self.cambiar_gif(None))
-            return
-        if activo: 
-            self.after(0, lambda: self.cambiar_gif(self.frames_breakdance))
-        else: 
-            self.after(0, lambda: self.cambiar_gif(self.frames_linterna))
+            self.en_proceso = True
+
+            self.abortar_proceso = False
+
+        
+
+            self.bloquear_ui(True)
+
+            self.alternar_modo_instalacion(True)
+
+        
+
+            seleccion = self.combo_disk.get()
+
+            disco_elegido = next((d for d in self.lista_discos_reales if d["display"] == seleccion), None)
+
+        
+
+            if not disco_elegido:
+
+                messagebox.showerror("Error", "No se pudo identificar la unidad seleccionada.")
+
+                self.en_proceso = False
+
+                self.bloquear_ui(False)
+
+                self.alternar_modo_instalacion(False)
+
+                return
+
+
+
+            config = {
+
+                "disk_index": disco_elegido["device"],
+
+                "cachy_gb": self.slider_c.get() if self.instalar_cachy.get() else 0.0,
+
+                "hollow_gb": self.slider_h.get(),                  
+
+                "gb_totales": self.gb_totales,                     
+
+                "preservar_espacio": self.preservar_espacio.get(), 
+
+                "instalar_cachy": self.instalar_cachy.get(),
+
+                "descargar_pack_hollow": self.descargar_pack_hollow.get(),
+
+                "descargar_pack_bato": self.descargar_pack_bato.get(),
+
+                "instalar_bato": self.instalar_bato.get(),
+
+                "metodo_descarga": self.metodo_descarga.get(),
+
+                "cachy_flavor": getattr(self, 'cachy_flavor', ctk.StringVar(value="kde")).get()
+
+            }
+
+        
+
+            self.hilo_instalacion = threading.Thread(target=self.proceso_instalacion_background, args=(config,), daemon=True)
+
+            self.hilo_instalacion.start()
+
+    def comprobar_actualizaciones(self):
+
+            url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+
+            try:
+
+                response = requests.get(url, timeout=5)
+
+                if response.status_code == 200:
+
+                    data = response.json()
+
+                    tag_remoto = data["tag_name"].strip().lower().replace("v", "")
+
+                    version_local = VERSION_ACTUAL.strip().lower().replace("v", "")
+
+                    if tag_remoto != version_local:
+
+                        url_exe_descarga = None
+
+                        for asset in data.get("assets", []):
+
+                            if asset["name"] == "HollowDrive.exe":
+
+                                url_exe_descarga = asset["browser_download_url"]
+
+                                break
+
+                        if url_exe_descarga:
+
+                            self.after(0, lambda: self.notificar_actualizacion(data["tag_name"], url_exe_descarga))
+
+            except Exception: pass
+
+    def ejecutar_auto_update(self, url_descarga):
+
+            try:
+
+                exe_actual = os.path.abspath(sys.argv[0])
+
+                if not exe_actual.endswith(".exe"):
+
+                    self.after(0, lambda: messagebox.showinfo("MODO DESARROLLO", f"Actualización ({GITHUB_REPO}) disponible.\nSaltando reemplazo físico porque estás ejecutando el script nativo de Python."))
+
+                    self.after(0, lambda: self.bloquear_ui(False))
+
+                    self.after(0, lambda: self.lbl_status.configure(text="ESPERANDO INICIO...", text_color=AZUL_SUAVE))
+
+                    return
+
+
+
+                ruta_temporal_exe = exe_actual + ".tmp"
+
+                response = requests.get(url_descarga, stream=True)
+
+                if response.status_code != 200: raise RuntimeError(f"HTTP {response.status_code}")
+
+                
+
+                with open(ruta_temporal_exe, "wb") as f:
+
+                    for chunk in response.iter_content(chunk_size=8192):
+
+                        if chunk: f.write(chunk)
+
+
+
+                ruta_bat = os.path.join(os.path.dirname(exe_actual), "hollow_updater.bat")
+
+                with open(ruta_bat, "w", encoding="ansi") as f:
+
+                    f.write('@echo off\n')
+
+                    f.write('timeout /t 1 /nobreak > nul\n')
+
+                    f.write(f'del "{exe_actual}"\n')
+
+                    f.write(f'move "{ruta_temporal_exe}" "{exe_actual}"\n')
+
+                    f.write(f'start "" "{exe_actual}"\n')
+
+                    f.write('del "%~f0"\n')
+
+
+
+                subprocess.Popen(["cmd.exe", "/c", ruta_bat], creationflags=subprocess.CREATE_NO_WINDOW)
+
+                self.after(0, self.destroy)
+
+
+
+            except Exception as e:
+
+                logging.error(f"Fallo crítico en el proceso de auto-actualización: {e}")
+
+                err_msg = str(e)
+
+                self.after(0, lambda msg=err_msg: messagebox.showerror("ERROR DE ACTUALIZACIÓN", f"No se pudo completar la instalación de la nueva versión:\n{msg}"))
+
+                self.after(0, lambda: self.bloquear_ui(False))
+
+                self.after(0, lambda: self.lbl_status.configure(text="FALLO AL ACTUALIZAR", text_color="#aa3333"))
 
     def mostrar_popup_exito(self, t_total, tiempos):
-        v = self.creventana_info_base("¡INSTALACIÓN COMPLETADA!", 500, 480)
+        v = self.creventana_info_base(t("modals.success_title"), 500, 480)
         f_in = ctk.CTkFrame(v, fg_color="transparent")
         f_in.pack(expand=True, fill="both", padx=20, pady=20)
-        
+
         mins_t, secs_t = divmod(int(t_total), 60)
         horas_t, mins_t = divmod(mins_t, 60)
         tiempo_str = f"{horas_t:02d}:{mins_t:02d}:{secs_t:02d}" if horas_t > 0 else f"{mins_t:02d}:{secs_t:02d}"
-        
-        ctk.CTkLabel(f_in, text="🎉 ¡LISTO!", font=("Impact", 38), text_color=VERDE_EXITO).pack(pady=(0, 5))
-        ctk.CTkLabel(f_in, text=f"El proceso total ha durado: {tiempo_str}", font=("Segoe UI", 18, "bold"), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        
+
+        ctk.CTkLabel(f_in, text=t("modals.success_header"), font=("Impact", 38), text_color=VERDE_EXITO).pack(pady=(0, 5))
+        ctk.CTkLabel(f_in, text=t("modals.success_duration", time=tiempo_str), font=("Segoe UI", 18, "bold"), text_color=AZUL_CIAN).pack(pady=(0, 15))
+
         f_grid = ctk.CTkScrollableFrame(f_in, fg_color="#0d141c", height=200, corner_radius=10, border_width=1, border_color="#222")
         f_grid.pack(fill="x", pady=5)
-        
+
         for nombre, dur in tiempos.items():
             m, s = divmod(int(dur), 60)
             row = ctk.CTkFrame(f_grid, fg_color="transparent")
             row.pack(fill="x", pady=4, padx=10)
             ctk.CTkLabel(row, text=nombre, font=("Segoe UI", 13)).pack(side="left")
             ctk.CTkLabel(row, text=f"{m:02d}m {s:02d}s", font=("Consolas", 13, "bold"), text_color="#aaaaaa").pack(side="right")
-            
-        ctk.CTkButton(f_in, text="FINALIZAR", font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=200, command=v.destroy).pack(pady=(20, 0))
+
+        ctk.CTkButton(f_in, text=t("modals.btn_finish"), font=("Segoe UI", 14, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=200, command=v.destroy).pack(pady=(20, 0))
         v.update(); v.grab_set()
 
-    # =====================================================================
-    # 💥 PIPELINE COMPLETO DE INSTALACIÓN
-    # =====================================================================
+    def notificar_actualizacion(self, nueva_version, url_descarga):
+
+            msg = f"¡Hay una nueva versión disponible de HollowDrive ({nueva_version})!\n\n¿Deseas descargarla e instalarla ahora automáticamente?"
+
+            if messagebox.askyesno("ACTUALIZACIÓN DETECTADA", msg):
+
+                self.bloquear_ui(True)
+
+                self.lbl_status.configure(text="DESCARGANDO NUEVA VERSIÓN... POR FAVOR ESPERA", text_color=AZUL_CIAN)
+
+                threading.Thread(target=self.ejecutar_auto_update, args=(url_descarga,), daemon=True).start()
 
     def proceso_instalacion_background(self, config):
         self.after(0, lambda: self.cambiar_gif(self.frames_linterna))
@@ -3122,15 +3565,29 @@ class SavinOceanicCommand(ctk.CTk):
             
             espacio_reservado_gb = (gb_totales - hollow_gb) if preservar_espacio else (cachy_gb + GB_GRUB if instalar_cachy else 0.0)
             
-            tools_base = os.path.join(BASE_DIR, "engine")
-            ventoy_dir = None
-            if os.path.exists(tools_base):
-                for root, dirs, files in os.walk(tools_base):
-                    if "Ventoy2Disk.exe" in files:
-                        ventoy_dir = root
-                        break
+            # Localizar Ventoy en recursos internos empaquetados y carpetas externas
+            candidatos_base = [
+                resource_path(os.path.join("engine", "resources")),
+                resource_path("engine"),
+                os.path.join(BASE_DIR, "engine", "resources"),
+                os.path.join(BASE_DIR, "engine")
+            ]
             
-            if not ventoy_dir: raise RuntimeError(f"No se encontró Ventoy2Disk.exe en: {tools_base}")
+            # Localizar Ventoy2Disk.exe (garantizado fuera)
+            ventoy_dir = asegurar_herramientas_externas()
+            if not ventoy_dir:
+                # Búsqueda de respaldo por si acaso
+                engine_base = os.path.join(BASE_DIR, "engine")
+                if os.path.exists(engine_base):
+                    for root, dirs, files in os.walk(engine_base):
+                        for f in files:
+                            if f.lower() == "ventoy2disk.exe":
+                                ventoy_dir = root
+                                break
+                        if ventoy_dir: break
+
+            if not ventoy_dir: 
+                raise RuntimeError("No se pudo localizar ni desplegar Ventoy2Disk.exe en la carpeta engine.")
 
             def esperar_unidad_por_etiqueta(etiqueta, intentos=6, retardo=2):
                 for i in range(intentos):
@@ -3217,7 +3674,7 @@ class SavinOceanicCommand(ctk.CTk):
                 letra = encontrar_letra_por_etiqueta_ps("Ventoy") or encontrar_letra_por_etiqueta_ps("HOLLOWDRIVE")
                 if letra:
                     if encontrar_letra_por_etiqueta_ps("Ventoy") is not None:
-                        subprocess.run(f"label {letra[:2]} HOLLOWDRIVE", shell=True)
+                        subprocess.run(f"label {letra[:2]} HOLLOWDRIVE", shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
                         time.sleep(1.5)
                         letra_hollow = encontrar_letra_por_etiqueta_ps("HOLLOWDRIVE") or letra
                     else: letra_hollow = letra
@@ -3276,18 +3733,30 @@ class SavinOceanicCommand(ctk.CTk):
             if "ventoy_base" in pasos_activos:
                 iniciar_cronometro("Configuración Base Ventoy")
                 if self.abortar_proceso: raise InterruptedError()
+                actualizar_progreso_paso(0.0, "Localizando configuración base...")
+                
                 ruta_tar_local = resource_path(os.path.join("engine", "resources", "ventoy.tar"))
-                if os.path.exists(ruta_tar_local):
-                    try:
-                        with tarfile.open(ruta_tar_local, "r") as tar:
-                            miembros = tar.getmembers()
-                            total_m = len(miembros)
-                            for idx, member in enumerate(miembros):
-                                if self.abortar_proceso: raise InterruptedError()
+                if not os.path.exists(ruta_tar_local):
+                    raise RuntimeError(f"No se encontró el archivo base de Ventoy en: {ruta_tar_local}")
+
+                try:
+                    with tarfile.open(ruta_tar_local, "r") as tar:
+                        miembros = tar.getmembers()
+                        total_m = len(miembros)
+                        for idx, member in enumerate(miembros):
+                            if self.abortar_proceso: raise InterruptedError()
+                            
+                            # Compatible con Python 3.12+ (sin warnings) y versiones anteriores
+                            try:
+                                tar.extract(member, path=letra_hollow, filter='data')
+                            except TypeError:
                                 tar.extract(member, path=letra_hollow)
-                                pct = (idx + 1) / total_m
-                                actualizar_progreso_paso(pct, f"Inyectando base local: {member.name[:30]} ({idx+1}/{total_m})")
-                    except Exception as e: raise RuntimeError(f"Fallo al desempaquetar la configuración interna:\n{e}")
+                                
+                            pct = (idx + 1) / total_m
+                            actualizar_progreso_paso(pct, f"Inyectando base local: {member.name[:30]} ({idx+1}/{total_m})")
+                except Exception as e: 
+                    raise RuntimeError(f"Fallo al desempaquetar la configuración interna:\n{e}")
+                    
                 detener_cronometro("Configuración Base Ventoy")
                 paso_actual += 1
 
@@ -3437,6 +3906,142 @@ class SavinOceanicCommand(ctk.CTk):
             self.after(0, lambda: self.bloquear_ui(False))
             self.after(0, lambda: self.alternar_modo_instalacion(False))
 
+    def crear_ocean_slider(self, parent, label, color, key, min_val=10):
+        f = ctk.CTkFrame(parent, fg_color="transparent")
+        f.pack(fill="x", padx=20, pady=5)
+        l_title = ctk.CTkLabel(f, text=f"❯ {label}", font=("Consolas", 11, "bold"))
+        l_title.pack(anchor="w")
+        setattr(self, f"lbl_slider_title_{key}", l_title)
+        row = ctk.CTkFrame(f, fg_color="transparent")
+        row.pack(fill="x")
+        s = ctk.CTkSlider(row, from_=min_val, to=1000, progress_color=color, command=lambda v, k=key: self.rebalancear(f"slider_{k}"))
+        s.pack(side="left", fill="x", expand=True)
+        setattr(self, f"slider_{key}", s)
+        self.widgets_interactivos.append(s)
+        l_val = ctk.CTkLabel(row, text="0 GB", width=70, font=("Consolas", 14, "bold"))
+        l_val.pack(side="right")
+        setattr(self, f"lbl_{key}_gb", l_val)
+        return f
+
+    def rebalancear(self, source=None):
+        if self.gb_totales <= 0: return
+        if getattr(self, '_bloqueo_rebalanceo', False): return
+        self._bloqueo_rebalanceo = True
+
+        try:
+            espacio_grub = GB_GRUB if self.instalar_cachy.get() else 0.0
+            gb_bato_interno = (self.tamanos_reales["bato_64"] if self.bato_64_act.get() else 0.0) + \
+                              (self.tamanos_reales["bato_32"] if self.bato_32_act.get() else 0.0) \
+                              if self.instalar_bato.get() else 0.0
+                    
+            base_hollow = 10.0 if self.descargar_pack_hollow.get() else 3.0
+            base_obligatoria = base_hollow
+            if self.instalar_cachy.get(): base_obligatoria += self.min_cachy  
+                
+            espacio_libre_para_packs = self.gb_totales - base_obligatoria - gb_bato_interno - espacio_grub
+            bato_disponible = self.instalar_bato.get() and (self.bato_64_act.get() or self.bato_32_act.get())
+            val_pack_bato = 0.0
+            
+            if bato_disponible:
+                if self.descargar_pack_bato.get():
+                    if espacio_libre_para_packs >= self.tamanos_reales["pack_bato"]:
+                        self.ch_pack_bato.configure(state="normal")
+                        val_pack_bato = self.tamanos_reales["pack_bato"]
+                    else:
+                        self.descargar_pack_bato.set(False)
+                        self.ch_pack_bato.configure(state="disabled")
+                else:
+                    if espacio_libre_para_packs >= self.tamanos_reales["pack_bato"]:
+                        self.ch_pack_bato.configure(state="normal")
+                    else:
+                        self.ch_pack_bato.configure(state="disabled")
+            else:
+                self.descargar_pack_bato.set(False)
+                self.ch_pack_bato.configure(state="disabled")
+
+            min_hollow = base_hollow + gb_bato_interno + val_pack_bato
+            
+            if self.instalar_cachy.get():
+                max_h = self.gb_totales - (self.min_cachy + espacio_grub)
+                max_c = self.gb_totales - (min_hollow + espacio_grub)
+                
+                self.slider_h.configure(from_=min_hollow, to=max_h)
+                self.slider_c.configure(from_=self.min_cachy, to=max_c)
+                
+                if self.preservar_espacio.get():
+                    # MODO PRESERVAR ESPACIO: Permite dejar espacio libre (unallocated) al final del disco
+                    if source == "slider_h":
+                        val_h = self.slider_h.get()
+                        val_c = self.slider_c.get()
+                        if val_h + val_c + espacio_grub > self.gb_totales:
+                            val_c = max(self.min_cachy, self.gb_totales - val_h - espacio_grub)
+                            self.slider_c.set(round(val_c, 1))
+                    elif source == "slider_c":
+                        val_c = self.slider_c.get()
+                        val_h = self.slider_h.get()
+                        if val_h + val_c + espacio_grub > self.gb_totales:
+                            val_h = max(min_hollow, self.gb_totales - val_c - espacio_grub)
+                            self.slider_h.set(round(val_h, 1))
+                    else:
+                        val_h = max(min_hollow, min(max_h, self.slider_h.get()))
+                        val_c = max(self.min_cachy, min(max_c, self.slider_c.get()))
+                        if val_h + val_c + espacio_grub > self.gb_totales:
+                            val_c = max(self.min_cachy, self.gb_totales - val_h - espacio_grub)
+                        self.slider_h.set(round(val_h, 1))
+                        self.slider_c.set(round(val_c, 1))
+                else:
+                    # MODO 100% DISCO: Sliders complementarios para llenar todo el disco
+                    if source == "slider_h":
+                        val_h = self.slider_h.get()
+                        val_c = max(self.min_cachy, self.gb_totales - val_h - espacio_grub)
+                        self.slider_c.set(round(val_c, 1))
+                    elif source == "slider_c":
+                        val_c = self.slider_c.get()
+                        val_h = max(min_hollow, self.gb_totales - val_c - espacio_grub)
+                        self.slider_h.set(round(val_h, 1))
+                    else:
+                        if self.gb_totales > (min_hollow + self.min_cachy + espacio_grub):
+                            mitad = round((self.gb_totales - espacio_grub) / 2, 1)
+                            val_h = max(min_hollow, mitad)
+                            val_c = max(self.min_cachy, round(self.gb_totales - val_h - espacio_grub, 1))
+                            self.slider_h.set(round(val_h, 1))
+                            self.slider_c.set(round(val_c, 1))
+                        else:
+                            val_h = min_hollow
+                            val_c = self.min_cachy
+                            self.slider_h.set(round(val_h, 1))
+                            self.slider_c.set(round(val_c, 1))
+            else:
+                max_h = self.gb_totales
+                self.slider_h.configure(from_=min_hollow, to=max_h)
+                if not self.preservar_espacio.get():
+                    self.slider_h.set(max_h)
+                else:
+                    val_h = max(min_hollow, min(max_h, self.slider_h.get()))
+                    self.slider_h.set(round(val_h, 1))
+                    
+            h = self.slider_h.get()
+            c = self.slider_c.get() if self.instalar_cachy.get() else 0.0
+            
+            self.lbl_h_gb.configure(text=f"{h:.1f} GB")
+            self.lbl_c_gb.configure(text=f"{c:.1f} GB")
+            
+            libre_calculado = max(0.0, self.gb_totales - (h + espacio_grub + c))
+            self.lbl_libre_info.configure(text=t("storage.free_space", size=f"{libre_calculado:.2f}"))
+
+            self.dic_leyenda["hollow"].configure(text=t("storage.legend_hollow", size=f"{h:.1f}"))
+            if self.instalar_cachy.get():
+                self.dic_leyenda["grub"].configure(text=t("storage.legend_grub", size=f"{espacio_grub:.1f}"))
+                self.dic_leyenda["cachy"].configure(text=t("storage.legend_cachy", size=f"{c:.1f}"))
+            else:
+                self.dic_leyenda["grub"].configure(text=t("storage.legend_grub", size="0"))
+                self.dic_leyenda["cachy"].configure(text=t("storage.legend_cachy", size="0"))
+
+            self.actualizar_barra_visual(h, espacio_grub, c)
+            
+        finally:
+            self._bloqueo_rebalanceo = False
+
     def actualizar_barra_visual(self, h, grub, cachy):
         if not self.canvas.winfo_exists(): return
         w = self.canvas.winfo_width()
@@ -3449,41 +4054,64 @@ class SavinOceanicCommand(ctk.CTk):
         if total <= 0: return
         
         pix_h = int((h / total) * w)
-        pix_g = int((grub / total) * w)
-        pix_c = int((cachy / total) * w)
+        pix_g = int((grub / total) * w) if self.instalar_cachy.get() else 0
+        pix_c = int((cachy / total) * w) if self.instalar_cachy.get() else 0
         
+        # Partición HOLLOWDRIVE
         x_start = 0
-        x_end = pix_h
-        
-        if not self.instalar_cachy.get() and not self.preservar_espacio.get(): x_end = w
+        if not self.instalar_cachy.get() and not self.preservar_espacio.get():
+            x_end = w
+        else:
+            x_end = pix_h
             
         self.canvas.create_rectangle(x_start, 0, x_end, 40, fill=COLOR_HOLLOW, outline="")
         
         if self.instalar_cachy.get():
+            # Partición GRUB (512 MB)
             x_start = x_end
             x_end = x_start + pix_g
-            self.canvas.create_rectangle(x_start, 0, x_end, 40, fill=COLOR_LIMINE, outline="")
+            if pix_g > 0:
+                self.canvas.create_rectangle(x_start, 0, x_end, 40, fill=COLOR_LIMINE, outline="")
             
+            # Partición CACHYOS
             x_start = x_end
-            if not self.preservar_espacio.get(): x_end = w  
-            else: x_end = x_start + pix_c
+            if not self.preservar_espacio.get():
+                x_end = w  
+            else:
+                x_end = min(w, x_start + pix_c)
             self.canvas.create_rectangle(x_start, 0, x_end, 40, fill=COLOR_CACHY, outline="")
             
-        if x_end < w: self.canvas.create_rectangle(x_end, 0, w, 40, fill=COLOR_LIBRE, outline="")
+        # Espacio LIBRE al final del disco (Unallocated)
+        if x_end < w:
+            self.canvas.create_rectangle(x_end, 0, w, 40, fill=COLOR_LIBRE, outline="")
 
     def actualizar_estados_bato(self):
-        if self.instalar_bato.get(): self.f_bato_opts.pack(fill="x", pady=5)
-        else: self.f_bato_opts.pack_forget()
+        """ Alterna instantáneamente las opciones de Batocera sin artefactos de renderizado """
+        activado = self.instalar_bato.get()
+        if activado:
+            try: self.f_bato_opts.pack(fill="x", pady=4)
+            except Exception: pass
+        else:
+            try: self.f_bato_opts.pack_forget()
+            except Exception: pass
         self.rebalancear()
 
     def actualizar_estados_cachy(self):
-        if self.instalar_cachy.get():
-            self.f_cachy_opts.pack(fill="x", pady=5)
-            self.f_row_c.pack(fill="x", padx=20, pady=5, before=self.canvas)
+        """ Alterna instantáneamente el panel de CachyOS sin artefactos gráficos de Tkinter """
+        activado = self.instalar_cachy.get()
+        if activado:
+            try: self.f_cachy_opts.pack(fill="x", pady=4)
+            except Exception: pass
+            try: self.f_row_c.pack(fill="x", padx=20, pady=2, before=self.canvas)
+            except Exception: pass
         else:
-            self.f_cachy_opts.pack_forget()
-            self.f_row_c.pack_forget()
+            try: self.f_cachy_opts.pack_forget()
+            except Exception: pass
+            try: self.f_row_c.pack_forget()
+            except Exception: pass
+        
         self.rebalancear()
+
 
     def reproducir_gif(self, label_widget, frames, delay=80, index=0):
         if not frames or not label_widget.winfo_exists(): return
@@ -3528,41 +4156,30 @@ class SavinOceanicCommand(ctk.CTk):
         step()
 
     def abrir_info_ht_isos(self):
-        v = self.creventana_info_base("INFORMACIÓN: AÑADIR ISOs", 640, 390)
+        v = self.creventana_info_base(t("modals.ht_isos_title"), 640, 390)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="CD GESTOR DE IMÁGENES ISO", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        info = ("Esta función permite volcar imágenes de sistemas operativos (.iso) directamente a la carpeta /HOLLOWDRIVE/OSimages/ de tu unidad HollowDrive.\n\n"
-                "• No requiere formatear la unidad.\n"
-                "• Ventoy detectará automáticamente las ISOs añadidas al arrancar.\n"
-                "• Puedes arrastrar los archivos directamente a la casilla o pulsar el botón (+).")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=560).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.ht_isos_header"), font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.ht_isos_body"), font=("Segoe UI", 15), justify="left", wraplength=560).pack(pady=5)
+        ctk.CTkButton(frame_interno, text=t("modals.btn_close"), font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_ht_packs(self):
-        v = self.creventana_info_base("INFORMACIÓN: INYECCIÓN DE PAQUETES", 660, 400)
+        v = self.creventana_info_base(t("modals.ht_packs_title"), 660, 400)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="📦 INYECCIÓN DE CONTENIDO", font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
-        info = ("Te permite descargar e inyectar paquetes pesados en un USB que ya ha sido creado anteriormente:\n\n"
-                "• Batocera OS (.img): Actualiza o restaura el sistema de emulación base.\n"
-                "• Pack ROMs: Inyecta el paquete de juegos y BIOS en la partición correspondiente.\n"
-                "• Pack HollowDrive: Descarga el conjunto completo de utilidades de rescate.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=580).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.ht_packs_header"), font=("Impact", 28), text_color=AZUL_CIAN).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.ht_packs_body"), font=("Segoe UI", 15), justify="left", wraplength=580).pack(pady=5)
+        ctk.CTkButton(frame_interno, text=t("modals.btn_close"), font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def abrir_info_ht_cachy(self):
-        v = self.creventana_info_base("INFORMACIÓN: GESTIÓN CACHYOS", 660, 400)
+        v = self.creventana_info_base(t("modals.ht_cachy_title"), 660, 400)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
         frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text="🚀 GESTOR CACHYOS Y PARTICIONES", font=("Impact", 28), text_color=COLOR_CACHY).pack(pady=(0, 15))
-        info = ("Herramienta de mantenimiento específica para el sistema operativo CachyOS:\n\n"
-                "• Reinstalar / Actualizar: Reflashea la partición de sistema y el arranque GRUB sin tocar la partición principal de Ventoy.\n"
-                "• Instalación en Espacio Libre: Si tu USB tiene espacio sin asignar, crea las particiones necesarias e instala CachyOS en dicho espacio.")
-        ctk.CTkLabel(frame_interno, text=info, font=("Segoe UI", 16), justify="left", wraplength=580).pack(pady=5)
-        ctk.CTkButton(frame_interno, text="ENTENDIDO", font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
+        ctk.CTkLabel(frame_interno, text=t("modals.ht_cachy_header"), font=("Impact", 28), text_color=COLOR_CACHY).pack(pady=(0, 15))
+        ctk.CTkLabel(frame_interno, text=t("modals.ht_cachy_body"), font=("Segoe UI", 15), justify="left", wraplength=580).pack(pady=5)
+        ctk.CTkButton(frame_interno, text=t("modals.btn_close"), font=("Segoe UI", 13, "bold"), fg_color=AZUL_ELECTRICO, height=40, width=160, command=v.destroy).pack(pady=(15, 0))
         v.update(); v.grab_set()
 
     def crear_barra_tarea_dinamica(self, id_tarea, titulo_inicial, color=AZUL_CIAN):
@@ -3617,6 +4234,197 @@ class SavinOceanicCommand(ctk.CTk):
             self.f_tasks_scroll.pack_forget()
             self.p_task.pack(fill="x", padx=5, pady=2)
             self.p_total.pack(fill="x", padx=5, pady=2)
+
+    def mostrar_menu_idioma(self):
+        """ Despliega el menú de idiomas con flechita o lo contrae si ya está abierto """
+        now = time.time()
+        if (now - getattr(self, "_last_lang_close_time", 0.0)) < 0.35:
+            return
+        try:
+            x = self.btn_idioma.winfo_rootx()
+            y = self.btn_idioma.winfo_rooty() + self.btn_idioma.winfo_height() + 4
+            self.menu_idioma.post(x, y)
+        except Exception:
+            pass
+        finally:
+            self._last_lang_close_time = time.time()
+
+    def al_cambiar_idioma(self, seleccion):
+        """ Callback cuando el usuario selecciona un nuevo idioma en el menú desplegable """
+        codigo = seleccion.lower().strip()
+        i18n.set_current_language(codigo)
+        if hasattr(self, 'btn_idioma'):
+            nombre = i18n.LANGUAGE_NAMES.get(codigo, codigo.upper())
+            self.btn_idioma.configure(text=f" {nombre} ▾")
+        self.actualizar_textos_idioma()
+
+    def actualizar_textos_idioma(self):
+        """ Actualiza en tiempo real todos los textos de la interfaz sin reiniciar """
+        self.title(t("app.title", version=VERSION_ACTUAL))
+        
+        # Pestañas y selector
+        if hasattr(self, 'btn_modo_installer'):
+            self.btn_modo_installer.configure(text=t("nav.installer"))
+        if hasattr(self, 'btn_modo_tools'):
+            self.btn_modo_tools.configure(text=t("nav.tools"))
+        if hasattr(self, 'lbl_select_disk'):
+            self.lbl_select_disk.configure(text=t("selector.title"))
+        if hasattr(self, 'sw_internos'):
+            self.sw_internos.configure(text=t("selector.show_internal"))
+        if hasattr(self, 'tooltip_refresh'):
+            self.tooltip_refresh.text = t("tooltips.reload")
+
+        # Combobox selector de discos instalador
+        if hasattr(self, 'combo_disk'):
+            curr_val = self.combo_disk.get()
+            if not getattr(self, 'lista_discos_reales', []):
+                self.combo_disk.configure(values=[t("selector.no_units")])
+                self.combo_disk.set(t("selector.no_units"))
+            elif any(k in curr_val for k in ["---", "Buscando", "Searching", "NO SE DETECTAN", "NO DRIVES", "Selecciona", "Select"]):
+                nombres = [d["display"] for d in self.lista_discos_reales]
+                self.combo_disk.configure(values=nombres)
+                self.combo_disk.set(t("selector.select_placeholder"))
+
+        # Batocera & CachyOS
+        if hasattr(self, 'sw_bato'):
+            self.sw_bato.configure(text=t("batocera.switch"))
+        self.actualizar_labels_ui_con_tamanos_reales()
+        if hasattr(self, 'sw_cachy'):
+            self.sw_cachy.configure(text=t("cachyos.switch"))
+        if hasattr(self, 'r_kde'):
+            self.r_kde.configure(text=f"{t('cachyos.kde')} (Próximamente)")
+        if hasattr(self, 'r_hypr'):
+            self.r_hypr.configure(text=t("cachyos.hyprland"))
+
+        # Motor de extracción
+        if hasattr(self, 'lbl_motor'):
+            self.lbl_motor.configure(text=t("motor.title"))
+        if hasattr(self, 'r_motor_ram'):
+            self.r_motor_ram.configure(text=t("motor.ram"))
+        if hasattr(self, 'r_motor_disco'):
+            self.r_motor_disco.configure(text=t("motor.disk"))
+        if hasattr(self, 'sw_preservar'):
+            self.sw_preservar.configure(text=t("motor.preserve_space"))
+
+        # Sliders titles
+        if hasattr(self, 'lbl_slider_title_h'):
+            self.lbl_slider_title_h.configure(text=f"❯ {t('storage.hollow_storage')}")
+        if hasattr(self, 'lbl_slider_title_c'):
+            self.lbl_slider_title_c.configure(text=f"❯ {t('storage.cachy_partition')}")
+
+        # Botón principal
+        if hasattr(self, 'btn_start') and not getattr(self, 'img_instalar', None):
+            self.btn_start.configure(text=t("install_btn.text"))
+
+        # HollowTools
+        if hasattr(self, 'lbl_ht_title'):
+            self.lbl_ht_title.configure(text=t("hollowtools.header_title"))
+        if hasattr(self, 'tooltip_ht_refresh'):
+            self.tooltip_ht_refresh.text = t("tooltips.reload")
+        if hasattr(self, 'btn_ht_refresh') and not getattr(self, 'img_reload', None):
+            self.btn_ht_refresh.configure(text="🔄")
+        if hasattr(self, 'lbl_drag_msg'):
+            self.lbl_drag_msg.configure(text=t("hollowtools.drop_msg"))
+        if hasattr(self, 'lbl_card_iso'):
+            self.lbl_card_iso.configure(text=t("hollowtools.card_iso_title"))
+        if hasattr(self, 'lbl_card_packs'):
+            self.lbl_card_packs.configure(text=t("hollowtools.card_packs_title"))
+        if hasattr(self, 'lbl_card_cachy'):
+            self.lbl_card_cachy.configure(text=t("hollowtools.card_cachy_title"))
+        if hasattr(self, 'btn_ht_inject_bato'):
+            self.btn_ht_inject_bato.configure(text=t("hollowtools.btn_inject_bato"))
+        if hasattr(self, 'btn_ht_inject_packs'):
+            self.btn_ht_inject_packs.configure(text=t("hollowtools.btn_inject_packs"))
+        if hasattr(self, 'combo_ht_disk'):
+            curr_ht = self.combo_ht_disk.get()
+            if not getattr(self, 'lista_discos_hollow', []):
+                self.combo_ht_disk.configure(values=[t("hollowtools.no_units")])
+                self.combo_ht_disk.set(t("hollowtools.no_units"))
+            elif any(k in curr_ht for k in ["---", "Buscando", "Searching", "NO SE DETECTAN", "NO DRIVES", "Selecciona", "Select"]):
+                nombres_ht = [d["display"] for d in self.lista_discos_hollow]
+                self.combo_ht_disk.configure(values=nombres_ht)
+                self.combo_ht_disk.set(t("selector.select_placeholder"))
+
+        # Rebalancear para refrescar leyendas y texto libre
+        self.rebalancear()
+
+    def animar_despliegue(self, widget, mostrar, altura_max, before_widget=None, pack_kwargs=None, on_finish=None):
+        """
+        Despliega u oculta suavemente un contenedor interpolando su altura (efecto acordeón fluido)
+        forzando el refresco de idletasks para evitar artefactos visuales o duplicación de elementos.
+        """
+        anim_attr = f"_anim_slide_{id(widget)}"
+        prev_id = getattr(self, anim_attr, None)
+        if prev_id:
+            try: self.after_cancel(prev_id)
+            except Exception: pass
+
+        pasos = 8
+        intervalo = 12
+
+        if mostrar:
+            widget.pack_propagate(False)
+            widget.configure(height=0)
+            
+            if not widget.winfo_ismapped():
+                kwargs = pack_kwargs or {"fill": "x", "pady": 4}
+                if before_widget:
+                    widget.pack(**kwargs, before=before_widget)
+                else:
+                    widget.pack(**kwargs)
+            
+            def paso_expandir(paso=1):
+                if not widget.winfo_exists(): return
+                t = paso / pasos
+                ease = 1 - (1 - t) * (1 - t)
+                h = max(1, int(altura_max * ease))
+                widget.configure(height=h)
+                try: self.update_idletasks()
+                except Exception: pass
+                
+                if paso < pasos:
+                    setattr(self, anim_attr, self.after(intervalo, lambda: paso_expandir(paso + 1)))
+                else:
+                    widget.pack_propagate(True)
+                    widget.configure(height=altura_max)
+                    setattr(self, anim_attr, None)
+                    try: 
+                        self.update_idletasks()
+                        if hasattr(self, 'rebalancear'): self.rebalancear()
+                    except Exception: pass
+                    if on_finish: on_finish()
+
+            paso_expandir()
+
+        else:
+            if not widget.winfo_ismapped():
+                return
+                
+            h_inicio = widget.winfo_height() or altura_max
+            widget.pack_propagate(False)
+
+            def paso_contraer(paso=1):
+                if not widget.winfo_exists(): return
+                t = paso / pasos
+                ease = t * t
+                h = max(0, int(h_inicio * (1 - ease)))
+                widget.configure(height=h)
+                try: self.update_idletasks()
+                except Exception: pass
+                
+                if paso < pasos:
+                    setattr(self, anim_attr, self.after(intervalo, lambda: paso_contraer(paso + 1)))
+                else:
+                    widget.pack_forget()
+                    widget.pack_propagate(True)
+                    setattr(self, anim_attr, None)
+                    try:
+                        self.update_idletasks()
+                        if hasattr(self, 'rebalancear'): self.rebalancear()
+                    except Exception: pass
+                    if on_finish: on_finish()
+
+            paso_contraer()
 
 if __name__ == "__main__":
     if os.name == 'nt' and not es_administrador():

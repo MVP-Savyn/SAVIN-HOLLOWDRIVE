@@ -1,3 +1,5 @@
+import ctypes
+import threading
 import subprocess
 import json
 import os
@@ -5,6 +7,29 @@ import time
 import logging
 
 ENGINE_DIR = os.path.dirname(os.path.abspath(__file__))
+_disk_query_lock = threading.Lock()
+
+def ejecutar_powershell_seguro(cmd):
+    """ Ejecuta un comando de PowerShell de forma síncrona y segura con bloqueo global para evitar errores GIL en Python 3.13 """
+    try:
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        si.wShowWindow = subprocess.SW_HIDE
+        with _disk_query_lock:
+            process = subprocess.Popen(
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", cmd],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                startupinfo=si,
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+            stdout = process.stdout.read()
+            process.stdout.close()
+            process.wait()
+            return stdout.decode('utf-8', errors='ignore').strip()
+    except Exception as e:
+        logging.error(f"Error ejecutando PowerShell seguro: {e}")
+        return ""
 
 def obtener_unidades_usb(incluir_internos=False):
     unidades_validas = []
@@ -12,13 +37,14 @@ def obtener_unidades_usb(incluir_internos=False):
         # 1. Identificar letra de sistema (C:) para el bloqueo absoluto
         drive_sistema = os.environ.get('SystemDrive', 'C:').replace(':', '').upper()
 
-        # 2. SCRIPT DE POWERSHELL
+        # 2. SCRIPT DE POWERSHELL (Una sola consulta para discos, particiones y etiquetas de volumen)
         ps_script = (
             '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; '
             '$resultado = Get-Disk | ForEach-Object { '
                 '$disk = $_; '
                 '$volumenes = ($disk | Get-Partition | Get-Volume -ErrorAction SilentlyContinue); '
-                '$letras = ($volumenes.DriveLetter) -join ","; '
+                '$letras = ($volumenes.DriveLetter | Where-Object { $_ }) -join ","; '
+                '$labels = ($volumenes.FileSystemLabel | Where-Object { $_ }) -join ","; '
                 '$nombre = $disk.FriendlyName; '
                 'if (!$nombre) { $nombre = $disk.Model } '
                 '[PSCustomObject]@{ '
@@ -27,29 +53,14 @@ def obtener_unidades_usb(incluir_internos=False):
                     'Size  = $disk.Size; '
                     'Bus   = $disk.BusType; '
                     'Letras = $letras; '
+                    'Labels = $labels; '
                     'IsUSB = ($disk.BusType -eq "USB" -or $disk.BusType -eq "SD"); '
                 '} '
             '}; '
             '$resultado | ConvertTo-Json'
         )
         
-        cmd = ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ps_script]
-        
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        startupinfo.wShowWindow = subprocess.SW_HIDE
-        
-        process = subprocess.Popen(
-            cmd, 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE, 
-            text=False,
-            startupinfo=startupinfo,
-            creationflags=subprocess.CREATE_NO_WINDOW
-        )
-        stdout, _ = process.communicate()
-        resultado_raw = stdout.decode('utf-8', errors='ignore').strip()
-        
+        resultado_raw = ejecutar_powershell_seguro(ps_script)
         if not resultado_raw or resultado_raw == "null": 
             return []
             
@@ -60,7 +71,9 @@ def obtener_unidades_usb(incluir_internos=False):
             idx = d.get('Index')
             model = str(d.get('Model', 'Disco Desconocido')).strip()
             letras_str = str(d.get('Letras', ''))
-            letras_lista = [l.strip() for l in letras_str.split(',') if l.strip()]
+            letras_lista = [l.strip().upper() for l in letras_str.split(',') if l.strip()]
+            labels_str = str(d.get('Labels', ''))
+            labels_lista = [lb.strip().upper() for lb in labels_str.split(',') if lb.strip()]
             
             # --- FILTRO 1: BLOQUEO TOTAL DE C: ---
             if drive_sistema in letras_lista:
@@ -79,10 +92,16 @@ def obtener_unidades_usb(incluir_internos=False):
                 str_letras = f" ({', '.join(letras_lista)})" if letras_lista else " (Sin letras)"
                 tipo = "[EXT]" if es_externo_real else "[INT]"
 
+                # Detección instantánea de HollowDrive sin llamadas PowerShell extra
+                es_hollow = any("HOLLOW" in lb for lb in labels_lista) or any(os.path.exists(f"{l}:\\HOLLOWDRIVE") for l in letras_lista)
+
                 unidades_validas.append({
                     "device": idx,
                     "label": model,
                     "size": size_gb,
+                    "letras": letras_lista,
+                    "labels": labels_lista,
+                    "is_hollow": es_hollow,
                     "display": f"{tipo} {model}{str_letras} - {size_gb} GB"
                 })
             except Exception:
@@ -94,23 +113,15 @@ def obtener_unidades_usb(incluir_internos=False):
     return unidades_validas
 
 def obtener_estructura_disco_ps(disk_index):
-    """ Retorna la lista de particiones físicas del disco con su tamaño, etiqueta y letra """
+    """ Retorna la lista de particiones físicas del disco con su tamaño, etiqueta y letra de forma segura """
     try:
-        cmd = (f'Get-Partition -DiskNumber {disk_index} | ForEach-Object {{ '
+        cmd = (f'[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; '
+               f'Get-Partition -DiskNumber {disk_index} | ForEach-Object {{ '
                f'$p = $_; $v = Get-Volume -Partition $p -ErrorAction SilentlyContinue; '
                f'[PSCustomObject]@{{"Number"=$p.PartitionNumber; "Size"=[math]::Round($p.Size/1GB, 2); '
                f'"Letter"=$p.DriveLetter; "Label"=$v.FileSystemLabel; "Type"=$p.Type}} }} | ConvertTo-Json')
-        si = subprocess.STARTUPINFO()
-        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        si.wShowWindow = subprocess.SW_HIDE
-        out = subprocess.check_output(
-            ["powershell", "-NoProfile", "-Command", cmd], 
-            startupinfo=si, 
-            creationflags=subprocess.CREATE_NO_WINDOW, 
-            text=True, 
-            errors="ignore"
-        )
-        if not out.strip(): return []
+        out = ejecutar_powershell_seguro(cmd)
+        if not out or out == "null": return []
         data = json.loads(out)
         return [data] if isinstance(data, dict) else data
     except Exception as e:
@@ -378,3 +389,11 @@ def volcar_imagen_dd(ruta_imagen, letra_unidad, dd_dir="tools", progress_callbac
     if progress_callback:
         progress_callback(100, "¡Volcado completado con éxito!")
     return True
+
+def iniciar_escuchador_usb(callback_cambio):
+    """
+    El monitoreo de discos USB ahora se realiza de forma 100% segura y nativa
+    a través del bucle de eventos principal de la interfaz para evitar conflictos
+    de GIL con hilos demonio en Python 3.13.
+    """
+    pass

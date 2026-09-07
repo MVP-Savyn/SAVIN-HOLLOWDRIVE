@@ -10,3 +10,6 @@ Savin_GUI.onefile-build/
 jolowcoras (2).png
 Savin_GUI.dist/
 HollowDrive.exe
+installer/installer.build
+installer/installer.onefile-build
+installer/installer.dist
