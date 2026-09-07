@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
+  <!-- Favicon de la pestaña del navegador -->
+  <link rel="icon" type="image/x-icon" href="assets/icon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
@@ -91,7 +93,7 @@
     .light-mid-right { top: 40%; right: -150px; background: var(--cyan); }
 
     /* =====================================================================
-       🧭 NAVEGACIÓN Y SELECTOR ANIMAR
+       🧭 NAVEGACIÓN
        ===================================================================== */
     nav {
       position: sticky;
@@ -111,12 +113,21 @@
     .nav-brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.55rem;
       text-decoration: none;
       font-weight: 800;
       font-size: 1.15rem;
       color: var(--text-main);
       letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    /* Icono 16x16 a la izquierda */
+    .brand-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      image-rendering: pixelated;
       flex-shrink: 0;
     }
 
@@ -236,7 +247,7 @@
     }
 
     /* =====================================================================
-       🚀 HERO SECTION (CON EL NUEVO TÍTULO CORTO Y POTENTE)
+       🚀 HERO SECTION
        ===================================================================== */
     .container {
       max-width: 1150px;
@@ -293,7 +304,7 @@
     }
 
     /* =====================================================================
-       📥 BOTÓN DESCARGA Y MENÚ HOVER
+       📥 BOTÓN DESCARGA (APUNTANDO A assets/HollowDriveBETA.exe)
        ===================================================================== */
     .download-widget {
       position: relative;
@@ -792,6 +803,8 @@
   <!-- NAVEGACIÓN -->
   <nav>
     <a href="#" class="nav-brand">
+      <!-- Icono de 16x16 a la izquierda -->
+      <img src="assets/icon.ico" alt="Icono" class="brand-icon" width="16" height="16" />
       <span>SAVIN-HOLLOWDRIVE</span>
       <span class="brand-badge">BETA</span>
     </a>
@@ -824,7 +837,7 @@
   </nav>
 
   <main class="container">
-    <!-- HERO SECTION (NUEVO TÍTULO CORTO Y POTENTE) -->
+    <!-- HERO SECTION -->
     <section class="hero">
       <div class="badge-safe">🛡️ 100% SEGURO // NO MODIFICA EL PC ANFITRIÓN</div>
       <h1>El Kit Más Potente del Mundo <span class="gradient-text">en tu Bolsillo</span></h1>
@@ -833,16 +846,16 @@
         <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
       </p>
 
-      <!-- BOTÓN DE DESCARGA CON MENÚ HOVER -->
+      <!-- BOTÓN DE DESCARGA DIRECTA (assets/HollowDriveBETA.exe) -->
       <div class="download-widget">
-        <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest" target="_blank" class="main-download-btn">
+        <a href="assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
           Descargar para Windows (.exe)
         </a>
 
         <!-- Menú Hover -->
         <div class="download-dropdown">
-          <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest" target="_blank" class="dropdown-item active">
+          <a href="assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="dropdown-item active">
             <span>🪟 Windows (BETA)</span>
             <span style="font-size: 0.8rem; font-weight: 800;">DISPONIBLE</span>
           </a>
@@ -1046,20 +1059,12 @@
     // =====================================================================
     // 2. REPRODUCTOR MULTIMEDIA BLINDADO
     // =====================================================================
-    // 👇 Si tus canciones tienen nombres específicos en media/songs/,
-    // agrégalos aquí y funcionarán aunque abras el archivo con doble clic:
     const CANCIONES_POR_DEFECTO = [
-      "ambient resonance.mp3",
-      "Billie Eilish - BITTERSUITE.mp3",
-      "Billie Eilish - ilomilo.mp3",
-      "Cyter - Lunar.mp3",
-      "FrankJavCee - Ｓｉｍｐｓｏｎｗａｖｅ １９９５.mp3",
-      "HOME - Resonance.mp3",
-      "Roi (Instrumental).mp3",
-      "Stephen Sanchez - Evangeline.mp3",
-      "TWO DOOR CINEMA CLUB UNDERCOVER MARTYN.mp3",
-      "VISIONS.mp3",
-      "Were Finally Landing.mp3"
+      "1.mp3",
+      "2.mp3",
+      "3.mp3",
+      "4.mp3",
+      "5.mp3"
     ];
 
     let LISTA_CANCIONES = CANCIONES_POR_DEFECTO.map((nombre, i) => {
@@ -1129,7 +1134,6 @@
       }
     }
 
-    // AVISO EN PANTALLA SI LA RUTA DEL ARCHIVO FALLA
     audioElement.addEventListener("error", () => {
       const rutaIntentada = LISTA_CANCIONES[indiceCancion]?.file || "";
       trackTitle.textContent = `⚠️ No encontrado (${rutaIntentada})`;
@@ -1180,7 +1184,6 @@
       cargarPista(indiceCancion - 1, !audioElement.paused);
     });
 
-    // Control de selector local con el icono de carpeta
     btnCargarLocal.addEventListener("click", () => audioFileInput.click());
     audioFileInput.addEventListener("change", (e) => {
       const files = Array.from(e.target.files);
@@ -1196,7 +1199,6 @@
       }
     });
 
-    // Control deslizante de Volumen
     volSlider.addEventListener("input", (e) => {
       const vol = parseFloat(e.target.value);
       audioElement.volume = vol;
@@ -1229,7 +1231,6 @@
       cargarPista(indiceCancion + 1, true);
     });
 
-    // Iniciar con la primera pista lista
     cargarPista(0, false);
   </script>
 </body>
