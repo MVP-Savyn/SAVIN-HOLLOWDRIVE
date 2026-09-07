@@ -423,7 +423,7 @@
     }
 
     /* =====================================================================
-       📥 BOTÓN DESCARGA DIRECTA
+       📥 BOTÓN DESCARGA (CONECTADO A GITHUB RELEASES)
        ===================================================================== */
     .download-widget {
       position: relative;
@@ -512,7 +512,7 @@
     }
 
     /* =====================================================================
-       🪙 MODAL DE KO-FI CON EL GIF
+       🪙 MODAL DE KO-FI
        ===================================================================== */
     .modal-backdrop {
       position: fixed;
@@ -854,7 +854,7 @@
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      width: 410px; /* Ancho fijo invariable */
+      width: 410px;
       box-sizing: border-box;
       justify-content: space-between;
     }
@@ -897,11 +897,10 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Caja de información con ancho estricto */
     .player-info {
       display: flex;
       flex-direction: column;
-      width: 140px; /* Ancho reservado estricto */
+      width: 140px;
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -914,7 +913,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Contenedor de la marquesina con desvanecimiento sutil en los bordes */
     .marquee-container {
       width: 100%;
       overflow: hidden;
@@ -933,18 +931,13 @@
       will-change: transform;
     }
 
-    /* Animación fluida de vaivén (desplazamiento para leer todo el nombre) */
     .marquee-active {
       animation: marqueeBounce 7s ease-in-out infinite alternate;
     }
 
     @keyframes marqueeBounce {
-      0%, 25% {
-        transform: translateX(0);
-      }
-      75%, 100% {
-        transform: translateX(var(--scroll-offset, -40px));
-      }
+      0%, 25% { transform: translateX(0); }
+      75%, 100% { transform: translateX(var(--scroll-offset, -40px)); }
     }
 
     .player-controls {
@@ -1045,7 +1038,7 @@
   </style>
 </head>
 <body>
-  <!-- Fondo de vídeo animado con blur (media/videos/1.mp4) -->
+  <!-- Fondo de vídeo animado con blur -->
   <div class="bg-video-wrap active" id="bgVideoWrap">
     <video id="bgVideo" loop muted playsinline autoplay preload="auto">
       <source id="bgVideoSource" src="media/videos/1.mp4" type="video/mp4" />
@@ -1119,15 +1112,15 @@
         <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
       </p>
 
-      <!-- BOTÓN DE DESCARGA DIRECTA -->
+      <!-- BOTÓN DE DESCARGA DIRECTA DESDE GITHUB RELEASES -->
       <div class="download-widget">
-        <a href="assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="main-download-btn">
+        <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
           Descargar para Windows (.exe)
         </a>
 
         <div class="download-dropdown">
-          <a href="assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="dropdown-item active">
+          <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="dropdown-item active">
             <span>🪟 Windows (BETA)</span>
             <span style="font-size: 0.8rem; font-weight: 800;">DISPONIBLE</span>
           </a>
@@ -1244,7 +1237,7 @@
     <div class="donate-modal">
       <button class="modal-close-btn" id="btnCloseDonate">&times;</button>
       <div class="modal-header-gif-wrap">
-        <img src="web/assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+        <img src="assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
       </div>
       <h3>¿Me echas una monedilla?</h3>
       <p>
@@ -1264,7 +1257,6 @@
 
     <div class="player-info">
       <span class="player-tag">Reproduciendo</span>
-      <!-- Contenedor Marquesina Desplazable -->
       <div class="marquee-container" id="marqueeContainer">
         <span class="player-title" id="trackTitle">Cargando pistas...</span>
       </div>
@@ -1363,7 +1355,7 @@
     });
 
     // =====================================================================
-    // 3. REPRODUCTOR MULTIMEDIA CON TUS 11 CANCIONES
+    // 3. REPRODUCTOR MULTIMEDIA CON TUS 11 CANCIONES (BLINDADO CON ENCODING)
     // =====================================================================
     const CANCIONES_POR_DEFECTO = [
       "ambient resonance.mp3",
@@ -1379,11 +1371,12 @@
       "Were Finally Landing.mp3"
     ];
 
+    // encodeURIComponent protege las canciones de espacios y caracteres especiales en GitHub Pages
     let LISTA_CANCIONES = CANCIONES_POR_DEFECTO.map((nombre) => {
       const limpio = nombre.replace(/\.[^/.]+$/, "").replace(/_/g, " ").trim();
       return {
         title: limpio,
-        file: `media/songs/${nombre}`
+        file: `media/songs/${encodeURIComponent(nombre)}`
       };
     });
 
@@ -1403,13 +1396,11 @@
 
     audioElement.volume = 0.75;
 
-    // Función que ajusta la marquesina inteligente según el ancho del texto
     function actualizarMarquesina() {
       trackTitle.classList.remove("marquee-active");
       trackTitle.style.removeProperty("--scroll-offset");
       trackTitle.style.transform = "translateX(0)";
 
-      // Dejamos un tick para que el navegador calcule el ancho real del texto
       setTimeout(() => {
         const anchoContenedor = marqueeContainer.clientWidth;
         const anchoTexto = trackTitle.scrollWidth;
@@ -1449,7 +1440,7 @@
 
     audioElement.addEventListener("error", () => {
       const ruta = LISTA_CANCIONES[indiceCancion]?.file || "";
-      trackTitle.textContent = `⚠️ No encontrada (${ruta})`;
+      trackTitle.textContent = `⚠️ No encontrada (${decodeURIComponent(ruta)})`;
       trackTitle.style.color = "#ff4d4d";
       actualizarEstadoPlay(false);
       actualizarMarquesina();
@@ -1498,7 +1489,6 @@
       cargarPista(indiceCancion - 1, !audioElement.paused);
     });
 
-    // Control de volumen
     volSlider.addEventListener("input", (e) => {
       const vol = parseFloat(e.target.value);
       audioElement.volume = vol;
