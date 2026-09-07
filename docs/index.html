@@ -423,7 +423,7 @@
     }
 
     /* =====================================================================
-       📥 BOTÓN DESCARGA (CONECTADO A GITHUB RELEASES)
+       📥 BOTÓN DESCARGA DIRECTA A RELEASES
        ===================================================================== */
     .download-widget {
       position: relative;
@@ -512,7 +512,7 @@
     }
 
     /* =====================================================================
-       🪙 MODAL DE KO-FI
+       🪙 MODAL DE KO-FI CON EL GIF
        ===================================================================== */
     .modal-backdrop {
       position: fixed;
@@ -1058,7 +1058,6 @@
     </a>
 
     <div class="nav-controls">
-      <!-- Botón Animar y Circulitos -->
       <div class="anim-widget">
         <button class="btn-animar active" id="btnAnimar" title="Activar / Desactivar fondo animado">
           <span>✨</span>
@@ -1076,7 +1075,6 @@
         </div>
       </div>
 
-      <!-- Avatar GitHub MVP-Savyn -->
       <a href="https://github.com/MVP-Savyn" target="_blank" rel="noopener" class="github-pill" title="Visitar perfil de GitHub">
         <img src="https://github.com/MVP-Savyn.png" alt="MVP-Savyn" class="avatar-img" onerror="this.src='https://avatars.githubusercontent.com/u/9919?v=4'" />
         <span>MVP-Savyn</span>
@@ -1112,7 +1110,7 @@
         <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
       </p>
 
-      <!-- BOTÓN DE DESCARGA DIRECTA DESDE GITHUB RELEASES -->
+      <!-- BOTÓN DE DESCARGA DIRECTA A GITHUB RELEASES -->
       <div class="download-widget">
         <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
@@ -1355,7 +1353,7 @@
     });
 
     // =====================================================================
-    // 3. REPRODUCTOR MULTIMEDIA CON TUS 11 CANCIONES (BLINDADO CON ENCODING)
+    // 3. REPRODUCTOR MULTIMEDIA (RUTA NATIVA SIN CODIFICACIÓN ARTIFICIAL)
     // =====================================================================
     const CANCIONES_POR_DEFECTO = [
       "ambient resonance.mp3",
@@ -1371,12 +1369,11 @@
       "Were Finally Landing.mp3"
     ];
 
-    // encodeURIComponent protege las canciones de espacios y caracteres especiales en GitHub Pages
     let LISTA_CANCIONES = CANCIONES_POR_DEFECTO.map((nombre) => {
       const limpio = nombre.replace(/\.[^/.]+$/, "").replace(/_/g, " ").trim();
       return {
         title: limpio,
-        file: `media/songs/${encodeURIComponent(nombre)}`
+        file: `media/songs/${nombre}`
       };
     });
 
@@ -1440,7 +1437,7 @@
 
     audioElement.addEventListener("error", () => {
       const ruta = LISTA_CANCIONES[indiceCancion]?.file || "";
-      trackTitle.textContent = `⚠️ No encontrada (${decodeURIComponent(ruta)})`;
+      trackTitle.textContent = `⚠️ No encontrada (${ruta})`;
       trackTitle.style.color = "#ff4d4d";
       actualizarEstadoPlay(false);
       actualizarMarquesina();
