@@ -19,6 +19,7 @@ El software opera de forma no intrusiva respecto al equipo anfitrión: las unida
 
 ## 2. Arquitectura del Sistema
 
+```text
 SAVIN-HOLLOWDRIVE/
 ├── Savin_GUI.py              # Interfaz gráfica principal (CustomTkinter) y orquestador
 ├── config.json               # Configuración local y persistencia de preferencias
@@ -34,6 +35,7 @@ SAVIN-HOLLOWDRIVE/
 ├── media/                    # Recursos multimedia locales (iconos, banners, assets)
 └── web/                      # Landing page y recursos de distribución web
     └── index.html            # Portal informativo y descarga de versiones
+```
 
 ---
 
