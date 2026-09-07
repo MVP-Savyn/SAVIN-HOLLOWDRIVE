@@ -615,6 +615,34 @@
       box-shadow: 0 12px 35px rgba(255, 94, 91, 0.5);
     }
 
+    .donate-buttons-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .btn-paypal-direct {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      background: #0070ba;
+      color: #ffffff;
+      padding: 0.95rem 1.4rem;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 112, 186, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .btn-paypal-direct:hover {
+      background: #005ea6;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(0, 112, 186, 0.5);
+    }
+
     /* =====================================================================
        📺 PREVISUALIZACIÓN VÍDEO YOUTUBE
        ===================================================================== */
@@ -1231,6 +1259,7 @@
   </main>
 
   <!-- MODAL EXCLUSIVO DE KO-FI -->
+  <!-- MODAL DE DONACIÓN CON KO-FI Y PAYPAL -->
   <div class="modal-backdrop" id="donateModalBackdrop">
     <div class="donate-modal">
       <button class="modal-close-btn" id="btnCloseDonate">&times;</button>
@@ -1239,13 +1268,22 @@
       </div>
       <h3>¿Me echas una monedilla?</h3>
       <p>
-        Desarrollar y mantener <strong>HollowDrive</strong> requiere muchas noches sin dormir. Si el kit te ha sido útil o te gusta la idea, cualquier aportación en Ko-fi ayuda un montón a seguir mejorándolo.
+        Desarrollar y mantener <strong>HollowDrive</strong> requiere muchas noches sin dormir. Si el kit te ha sido útil o te gusta la idea, cualquier aportación ayuda un montón a seguir mejorándolo.
       </p>
 
-      <a href="https://ko-fi.com/t0xic4rea" target="_blank" rel="noopener" class="btn-kofi-direct">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.047 3.974-4.047 3.974s-2.8-2.521-4.047-3.974c-1.332-1.556-.838-3.877 1.007-4.432 1.845-.555 3.04 1.137 3.04 1.137s1.195-1.692 3.04-1.137c1.845.555 2.339 2.876 1.007 4.432zm7.14-1.277c-.439 2.327-2.736 2.344-2.736 2.344v-4.688s2.297.017 2.736 2.344z"/></svg>
-        <span>Apoyar en Ko-fi (Invítame a un café)</span>
-      </a>
+      <div class="donate-buttons-list">
+        <!-- Opción Ko-fi -->
+        <a href="https://ko-fi.com/t0xic4rea" target="_blank" rel="noopener" class="btn-kofi-direct">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.047 3.974-4.047 3.974s-2.8-2.521-4.047-3.974c-1.332-1.556-.838-3.877 1.007-4.432 1.845-.555 3.04 1.137 3.04 1.137s1.195-1.692 3.04-1.137c1.845.555 2.339 2.876 1.007 4.432zm7.14-1.277c-.439 2.327-2.736 2.344-2.736 2.344v-4.688s2.297.017 2.736 2.344z"/></svg>
+          <span>Invítame a un café (Ko-fi)</span>
+        </a>
+
+        <!-- Opción PayPal (Pon aquí tu enlace de paypal.me) -->
+        <a href="https://paypal.me/T0xicArea" target="_blank" rel="noopener" class="btn-paypal-direct">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.586c3.084 0 5.378.694 6.438 2.059.984 1.268 1.168 3.064.551 5.341-1.026 3.782-3.843 5.76-7.857 5.76H8.736a.785.785 0 0 0-.773.654l-.887 4.457z"/></svg>
+          <span>Donar con PayPal</span>
+        </a>
+      </div>
     </div>
   </div>
 
