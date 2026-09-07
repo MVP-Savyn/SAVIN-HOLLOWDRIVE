@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
-  <link rel="icon" type="image/x-icon" href="assets/icon.ico" />
+  <link rel="icon" type="image/x-icon" href="web/assets/icon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
@@ -183,7 +183,6 @@
       box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
     }
 
-    /* Solución anti-recorte del glow */
     .circles-tray {
       display: flex;
       align-items: center;
@@ -258,7 +257,7 @@
     }
 
     /* =====================================================================
-       🗡️ WIDGET FIJO: PEGADO A LA ESQUINA INFERIOR IZQUIERDA
+       🗡️ WIDGET FIJO: EL CABALLERO + BOTÓN MONEDA
        ===================================================================== */
     .fixed-knight-container {
       position: fixed;
@@ -839,7 +838,7 @@
     }
 
     /* =====================================================================
-       🎵 MINI REPRODUCTOR MULTIMEDIA CON VINILO Y VOLUMEN
+       🎵 MINI REPRODUCTOR: ANCHO FIJO (410px) Y MARQUESINA DESPLAZABLE
        ===================================================================== */
     .mini-player {
       position: fixed;
@@ -855,6 +854,9 @@
       display: flex;
       align-items: center;
       gap: 0.85rem;
+      width: 410px; /* Ancho fijo invariable */
+      box-sizing: border-box;
+      justify-content: space-between;
     }
 
     .vinyl-record {
@@ -895,11 +897,13 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* Caja de información con ancho estricto */
     .player-info {
       display: flex;
       flex-direction: column;
-      min-width: 90px;
-      max-width: 170px;
+      width: 140px; /* Ancho reservado estricto */
+      flex-shrink: 0;
+      overflow: hidden;
     }
 
     .player-tag {
@@ -910,19 +914,44 @@
       letter-spacing: 0.5px;
     }
 
+    /* Contenedor de la marquesina con desvanecimiento sutil en los bordes */
+    .marquee-container {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      mask-image: linear-gradient(to right, transparent 0%, black 6%, black 92%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 92%, transparent 100%);
+    }
+
     .player-title {
+      display: inline-block;
       font-size: 0.82rem;
       font-weight: 700;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       color: #fff;
+      will-change: transform;
+    }
+
+    /* Animación fluida de vaivén (desplazamiento para leer todo el nombre) */
+    .marquee-active {
+      animation: marqueeBounce 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes marqueeBounce {
+      0%, 25% {
+        transform: translateX(0);
+      }
+      75%, 100% {
+        transform: translateX(var(--scroll-offset, -40px));
+      }
     }
 
     .player-controls {
       display: flex;
       align-items: center;
       gap: 0.35rem;
+      flex-shrink: 0;
     }
 
     .ctrl-btn {
@@ -960,10 +989,11 @@
       gap: 0.35rem;
       padding-left: 0.35rem;
       border-left: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
     }
 
     .vol-slider {
-      width: 60px;
+      width: 55px;
       height: 4px;
       -webkit-appearance: none;
       background: rgba(255, 255, 255, 0.2);
@@ -1001,21 +1031,24 @@
       .video-player-mockup { height: 260px; }
       nav { padding: 0.8rem 1rem; }
       .mini-player {
+        width: auto;
         bottom: 12px;
         right: 12px;
         left: 12px;
-        justify-content: space-between;
       }
-      .player-info { max-width: 110px; }
+      .player-info {
+        width: auto;
+        flex: 1;
+      }
       .vol-slider { width: 45px; }
     }
   </style>
 </head>
 <body>
-  <!-- Fondo de vídeo animado con blur -->
+  <!-- Fondo de vídeo animado con blur (web/media/videos/1.mp4) -->
   <div class="bg-video-wrap active" id="bgVideoWrap">
     <video id="bgVideo" loop muted playsinline autoplay preload="auto">
-      <source id="bgVideoSource" src="media/videos/1.mp4" type="video/mp4" />
+      <source id="bgVideoSource" src="web/media/videos/1.mp4" type="video/mp4" />
     </video>
     <div class="bg-video-overlay"></div>
   </div>
@@ -1026,7 +1059,7 @@
   <!-- NAVEGACIÓN -->
   <nav>
     <a href="#" class="nav-brand">
-      <img src="assets/icon.ico" alt="Icono" class="brand-icon" width="40" height="40" />
+      <img src="web/assets/icon.ico" alt="Icono" class="brand-icon" width="40" height="40" />
       <span>SAVIN-HOLLOWDRIVE</span>
       <span class="brand-badge">BETA</span>
     </a>
@@ -1058,18 +1091,16 @@
     </div>
   </nav>
 
-  <!-- WIDGET FIJO A LA ESQUINA INFERIOR IZQUIERDA -->
+  <!-- WIDGET FIJO: EL CABALLERO + BOTÓN MONEDA -->
   <aside class="fixed-knight-container" id="fixedKnightWidget">
-    <!-- Botón interactivo con coin.gif de 95x95 -->
     <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar en Ko-fi)">
       <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
-      <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="95" height="95" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+      <img src="web/assets/coin.gif" alt="Moneda" class="coin-gif-img" width="95" height="95" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
     </button>
 
-    <!-- Imagen del Caballero -->
     <div class="knight-wrapper">
       <img 
-        src="assets/knight-cuenco.png" 
+        src="web/assets/knight-cuenco.png" 
         alt="Hollow Knight con cuenco" 
         class="knight-large-img" 
         id="knightPngImg"
@@ -1090,13 +1121,13 @@
 
       <!-- BOTÓN DE DESCARGA DIRECTA -->
       <div class="download-widget">
-        <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
+        <a href="web/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
           Descargar para Windows (.exe)
         </a>
 
         <div class="download-dropdown">
-          <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
+          <a href="web/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="dropdown-item active">
             <span>🪟 Windows (BETA)</span>
             <span style="font-size: 0.8rem; font-weight: 800;">DISPONIBLE</span>
           </a>
@@ -1213,7 +1244,7 @@
     <div class="donate-modal">
       <button class="modal-close-btn" id="btnCloseDonate">&times;</button>
       <div class="modal-header-gif-wrap">
-        <img src="assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+        <img src="web/assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
       </div>
       <h3>¿Me echas una monedilla?</h3>
       <p>
@@ -1233,7 +1264,10 @@
 
     <div class="player-info">
       <span class="player-tag">Reproduciendo</span>
-      <span class="player-title" id="trackTitle">Cargando pistas...</span>
+      <!-- Contenedor Marquesina Desplazable -->
+      <div class="marquee-container" id="marqueeContainer">
+        <span class="player-title" id="trackTitle">Cargando pistas...</span>
+      </div>
     </div>
 
     <div class="player-controls">
@@ -1301,7 +1335,7 @@
         circleBtns.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        bgVideoSource.src = `media/videos/${num}.mp4`;
+        bgVideoSource.src = `web/media/videos/${num}.mp4`;
         bgVideo.load();
         bgVideo.play().catch(() => {});
       });
@@ -1329,7 +1363,7 @@
     });
 
     // =====================================================================
-    // 3. REPRODUCTOR CON TUS CANCIONES POR DEFECTO
+    // 3. REPRODUCTOR MULTIMEDIA CON TUS 11 CANCIONES
     // =====================================================================
     const CANCIONES_POR_DEFECTO = [
       "ambient resonance.mp3",
@@ -1349,13 +1383,14 @@
       const limpio = nombre.replace(/\.[^/.]+$/, "").replace(/_/g, " ").trim();
       return {
         title: limpio,
-        file: `media/songs/${nombre}`
+        file: `web/media/songs/${nombre}`
       };
     });
 
     let indiceCancion = 0;
 
     const audioElement = document.getElementById("audioElement");
+    const marqueeContainer = document.getElementById("marqueeContainer");
     const trackTitle = document.getElementById("trackTitle");
     const btnPlay = document.getElementById("btnPlay");
     const playIcon = document.getElementById("playIcon");
@@ -1367,6 +1402,25 @@
     const volIcon = document.getElementById("volIcon");
 
     audioElement.volume = 0.75;
+
+    // Función que ajusta la marquesina inteligente según el ancho del texto
+    function actualizarMarquesina() {
+      trackTitle.classList.remove("marquee-active");
+      trackTitle.style.removeProperty("--scroll-offset");
+      trackTitle.style.transform = "translateX(0)";
+
+      // Dejamos un tick para que el navegador calcule el ancho real del texto
+      setTimeout(() => {
+        const anchoContenedor = marqueeContainer.clientWidth;
+        const anchoTexto = trackTitle.scrollWidth;
+
+        if (anchoTexto > anchoContenedor) {
+          const desfase = anchoContenedor - anchoTexto - 8;
+          trackTitle.style.setProperty("--scroll-offset", `${desfase}px`);
+          trackTitle.classList.add("marquee-active");
+        }
+      }, 50);
+    }
 
     function cargarPista(index, iniciarReproduccion = false) {
       if (!LISTA_CANCIONES || LISTA_CANCIONES.length === 0) return;
@@ -1380,6 +1434,8 @@
       trackTitle.style.color = "#fff";
       trackTitle.title = track.title;
       audioElement.src = track.file;
+
+      actualizarMarquesina();
 
       if (iniciarReproduccion) {
         audioElement.play()
@@ -1396,6 +1452,7 @@
       trackTitle.textContent = `⚠️ No encontrada (${ruta})`;
       trackTitle.style.color = "#ff4d4d";
       actualizarEstadoPlay(false);
+      actualizarMarquesina();
     });
 
     audioElement.addEventListener("canplay", () => {
@@ -1441,6 +1498,7 @@
       cargarPista(indiceCancion - 1, !audioElement.paused);
     });
 
+    // Control de volumen
     volSlider.addEventListener("input", (e) => {
       const vol = parseFloat(e.target.value);
       audioElement.volume = vol;
