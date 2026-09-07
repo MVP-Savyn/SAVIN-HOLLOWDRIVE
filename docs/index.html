@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
-  <link rel="icon" type="image/x-icon" href="web/assets/icon.ico" />
+  <link rel="icon" type="image/x-icon" href="docs/assets/icon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
@@ -1045,10 +1045,10 @@
   </style>
 </head>
 <body>
-  <!-- Fondo de vídeo animado con blur (web/media/videos/1.mp4) -->
+  <!-- Fondo de vídeo animado con blur (docs/media/videos/1.mp4) -->
   <div class="bg-video-wrap active" id="bgVideoWrap">
     <video id="bgVideo" loop muted playsinline autoplay preload="auto">
-      <source id="bgVideoSource" src="web/media/videos/1.mp4" type="video/mp4" />
+      <source id="bgVideoSource" src="docs/media/videos/1.mp4" type="video/mp4" />
     </video>
     <div class="bg-video-overlay"></div>
   </div>
@@ -1059,7 +1059,7 @@
   <!-- NAVEGACIÓN -->
   <nav>
     <a href="#" class="nav-brand">
-      <img src="web/assets/icon.ico" alt="Icono" class="brand-icon" width="40" height="40" />
+      <img src="docs/assets/icon.ico" alt="Icono" class="brand-icon" width="40" height="40" />
       <span>SAVIN-HOLLOWDRIVE</span>
       <span class="brand-badge">BETA</span>
     </a>
@@ -1095,12 +1095,12 @@
   <aside class="fixed-knight-container" id="fixedKnightWidget">
     <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar en Ko-fi)">
       <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
-      <img src="web/assets/coin.gif" alt="Moneda" class="coin-gif-img" width="95" height="95" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+      <img src="docs/assets/coin.gif" alt="Moneda" class="coin-gif-img" width="95" height="95" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
     </button>
 
     <div class="knight-wrapper">
       <img 
-        src="web/assets/knight-cuenco.png" 
+        src="docs/assets/knight-cuenco.png" 
         alt="Hollow Knight con cuenco" 
         class="knight-large-img" 
         id="knightPngImg"
@@ -1121,13 +1121,13 @@
 
       <!-- BOTÓN DE DESCARGA DIRECTA -->
       <div class="download-widget">
-        <a href="web/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="main-download-btn">
+        <a href="docs/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
           Descargar para Windows (.exe)
         </a>
 
         <div class="download-dropdown">
-          <a href="web/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="dropdown-item active">
+          <a href="docs/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="dropdown-item active">
             <span>🪟 Windows (BETA)</span>
             <span style="font-size: 0.8rem; font-weight: 800;">DISPONIBLE</span>
           </a>
@@ -1335,7 +1335,7 @@
         circleBtns.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        bgVideoSource.src = `web/media/videos/${num}.mp4`;
+        bgVideoSource.src = `docs/media/videos/${num}.mp4`;
         bgVideo.load();
         bgVideo.play().catch(() => {});
       });
@@ -1383,7 +1383,7 @@
       const limpio = nombre.replace(/\.[^/.]+$/, "").replace(/_/g, " ").trim();
       return {
         title: limpio,
-        file: `web/media/songs/${nombre}`
+        file: `docs/media/songs/${nombre}`
       };
     });
 
