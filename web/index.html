@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
-  <link rel="icon" type="image/x-icon" href="web/assets/icon.ico" />
+  <link rel="icon" type="image/x-icon" href="assets/icon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
@@ -183,6 +183,7 @@
       box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
     }
 
+    /* Solución anti-recorte del glow */
     .circles-tray {
       display: flex;
       align-items: center;
@@ -1011,10 +1012,10 @@
   </style>
 </head>
 <body>
-  <!-- Fondo de vídeo animado con blur (Ruta web/media/videos/1.mp4) -->
+  <!-- Fondo de vídeo animado con blur -->
   <div class="bg-video-wrap active" id="bgVideoWrap">
     <video id="bgVideo" loop muted playsinline autoplay preload="auto">
-      <source id="bgVideoSource" src="web/media/videos/1.mp4" type="video/mp4" />
+      <source id="bgVideoSource" src="media/videos/1.mp4" type="video/mp4" />
     </video>
     <div class="bg-video-overlay"></div>
   </div>
@@ -1025,7 +1026,7 @@
   <!-- NAVEGACIÓN -->
   <nav>
     <a href="#" class="nav-brand">
-      <img src="web/assets/icon.ico" alt="Icono" class="brand-icon" width="40" height="40" />
+      <img src="assets/icon.ico" alt="Icono" class="brand-icon" width="40" height="40" />
       <span>SAVIN-HOLLOWDRIVE</span>
       <span class="brand-badge">BETA</span>
     </a>
@@ -1062,13 +1063,13 @@
     <!-- Botón interactivo con coin.gif de 95x95 -->
     <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar en Ko-fi)">
       <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
-      <img src="web/assets/coin.gif" alt="Moneda" class="coin-gif-img" width="95" height="95" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+      <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="95" height="95" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
     </button>
 
-    <!-- Imagen del Caballero (web/assets/knight-cuenco.png) -->
+    <!-- Imagen del Caballero -->
     <div class="knight-wrapper">
       <img 
-        src="web/assets/knight-cuenco.png" 
+        src="assets/knight-cuenco.png" 
         alt="Hollow Knight con cuenco" 
         class="knight-large-img" 
         id="knightPngImg"
@@ -1087,15 +1088,15 @@
         <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
       </p>
 
-      <!-- BOTÓN DE DESCARGA DIRECTA (web/assets/HollowDriveBETA.exe) -->
+      <!-- BOTÓN DE DESCARGA DIRECTA -->
       <div class="download-widget">
-        <a href="web/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="main-download-btn">
+        <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
           Descargar para Windows (.exe)
         </a>
 
         <div class="download-dropdown">
-          <a href="web/assets/HollowDriveBETA.exe" download="HollowDriveBETA.exe" class="dropdown-item active">
+          <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
             <span>🪟 Windows (BETA)</span>
             <span style="font-size: 0.8rem; font-weight: 800;">DISPONIBLE</span>
           </a>
@@ -1212,7 +1213,7 @@
     <div class="donate-modal">
       <button class="modal-close-btn" id="btnCloseDonate">&times;</button>
       <div class="modal-header-gif-wrap">
-        <img src="web/assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+        <img src="assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
       </div>
       <h3>¿Me echas una monedilla?</h3>
       <p>
@@ -1236,11 +1237,6 @@
     </div>
 
     <div class="player-controls">
-      <button class="ctrl-btn" id="btnCargarLocal" title="Elegir canciones de tu PC">
-        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-      </button>
-      <input type="file" id="audioFileInput" multiple accept=".mp3,audio/*" style="display: none;" />
-
       <button class="ctrl-btn" id="btnPrev" title="Pista Anterior">
         <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
       </button>
@@ -1273,7 +1269,7 @@
   <!-- SCRIPTS -->
   <script>
     // =====================================================================
-    // 1. GESTIÓN DEL FONDO ANIMADO (web/media/videos/1.mp4 ... 8.mp4)
+    // 1. GESTIÓN DEL FONDO ANIMADO
     // =====================================================================
     let modoAnimadoActivo = true;
 
@@ -1305,7 +1301,7 @@
         circleBtns.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        bgVideoSource.src = `web/media/videos/${num}.mp4`;
+        bgVideoSource.src = `media/videos/${num}.mp4`;
         bgVideo.load();
         bgVideo.play().catch(() => {});
       });
@@ -1333,7 +1329,7 @@
     });
 
     // =====================================================================
-    // 3. REPRODUCTOR CON TUS CANCIONES (web/media/songs/)
+    // 3. REPRODUCTOR CON TUS CANCIONES POR DEFECTO
     // =====================================================================
     const CANCIONES_POR_DEFECTO = [
       "ambient resonance.mp3",
@@ -1353,7 +1349,7 @@
       const limpio = nombre.replace(/\.[^/.]+$/, "").replace(/_/g, " ").trim();
       return {
         title: limpio,
-        file: `web/media/songs/${nombre}`
+        file: `media/songs/${nombre}`
       };
     });
 
@@ -1369,8 +1365,6 @@
     const volSlider = document.getElementById("volSlider");
     const btnMute = document.getElementById("btnMute");
     const volIcon = document.getElementById("volIcon");
-    const btnCargarLocal = document.getElementById("btnCargarLocal");
-    const audioFileInput = document.getElementById("audioFileInput");
 
     audioElement.volume = 0.75;
 
@@ -1445,21 +1439,6 @@
 
     btnPrev.addEventListener("click", () => {
       cargarPista(indiceCancion - 1, !audioElement.paused);
-    });
-
-    btnCargarLocal.addEventListener("click", () => audioFileInput.click());
-    audioFileInput.addEventListener("change", (e) => {
-      const files = Array.from(e.target.files);
-      if (files.length > 0) {
-        LISTA_CANCIONES = files.map((file) => {
-          const limpio = file.name.replace(/\.[^/.]+$/, "").replace(/_/g, " ").trim();
-          return {
-            title: limpio,
-            file: URL.createObjectURL(file)
-          };
-        });
-        cargarPista(0, true);
-      }
     });
 
     volSlider.addEventListener("input", (e) => {
