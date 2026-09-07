@@ -80,8 +80,10 @@ A diferencia de las instalaciones tradicionales que exigen particionar discos en
 
 * **Imagen adaptada sin partición dedicada:** Se utiliza una versión modificada y comprimida de Batocera diseñada específicamente para arrancar directamente dentro del entorno Ventoy, evitando crear particiones adicionales que bloqueen espacio útil del dispositivo.
 * **Gestión nativa en `exFAT`:** Todos los datos de usuario de Batocera residen en la carpeta `batocera/` ubicada en la raíz de la partición principal `HOLLOWDRIVE`. Desde cualquier ordenador con Windows, Linux o macOS se pueden copiar, mover o borrar ROMs, BIOS y decoraciones simplemente usando el explorador de archivos habitual.
-* **Persistencia total:** Las partidas guardadas, los estados (*savestates*), las configuraciones de emuladores y las descargas de carátulas se conservan entre sesiones en dicha carpeta.
+* **Persistencia total:** Las partidas guardadas, los estados (*savestates*), las configuraciones de emuladores y las descargas de carátulas se conservan entre sesiones en dicha carpeta, tienes control total sobre el sistema, pudiendo agregar o borrar roms, emuladores, bios, etc.
 * **Mismo rendimiento, cero desperdicio de espacio:** El sistema funciona con exactamente las mismas capacidades y rendimiento que una instalación convencional en disco físico, pero sin monopolizar almacenamiento en particiones cerradas.
+
+Todo funciona como si batocera estuviera instalado en el pincho, pero... ¡No lo está!
 
 ---
 
