@@ -1517,6 +1517,9 @@ class SavinOceanicCommand(ctk.CTk):
                 pass
 
     def refrescar_discos(self):
+        if getattr(self, 'en_proceso', False):  # <--- Si se está instalando, no hacer nada
+            return
+
         self.combo_disk.configure(values=[t("selector.searching")])
         self.combo_disk.set(t("selector.searching"))
         self.ocultar_interfaz_instalador()
@@ -1543,7 +1546,8 @@ class SavinOceanicCommand(ctk.CTk):
     def _finalizar_refresco_discos(self, discos):
         self._refrescando_discos = False
         self.lista_discos_reales = discos
-        self.btn_refresh.configure(state="normal")
+        if not getattr(self, 'en_proceso', False):
+            self.btn_refresh.configure(state="normal")  # Solo reactivar si no está instalando
         self.ocultar_interfaz_instalador()
         if not self.lista_discos_reales:
             self.combo_disk.configure(values=[t("selector.no_units")])
@@ -1713,6 +1717,9 @@ class SavinOceanicCommand(ctk.CTk):
         threading.Thread(target=hilo_envio, daemon=True).start()
 
     def toggle_discos_internos(self):
+        if getattr(self, 'en_proceso', False):  # <--- Bloqueado durante instalación
+            return
+
         if self.mostrar_internos.get():
             if not messagebox.askyesno("⚠️ MODO PELIGRO", "Vas a habilitar la visualización de DISCOS INTERNOS.\nInstalar HollowDrive en un disco interno BORRARÁ TODO su contenido.\n¿Continuar?", icon='warning'):
                 self.mostrar_internos.set(False)
@@ -1922,6 +1929,7 @@ class SavinOceanicCommand(ctk.CTk):
         
         f_combo = ctk.CTkFrame(self.f_selection, fg_color="transparent")
         f_combo.pack(pady=10)
+        # CÓDIGO ACTUALIZADO:
         self.combo_disk = ctk.CTkComboBox(f_combo, values=[t("selector.searching")], width=450, command=self.al_seleccionar_disco)
         self.combo_disk.set(t("selector.searching"))
         self.combo_disk.pack(side="left", padx=10)
@@ -1931,9 +1939,11 @@ class SavinOceanicCommand(ctk.CTk):
         self.btn_refresh = ctk.CTkButton(f_combo, image=getattr(self, 'img_reload', None), text="" if getattr(self, 'img_reload', None) else "🔄", width=44, height=44, fg_color="transparent", hover_color="#1e293b", cursor="hand2", command=self.refrescar_discos)
         self.btn_refresh.pack(side="left", padx=5)
         self.tooltip_refresh = CTkToolTip(self.btn_refresh, t("tooltips.reload"), delay_ms=500)
+        self.widgets_interactivos.append(self.btn_refresh)  # <--- Agregado a widgets bloqueables
 
         self.sw_internos = ctk.CTkCheckBox(f_combo, text=t("selector.show_internal"), variable=self.mostrar_internos, command=self.toggle_discos_internos, text_color="#aa3333", font=("Segoe UI", 11, "bold"))
         self.sw_internos.pack(side="left", padx=10)
+        self.widgets_interactivos.append(self.sw_internos)  # <--- Agregado a widgets bloqueables
 
         # --- CONTENEDOR INSTALADOR MAESTRO ---
         self.main_container = ctk.CTkFrame(self, fg_color="transparent")

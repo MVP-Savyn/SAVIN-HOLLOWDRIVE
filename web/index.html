@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =====================================================================
+       🎨 VARIABLES Y ESTILOS BASE
+       ===================================================================== */
+    :root {
+      --bg-body: #05080a;
+      --bg-card: rgba(13, 17, 23, 0.72);
+      --bg-card-inner: rgba(9, 13, 18, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-active: #00d4ff;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan: #00d4ff;
+      --blue-electric: #005eff;
+      --shadow-glow: 0 0 35px rgba(0, 212, 255, 0.18);
+      --nav-bg: rgba(5, 8, 10, 0.82);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      overflow-x: hidden;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* =====================================================================
+       🎥 FONDO DE VÍDEO ANIMADO CON BLUR
+       ===================================================================== */
+    .bg-video-wrap {
+      position: fixed;
+      inset: -25px;
+      width: calc(100vw + 50px);
+      height: calc(100vh + 50px);
+      z-index: -2;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      pointer-events: none;
+    }
+
+    .bg-video-wrap.active {
+      opacity: 1;
+    }
+
+    #bgVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(8px) brightness(0.65);
+      transform: scale(1.05);
+    }
+
+    .bg-video-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(5, 8, 10, 0.3), rgba(5, 8, 10, 0.85));
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .ambient-light {
+      position: fixed;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: -2;
+      opacity: 0.35;
+    }
+    .light-top-left { top: -100px; left: -100px; background: var(--blue-electric); }
+    .light-mid-right { top: 40%; right: -150px; background: var(--cyan); }
+
+    /* =====================================================================
+       🧭 NAVEGACIÓN Y SELECTOR ANIMAR
+       ===================================================================== */
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 2rem;
+      gap: 1rem;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--blue-electric), var(--cyan));
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .anim-widget {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-animar {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.45rem 1.1rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.25s ease;
+    }
+    .btn-animar:hover {
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    .btn-animar.active {
+      background: linear-gradient(135deg, var(--blue-electric), var(--cyan));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    }
+
+    .circles-tray {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-width 0.4s ease, opacity 0.3s ease;
+    }
+
+    .circles-tray.open {
+      max-width: 260px;
+      opacity: 1;
+    }
+
+    .circle-btn {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .circle-btn:hover {
+      border-color: var(--cyan);
+      background: rgba(0, 212, 255, 0.5);
+      transform: scale(1.35);
+    }
+
+    .circle-btn.active {
+      background: var(--cyan);
+      border-color: #fff;
+      box-shadow: 0 0 12px var(--cyan);
+      transform: scale(1.3);
+    }
+
+    .github-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--bg-card-inner);
+      border: 1px solid var(--border-color);
+      padding: 0.3rem 0.8rem 0.3rem 0.35rem;
+      border-radius: 50px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .github-pill:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }
+
+    .avatar-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+      object-fit: cover;
+    }
+
+    /* =====================================================================
+       🚀 HERO SECTION (CON EL NUEVO TÍTULO CORTO Y POTENTE)
+       ===================================================================== */
+    .container {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4.5rem 1rem 3rem;
+    }
+
+    .badge-safe {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #10b981;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.4rem 1.1rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 4.1rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 1.25rem;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--cyan) 20%, var(--blue-electric) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.18rem;
+      color: var(--text-muted);
+      max-width: 780px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .highlight-safe {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    /* =====================================================================
+       📥 BOTÓN DESCARGA Y MENÚ HOVER
+       ===================================================================== */
+    .download-widget {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 3.5rem;
+    }
+
+    .main-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: linear-gradient(135deg, var(--blue-electric), #0040b0);
+      color: #ffffff;
+      font-size: 1.12rem;
+      font-weight: 700;
+      padding: 0.95rem 2.4rem;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(0, 94, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+    }
+
+    .main-download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(0, 94, 255, 0.5);
+    }
+
+    .download-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 0.6rem;
+      width: 320px;
+      box-shadow: var(--shadow-glow), 0 20px 40px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+
+    .download-widget:hover .download-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(12px);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.3rem;
+      text-decoration: none;
+    }
+
+    .dropdown-item.active {
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--cyan);
+      font-weight: 700;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .dropdown-item.disabled {
+      background: rgba(255, 255, 255, 0.02);
+      color: #64748b;
+      cursor: not-allowed;
+      border: 1px dashed var(--border-color);
+      opacity: 0.75;
+    }
+
+    .badge-support {
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: rgba(148, 163, 184, 0.15);
+      color: #94a3b8;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      text-align: right;
+    }
+
+    /* =====================================================================
+       📺 PREVISUALIZACIÓN VÍDEO YOUTUBE
+       ===================================================================== */
+    .video-section {
+      margin-bottom: 4.5rem;
+    }
+
+    .video-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-glow);
+      backdrop-filter: blur(16px);
+    }
+
+    .video-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .video-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .badge-upcoming {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 0.3rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .video-player-mockup {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(9, 13, 20, 0.9), rgba(18, 28, 44, 0.9));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .play-btn-circle {
+      width: 80px;
+      height: 80px;
+      background: var(--blue-electric);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(0, 94, 255, 0.6);
+      transition: transform 0.25s, background-color 0.25s;
+      z-index: 2;
+    }
+
+    .play-btn-circle svg {
+      width: 30px;
+      height: 30px;
+      fill: #fff;
+      margin-left: 4px;
+    }
+
+    .video-player-mockup:hover .play-btn-circle {
+      transform: scale(1.1);
+      background: var(--cyan);
+    }
+
+    .video-caption {
+      margin-top: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      z-index: 2;
+      font-size: 1.05rem;
+    }
+
+    .video-subcaption {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      z-index: 2;
+    }
+
+    /* =====================================================================
+       ⚙️ PILARES DEL SISTEMA
+       ===================================================================== */
+    .section-title {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .section-title h2 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+    }
+
+    .grid-pillars {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 4.5rem;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .pillar-card:hover {
+      border-color: var(--cyan);
+    }
+
+    .pillar-icon { font-size: 2rem; }
+    .pillar-card h3 { font-size: 1.2rem; font-weight: 700; }
+    .pillar-card p { font-size: 0.92rem; color: var(--text-muted); }
+
+    /* =====================================================================
+       💾 REQUISITOS Y CONSEJO WALLAPOP
+       ===================================================================== */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 1.8rem;
+      margin-bottom: 6rem;
+    }
+
+    .requirements-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 2rem;
+      backdrop-filter: blur(14px);
+    }
+
+    .requirements-box h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .req-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    .req-item span.icon {
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .savyn-tip-box {
+      background: linear-gradient(135deg, rgba(0, 94, 255, 0.12), rgba(0, 212, 255, 0.08));
+      border: 2px solid var(--cyan);
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: var(--shadow-glow);
+      backdrop-filter: blur(16px);
+    }
+
+    .tip-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .tip-author-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+    }
+
+    .tip-header h4 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .tip-body {
+      font-size: 0.96rem;
+      color: var(--text-main);
+      line-height: 1.65;
+    }
+
+    .wallapop-badge {
+      display: inline-block;
+      background: #13c1ac;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin: 0 0.2rem;
+    }
+
+    /* =====================================================================
+       🎵 MINI REPRODUCTOR MULTIMEDIA CON VINILO Y VOLUMEN
+       ===================================================================== */
+    .mini-player {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 1000;
+      background: rgba(13, 17, 23, 0.88);
+      border: 1px solid var(--cyan);
+      border-radius: 50px;
+      padding: 0.5rem 1.1rem 0.5rem 0.65rem;
+      box-shadow: var(--shadow-glow), 0 10px 30px rgba(0,0,0,0.6);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .vinyl-record {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center,
+        #0a0a0a 0%, #0a0a0a 16%,
+        #00d4ff 17%, #005eff 34%,
+        #111 35%, #191919 44%,
+        #0b0b0b 45%, #242424 55%,
+        #111 56%, #1c1c1c 70%,
+        #090909 71%, #222 85%,
+        #111 86%, #050505 100%
+      );
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 212, 255, 0.3);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .vinyl-record::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #ffffff;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .vinyl-record.spinning {
+      animation: spinRecord 2.4s linear infinite;
+    }
+
+    @keyframes spinRecord {
+      100% { transform: rotate(360deg); }
+    }
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 90px;
+      max-width: 150px;
+    }
+
+    .player-tag {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .player-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #fff;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      border-radius: 50%;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .ctrl-btn:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    .ctrl-play {
+      width: 32px;
+      height: 32px;
+      background: var(--cyan);
+      color: #05080a;
+      border-radius: 50%;
+    }
+    .ctrl-play:hover {
+      background: #fff;
+      color: #05080a;
+    }
+
+    .vol-control {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding-left: 0.35rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .vol-slider {
+      width: 60px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--cyan);
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--cyan);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-credits {
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 850px) {
+      .specs-grid { grid-template-columns: 1fr; }
+      .video-player-mockup { height: 260px; }
+      nav { padding: 0.8rem 1rem; }
+      .mini-player {
+        bottom: 12px;
+        right: 12px;
+        left: 12px;
+        justify-content: space-between;
+      }
+      .player-info { max-width: 100px; }
+      .vol-slider { width: 45px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Contenedor del vídeo de fondo con desenfoque -->
+  <div class="bg-video-wrap active" id="bgVideoWrap">
+    <video id="bgVideo" loop muted playsinline autoplay preload="auto">
+      <source id="bgVideoSource" src="media/videos/1.mp4" type="video/mp4" />
+    </video>
+    <div class="bg-video-overlay"></div>
+  </div>
+
+  <!-- Luces ambientales de respaldo -->
+  <div class="ambient-light light-top-left"></div>
+  <div class="ambient-light light-mid-right"></div>
+
+  <!-- NAVEGACIÓN -->
+  <nav>
+    <a href="#" class="nav-brand">
+      <span>SAVIN-HOLLOWDRIVE</span>
+      <span class="brand-badge">BETA</span>
+    </a>
+
+    <div class="nav-controls">
+      <!-- Botón Animar y Circulitos Minimalistas -->
+      <div class="anim-widget">
+        <button class="btn-animar active" id="btnAnimar" title="Activar / Desactivar fondo animado">
+          <span>✨</span>
+          <span>Animar</span>
+        </button>
+        <div class="circles-tray open" id="circlesTray">
+          <button class="circle-btn active" data-index="1" title="Fondo 1"></button>
+          <button class="circle-btn" data-index="2" title="Fondo 2"></button>
+          <button class="circle-btn" data-index="3" title="Fondo 3"></button>
+          <button class="circle-btn" data-index="4" title="Fondo 4"></button>
+          <button class="circle-btn" data-index="5" title="Fondo 5"></button>
+          <button class="circle-btn" data-index="6" title="Fondo 6"></button>
+          <button class="circle-btn" data-index="7" title="Fondo 7"></button>
+          <button class="circle-btn" data-index="8" title="Fondo 8"></button>
+        </div>
+      </div>
+
+      <!-- Avatar GitHub MVP-Savyn -->
+      <a href="https://github.com/MVP-Savyn" target="_blank" rel="noopener" class="github-pill" title="Visitar perfil de GitHub">
+        <img src="https://github.com/MVP-Savyn.png" alt="MVP-Savyn" class="avatar-img" onerror="this.src='https://avatars.githubusercontent.com/u/9919?v=4'" />
+        <span>MVP-Savyn</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- HERO SECTION (NUEVO TÍTULO CORTO Y POTENTE) -->
+    <section class="hero">
+      <div class="badge-safe">🛡️ 100% SEGURO // NO MODIFICA EL PC ANFITRIÓN</div>
+      <h1>El Kit Más Potente del Mundo <span class="gradient-text">en tu Bolsillo</span></h1>
+      <p>
+        Convierte cualquier USB o disco externo en una bestia de rescate y sistemas portátiles con <strong>Batocera</strong> y <strong>CachyOS</strong>, con total libertad para añadir tus propias <strong>ISOs</strong>.<br />
+        <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
+      </p>
+
+      <!-- BOTÓN DE DESCARGA CON MENÚ HOVER -->
+      <div class="download-widget">
+        <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest" target="_blank" class="main-download-btn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
+          Descargar para Windows (.exe)
+        </a>
+
+        <!-- Menú Hover -->
+        <div class="download-dropdown">
+          <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest" target="_blank" class="dropdown-item active">
+            <span>🪟 Windows (BETA)</span>
+            <span style="font-size: 0.8rem; font-weight: 800;">DISPONIBLE</span>
+          </a>
+
+          <div class="dropdown-item disabled">
+            <span>🐧 Linux</span>
+            <span class="badge-support">Próximamente si me apoyáis ;)</span>
+          </div>
+
+          <div class="dropdown-item disabled">
+            <span>🍎 macOS</span>
+            <span class="badge-support">Próximamente si me apoyáis ;)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREVISUALIZACIÓN VÍDEO YOUTUBE -->
+    <section class="video-section">
+      <div class="video-card">
+        <div class="video-header">
+          <div class="video-title">
+            <span>📺</span>
+            <span>Mira el vídeo para saber cómo funciona!</span>
+          </div>
+          <span class="badge-upcoming">Próximamente en YouTube</span>
+        </div>
+
+        <a href="https://www.youtube.com/@T0xicAre4" target="_blank" rel="noopener" class="video-player-mockup" title="Ir a mi canal de YouTube @T0xicAre4">
+          <div class="play-btn-circle">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </div>
+          <div class="video-caption">◈ ¡MIRA ESTE VÍDEO PARA SABER CÓMO FUNCIONA! ◈</div>
+          <div class="video-subcaption">Haz clic para visitar mi canal oficial de YouTube (@T0xicAre4)</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- PILARES DEL SISTEMA -->
+    <section>
+      <div class="section-title">
+        <h2>¿Qué incluye tu HollowDrive?</h2>
+      </div>
+
+      <div class="grid-pillars">
+        <div class="pillar-card">
+          <div class="pillar-icon">📂</div>
+          <h3>Tus Propias ISOs</h3>
+          <p>Copia y pega cualquier imagen ISO (Windows, Linux, antivirus, diagnósticos). Ventoy las arrancará directamente sin descomprimir ni quemar una a una.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon">🎮</div>
+          <h3>Batocera Retrogaming</h3>
+          <p>Convierte al instante cualquier ordenador en una consola retro sin arriesgar datos: arranca directamente desde el USB.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon">🚀</div>
+          <h3>CachyOS Portátil</h3>
+          <p>Distribución Arch Linux ultra-optimizada con Hyprland. Lleva tu estación de trabajo, aplicaciones y configuración en el bolsillo.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon">🛠️</div>
+          <h3>HollowTools</h3>
+          <p>Gestor de mantenimiento integrado para añadir ISOs por Drag & Drop o redimensionar particiones sin formatear tu disco.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REQUISITOS Y CONSEJO DE SAVYN -->
+    <section class="specs-grid">
+      <div class="requirements-box">
+        <h3>📋 Requisitos Mínimos</h3>
+        <div class="req-item">
+          <span class="icon">✔</span>
+          <div><strong>Almacenamiento:</strong> Pendrive USB o disco externo de <strong>al menos 10 GB</strong>.</div>
+        </div>
+        <div class="req-item">
+          <span class="icon">✔</span>
+          <div><strong>Sistema Operativo:</strong> Windows 10 u 11 (64 bits).</div>
+        </div>
+        <div class="req-item">
+          <span class="icon">✔</span>
+          <div><strong>Permisos:</strong> Ejecutar como Administrador (para escribir en sectores físicos).</div>
+        </div>
+        <div class="req-item">
+          <span class="icon">✔</span>
+          <div><strong>Seguridad Host:</strong> El sistema de tu PC queda intacto durante el arranque.</div>
+        </div>
+      </div>
+
+      <!-- Consejo de Wallapop -->
+      <div class="savyn-tip-box">
+        <div>
+          <div class="tip-header">
+            <img src="https://github.com/MVP-Savyn.png" alt="Savyn" class="tip-author-avatar" onerror="this.src='https://avatars.githubusercontent.com/u/9919?v=4'" />
+            <div>
+              <h4>💡 Consejo y Recomendación de Savyn</h4>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Recomendación para el mejor rendimiento</span>
+            </div>
+          </div>
+          <p class="tip-body">
+            «Mi recomendación es que uses un <strong>disco duro externo o SSD</strong>, aunque sea barato. Los de <strong>64GB o 128GB</strong> se consiguen muy fácilmente y tirados de precio por <span class="wallapop-badge">Wallapop</span> o de segunda mano.<br /><br />
+            Con una carcasa USB barata tienes el pincho perfecto: los discos están infinitamente mejor diseñados para aguantar <strong>lecturas y escrituras constantes</strong> sin calentarse ni degradarse como le pasa a los pendrives normales.»
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MINI REPRODUCTOR MULTIMEDIA -->
+  <aside class="mini-player" id="miniPlayer">
+    <div class="vinyl-record" id="vinylRecord" title="Disco de vinilo"></div>
+
+    <div class="player-info">
+      <span class="player-tag">Reproduciendo</span>
+      <span class="player-title" id="trackTitle">Pista 01</span>
+    </div>
+
+    <div class="player-controls">
+      <!-- Botón para elegir archivo local si abres index.html sin servidor -->
+      <button class="ctrl-btn" id="btnCargarLocal" title="Elegir canciones de tu PC">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+      </button>
+      <input type="file" id="audioFileInput" multiple accept=".mp3,audio/*" style="display: none;" />
+
+      <button class="ctrl-btn" id="btnPrev" title="Pista Anterior">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+      <button class="ctrl-btn ctrl-play" id="btnPlay" title="Reproducir / Pausar">
+        <svg width="14" height="14" id="playIcon" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      </button>
+      <button class="ctrl-btn" id="btnNext" title="Pista Siguiente">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+    </div>
+
+    <!-- Control de Volumen -->
+    <div class="vol-control">
+      <button class="ctrl-btn" id="btnMute" title="Silenciar / Activar sonido">
+        <svg id="volIcon" width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+      <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.02" value="0.75" title="Volumen" />
+    </div>
+  </aside>
+
+  <!-- Elemento de audio nativo -->
+  <audio id="audioElement" preload="metadata"></audio>
+
+  <!-- PIE DE PÁGINA -->
+  <footer>
+    <p>Desarrollado por <strong>MVP-Savyn</strong> // Proyecto de código abierto</p>
+    <p class="footer-credits">
+      Agradecimiento especial a <strong>MediCat USB</strong> por la inspiración técnica para este kit.
+    </p>
+  </footer>
+
+  <!-- SCRIPT DE FONDOS Y REPRODUCTOR BLINDADO -->
+  <script>
+    // =====================================================================
+    // 1. GESTIÓN DEL FONDO ANIMADO
+    // =====================================================================
+    let modoAnimadoActivo = true;
+
+    const btnAnimar = document.getElementById("btnAnimar");
+    const circlesTray = document.getElementById("circlesTray");
+    const circleBtns = document.querySelectorAll(".circle-btn");
+    const bgVideoWrap = document.getElementById("bgVideoWrap");
+    const bgVideo = document.getElementById("bgVideo");
+    const bgVideoSource = document.getElementById("bgVideoSource");
+
+    btnAnimar.addEventListener("click", () => {
+      modoAnimadoActivo = !modoAnimadoActivo;
+      if (modoAnimadoActivo) {
+        btnAnimar.classList.add("active");
+        circlesTray.classList.add("open");
+        bgVideoWrap.classList.add("active");
+        bgVideo.play().catch(() => {});
+      } else {
+        btnAnimar.classList.remove("active");
+        circlesTray.classList.remove("open");
+        bgVideoWrap.classList.remove("active");
+        bgVideo.pause();
+      }
+    });
+
+    circleBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const num = btn.getAttribute("data-index");
+        circleBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        bgVideoSource.src = `media/videos/${num}.mp4`;
+        bgVideo.load();
+        bgVideo.play().catch(() => {});
+      });
+    });
+
+    // =====================================================================
+    // 2. REPRODUCTOR MULTIMEDIA BLINDADO
+    // =====================================================================
+    // 👇 Si tus canciones tienen nombres específicos en media/songs/,
+    // agrégalos aquí y funcionarán aunque abras el archivo con doble clic:
+    const CANCIONES_POR_DEFECTO = [
+      "ambient resonance.mp3",
+      "Billie Eilish - BITTERSUITE.mp3",
+      "Billie Eilish - ilomilo.mp3",
+      "Cyter - Lunar.mp3",
+      "FrankJavCee - Ｓｉｍｐｓｏｎｗａｖｅ １９９５.mp3",
+      "HOME - Resonance.mp3",
+      "Roi (Instrumental).mp3",
+      "Stephen Sanchez - Evangeline.mp3",
+      "TWO DOOR CINEMA CLUB UNDERCOVER MARTYN.mp3",
+      "VISIONS.mp3",
+      "Were Finally Landing.mp3"
+    ];
+
+    let LISTA_CANCIONES = CANCIONES_POR_DEFECTO.map((nombre, i) => {
+      const limpio = nombre.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ").trim();
+      return {
+        title: limpio.charAt(0).toUpperCase() + limpio.slice(1),
+        file: `media/songs/${nombre}`
+      };
+    });
+
+    let indiceCancion = 0;
+
+    const audioElement = document.getElementById("audioElement");
+    const trackTitle = document.getElementById("trackTitle");
+    const btnPlay = document.getElementById("btnPlay");
+    const playIcon = document.getElementById("playIcon");
+    const btnPrev = document.getElementById("btnPrev");
+    const btnNext = document.getElementById("btnNext");
+    const vinylRecord = document.getElementById("vinylRecord");
+    const volSlider = document.getElementById("volSlider");
+    const btnMute = document.getElementById("btnMute");
+    const volIcon = document.getElementById("volIcon");
+    const btnCargarLocal = document.getElementById("btnCargarLocal");
+    const audioFileInput = document.getElementById("audioFileInput");
+
+    audioElement.volume = 0.75;
+
+    // Intentar leer songs.json si estamos bajo un servidor web (http/https)
+    if (window.location.protocol.startsWith('http')) {
+      fetch('media/songs/songs.json')
+        .then(res => res.ok ? res.json() : [])
+        .then(archivos => {
+          if (Array.isArray(archivos) && archivos.length > 0) {
+            LISTA_CANCIONES = archivos.map((archivo) => {
+              const limpio = archivo.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ").trim();
+              return {
+                title: limpio.charAt(0).toUpperCase() + limpio.slice(1),
+                file: `media/songs/${archivo}`
+              };
+            });
+            cargarPista(0, false);
+          }
+        })
+        .catch(() => {});
+    }
+
+    function cargarPista(index, iniciarReproduccion = false) {
+      if (!LISTA_CANCIONES || LISTA_CANCIONES.length === 0) return;
+
+      if (index < 0) index = LISTA_CANCIONES.length - 1;
+      if (index >= LISTA_CANCIONES.length) index = 0;
+      indiceCancion = index;
+
+      const track = LISTA_CANCIONES[indiceCancion];
+      trackTitle.textContent = track.title;
+      trackTitle.style.color = "#fff";
+      trackTitle.title = track.title;
+      audioElement.src = track.file;
+
+      if (iniciarReproduccion) {
+        audioElement.play()
+          .then(() => actualizarEstadoPlay(true))
+          .catch(e => {
+            console.warn("Navegador bloqueó el autoplay o archivo no disponible:", e);
+            actualizarEstadoPlay(false);
+          });
+      }
+    }
+
+    // AVISO EN PANTALLA SI LA RUTA DEL ARCHIVO FALLA
+    audioElement.addEventListener("error", () => {
+      const rutaIntentada = LISTA_CANCIONES[indiceCancion]?.file || "";
+      trackTitle.textContent = `⚠️ No encontrado (${rutaIntentada})`;
+      trackTitle.style.color = "#ff4d4d";
+      actualizarEstadoPlay(false);
+    });
+
+    audioElement.addEventListener("canplay", () => {
+      trackTitle.style.color = "#fff";
+    });
+
+    function alternarPlayPausa() {
+      if (!audioElement.src || audioElement.src === "") {
+        cargarPista(indiceCancion, true);
+        return;
+      }
+
+      if (audioElement.paused) {
+        audioElement.play()
+          .then(() => actualizarEstadoPlay(true))
+          .catch(e => {
+            console.warn("Fallo al reproducir:", e);
+            actualizarEstadoPlay(false);
+          });
+      } else {
+        audioElement.pause();
+        actualizarEstadoPlay(false);
+      }
+    }
+
+    function actualizarEstadoPlay(estaSonando) {
+      if (estaSonando) {
+        playIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>`;
+        vinylRecord.classList.add("spinning");
+      } else {
+        playIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+        vinylRecord.classList.remove("spinning");
+      }
+    }
+
+    btnPlay.addEventListener("click", alternarPlayPausa);
+
+    btnNext.addEventListener("click", () => {
+      cargarPista(indiceCancion + 1, !audioElement.paused);
+    });
+
+    btnPrev.addEventListener("click", () => {
+      cargarPista(indiceCancion - 1, !audioElement.paused);
+    });
+
+    // Control de selector local con el icono de carpeta
+    btnCargarLocal.addEventListener("click", () => audioFileInput.click());
+    audioFileInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        LISTA_CANCIONES = files.map((file) => {
+          const limpio = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ").trim();
+          return {
+            title: limpio.charAt(0).toUpperCase() + limpio.slice(1),
+            file: URL.createObjectURL(file)
+          };
+        });
+        cargarPista(0, true);
+      }
+    });
+
+    // Control deslizante de Volumen
+    volSlider.addEventListener("input", (e) => {
+      const vol = parseFloat(e.target.value);
+      audioElement.volume = vol;
+      actualizarIconoVolumen(vol);
+    });
+
+    let volumenPrevio = 0.75;
+    btnMute.addEventListener("click", () => {
+      if (audioElement.volume > 0) {
+        volumenPrevio = audioElement.volume;
+        audioElement.volume = 0;
+        volSlider.value = 0;
+        actualizarIconoVolumen(0);
+      } else {
+        audioElement.volume = volumenPrevio || 0.75;
+        volSlider.value = audioElement.volume;
+        actualizarIconoVolumen(audioElement.volume);
+      }
+    });
+
+    function actualizarIconoVolumen(vol) {
+      if (vol === 0) {
+        volIcon.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
+      } else {
+        volIcon.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
+      }
+    }
+
+    audioElement.addEventListener("ended", () => {
+      cargarPista(indiceCancion + 1, true);
+    });
+
+    // Iniciar con la primera pista lista
+    cargarPista(0, false);
+  </script>
+</body>
+</html>
