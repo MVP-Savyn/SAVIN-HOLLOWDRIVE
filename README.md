@@ -91,7 +91,7 @@ Todo funciona como si batocera estuviera instalado en el pincho, pero... ¡No lo
 
 ### Requisitos Mínimos
 * **Sistema Operativo:** Microsoft Windows 10 o Windows 11 (arquitectura de 64 bits).
-* **Capacidad de Almacenamiento:** Unidad de almacenamiento extraíble (USB o disco externo) con capacidad mínima de **10 GB**.
+* **Capacidad de Almacenamiento:** Unidad de almacenamiento extraíble (USB o disco externo) con capacidad mínima de **3 GB**. (Necesitas más si quieres instalar todo lo que HollowDrive ofrece, para una instalación completa necesitas al menos unos 70GB, pero puedo trabajar en packs un poquito más pequeños para que los usb de 64GB puedan tener todo)
 * **Privilegios de Ejecución:** Permisos de Administrador en Windows (imprescindibles para el bloqueo de volúmenes, asignación de letras con `diskpart` y escritura de bajo nivel en sectores físicos).
 * **Conectividad:** Conexión a Internet activa para la descarga de mirrors y paquetes seleccionados.
 
