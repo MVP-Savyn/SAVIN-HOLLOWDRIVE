@@ -842,7 +842,7 @@
     }
 
     /* =====================================================================
-       🎵 MINI REPRODUCTOR: ANCHO FIJO (410px) Y MARQUESINA DESPLAZABLE
+       🎵 MINI REPRODUCTOR: ANCHO Y MARQUESINA
        ===================================================================== */
     .mini-player {
       position: fixed;
@@ -852,13 +852,15 @@
       background: rgba(13, 17, 23, 0.88);
       border: 1px solid var(--cyan);
       border-radius: 50px;
-      padding: 0.5rem 1.1rem 0.5rem 0.65rem;
+      /* 👇 AQUÍ EL ARREGLO DEL VOLUMEN: Padding derecho aumentado de 1.1rem a 1.5rem */
+      padding: 0.5rem 1.5rem 0.5rem 0.65rem; 
       box-shadow: var(--shadow-glow), 0 10px 30px rgba(0,0,0,0.6);
       backdrop-filter: blur(20px);
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      width: 410px;
+      /* 👇 AQUÍ EL ARREGLO DEL ANCHO: Ampliado de 410px a 425px para dar holgura */
+      width: 425px; 
       box-sizing: border-box;
       justify-content: space-between;
     }
@@ -984,7 +986,7 @@
       display: flex;
       align-items: center;
       gap: 0.35rem;
-      padding-left: 0.35rem;
+      padding-left: 0.45rem;
       border-left: 1px solid rgba(255, 255, 255, 0.1);
       flex-shrink: 0;
     }
@@ -1000,8 +1002,8 @@
     }
     .vol-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 11px;
-      height: 11px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: var(--cyan);
       cursor: pointer;
@@ -1026,7 +1028,6 @@
     /* =====================================================================
        📱 MEDIA QUERIES (ADAPTACIÓN MÓVIL CONDICIONAL)
        ===================================================================== */
-
     @media (max-width: 1400px) {
       .fixed-knight-container {
         transform: scale(0.85);
@@ -1045,21 +1046,23 @@
     }
 
     @media (max-width: 850px) {
-      /* Diseño de Grilla */
+      /* Diseño de Grilla y Hero */
       .specs-grid { grid-template-columns: 1fr; }
       .video-player-mockup { height: 260px; }
       
       /* Navegación Compacta */
       nav { padding: 0.8rem 1rem; }
-      .nav-brand span:last-of-type, .brand-badge { display: none; }
-      .circles-tray.open { max-width: 150px; }
+      .nav-brand span, .brand-badge { display: none; }
+      .circles-tray.open { max-width: 140px; }
 
       /* Reproductor adaptable en Móvil */
       .mini-player {
-        width: auto;
-        bottom: 12px;
-        right: 12px;
-        left: 12px;
+        width: calc(100% - 30px);
+        min-width: 0;
+        bottom: 15px;
+        right: 15px;
+        left: 15px;
+        z-index: 1000;
       }
       .player-info {
         width: auto;
@@ -1067,26 +1070,36 @@
       }
       .vol-slider { width: 45px; }
 
-      /* El Caballero en Móvil */
+      /* 👇 AQUÍ EL ARREGLO DEL CABALLERO EN MÓVIL: SOBRE EL REPRODUCTOR */
       .fixed-knight-container {
-        transform: scale(0.5);
-        transform-origin: bottom left;
-        left: -25px;
-        bottom: -20px;
-        opacity: 0.6;
+        left: auto;
+        right: 15px;
+        bottom: 85px; /* Elevado para flotar exactamente sobre el reproductor */
+        transform: scale(0.45);
+        transform-origin: bottom right;
+        opacity: 1;
+        z-index: 1001; /* Asegura que no lo tape el reproductor */
+      }
+      .coin-btn-interactive {
+        transform: translateX(0); /* Moneda centrada en el cuenco */
       }
     }
 
     @media (max-width: 500px) {
-        .hero h1 { font-size: 2.2rem; }
-        .hero p { font-size: 1rem; }
-        /* Ocultar volumen en móviles muy pequeños para ahorrar espacio */
-        .vol-control { display: none; }
-        .main-download-btn { padding: 0.8rem 1.5rem; font-size: 1rem; width: 100%; justify-content: center; }
-        .download-dropdown { width: 90vw; }
-        .nav-brand span { display: none; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero p { font-size: 1rem; }
+      
+      /* Ocultar volumen en móviles muy pequeños para ahorrar espacio */
+      .vol-control { display: none; }
+      
+      .main-download-btn { width: 100%; justify-content: center; padding: 0.8rem 1rem; font-size: 1rem;}
+      .download-dropdown { width: 100%; }
+      
+      .fixed-knight-container {
+        bottom: 75px; 
+        transform: scale(0.4);
+      }
     }
-
   </style>
 </head>
 <body>
