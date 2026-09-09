@@ -15,7 +15,7 @@
        ===================================================================== */
     :root {
       --bg-body: #05080a;
-      --bg-card: rgba(13, 17, 23, 0.72);
+      --bg-card: rgba(13, 17, 23, 0.75);
       --bg-card-inner: rgba(9, 13, 18, 0.85);
       --border-color: rgba(255, 255, 255, 0.08);
       --border-active: #00d4ff;
@@ -36,6 +36,10 @@
       transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-body);
@@ -46,7 +50,7 @@
     }
 
     /* =====================================================================
-       🎥 FONDO DE VÍDEO ANIMADO CON BLUR
+       🎥 FONDO DE VÍDEO ANIMADO CON BLUR Y ACELERACIÓN GPU
        ===================================================================== */
     .bg-video-wrap {
       position: fixed;
@@ -58,6 +62,8 @@
       opacity: 0;
       transition: opacity 0.8s ease-in-out;
       pointer-events: none;
+      transform: translateZ(0);
+      will-change: transform, opacity;
     }
 
     .bg-video-wrap.active {
@@ -257,6 +263,83 @@
     }
 
     /* =====================================================================
+       🧭 ÍNDICE LATERAL MINIMALISTA FLOTANTE (DERECHA)
+       ===================================================================== */
+    .side-index-nav {
+      position: fixed;
+      right: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: flex-end;
+      user-select: none;
+    }
+
+    .side-index-dot {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      position: relative;
+      padding: 4px 0;
+    }
+
+    .side-dot-bar {
+      width: 14px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 4px;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .side-index-dot:hover .side-dot-bar {
+      width: 26px;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .side-index-dot.active .side-dot-bar {
+      width: 30px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue-electric), var(--cyan));
+      box-shadow: 0 0 12px var(--cyan);
+    }
+
+    .side-dot-label {
+      position: absolute;
+      right: calc(100% + 12px);
+      background: rgba(13, 17, 23, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 8px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(8px);
+      transition: all 0.22s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+    }
+
+    .side-index-dot:hover .side-dot-label {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    @media (max-width: 900px) {
+      .side-index-nav { display: none; }
+    }
+
+    /* =====================================================================
        🗡️ WIDGET FIJO: EL CABALLERO + BOTÓN MONEDA
        ===================================================================== */
     .fixed-knight-container {
@@ -423,7 +506,7 @@
     }
 
     /* =====================================================================
-       📥 BOTÓN DESCARGA DIRECTA A RELEASES
+       📥 BOTÓN DESCARGA DIRECTA A GITHUB RELEASES
        ===================================================================== */
     .download-widget {
       position: relative;
@@ -512,7 +595,7 @@
     }
 
     /* =====================================================================
-       🪙 MODAL DE KO-FI CON EL GIF
+       🪙 MODAL DE DONACIÓN CON KO-FI Y PAYPAL
        ===================================================================== */
     .modal-backdrop {
       position: fixed;
@@ -593,6 +676,12 @@
       margin-bottom: 1.8rem;
     }
 
+    .donate-buttons-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
     .btn-kofi-direct {
       display: flex;
       align-items: center;
@@ -600,11 +689,11 @@
       gap: 0.75rem;
       background: #ff5e5b;
       color: #ffffff;
-      padding: 1rem 1.4rem;
+      padding: 0.95rem 1.4rem;
       border-radius: 14px;
       text-decoration: none;
       font-weight: 800;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       box-shadow: 0 8px 25px rgba(255, 94, 91, 0.35);
       transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
@@ -613,12 +702,6 @@
       background: #ff4340;
       transform: translateY(-2px);
       box-shadow: 0 12px 35px rgba(255, 94, 91, 0.5);
-    }
-
-    .donate-buttons-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
     }
 
     .btn-paypal-direct {
@@ -744,79 +827,409 @@
     }
 
     /* =====================================================================
-       ⚙️ PILARES DEL SISTEMA
+       ⚙️ SECCIÓN "¿QUÉ HACE HOLLOWDRIVE?"
        ===================================================================== */
-    .section-title {
+    .section-header-block {
       text-align: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
     }
-    .section-title h2 {
-      font-size: 2.1rem;
+
+    .section-header-block h2 {
+      font-size: 2.3rem;
       font-weight: 800;
       letter-spacing: -0.8px;
+      margin-bottom: 0.8rem;
     }
 
-    .grid-pillars {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 4.5rem;
+    .section-intro-text {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 820px;
+      margin: 0 auto;
     }
 
-    .pillar-card {
+    .action-pillar-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 1.75rem;
-      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 2.2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-glow);
+      backdrop-filter: blur(16px);
+      position: relative;
+    }
+
+    .pillar-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 0.8rem;
+    }
+
+    .pillar-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .pillar-num-badge {
+      background: linear-gradient(135deg, var(--blue-electric), var(--cyan));
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .pillar-title-wrap h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .pillar-body-text {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.6rem;
+    }
+
+    /* Contenedor optimizado para los vídeos en bucle de cada sección */
+    .section-video-slot {
+      width: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.4rem;
+      position: relative;
+    }
+
+    .section-preview-video {
+      width: 100%;
+      max-height: 380px;
+      object-fit: cover;
+      display: block;
+      border-radius: 14px;
+    }
+
+    /* Cuadrícula de herramientas */
+    .tools-categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .tool-category-item {
+      background: var(--bg-card-inner);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.2rem;
       display: flex;
       flex-direction: column;
-      gap: 0.7rem;
-    }
-    .pillar-card:hover {
-      border-color: var(--cyan);
+      gap: 0.65rem;
+      transition: transform 0.2s, border-color 0.2s;
+      min-width: 0;
     }
 
-    .pillar-icon { font-size: 2rem; }
-    .pillar-card h3 { font-size: 1.2rem; font-weight: 700; }
-    .pillar-card p { font-size: 0.92rem; color: var(--text-muted); }
+    .tool-category-item:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .tool-cat-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .tool-cat-icon {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.3));
+    }
+
+    .tool-cat-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tool-files-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-top: 0.2rem;
+      width: 100%;
+    }
+
+    /* Píldoras con ajuste anti-desborde para nombres largos */
+    .tool-file-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      width: 100%;
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      color: #cbd5e1;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+      min-width: 0;
+    }
+
+    .tool-file-link:hover {
+      background: rgba(0, 212, 255, 0.12);
+      border-color: var(--cyan);
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .tool-file-name {
+      word-break: break-all;
+      overflow-wrap: anywhere;
+      min-width: 0;
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .tool-file-link .arrow-icon {
+      font-size: 0.85rem;
+      color: var(--cyan);
+      opacity: 0.8;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .tool-file-link:hover .arrow-icon {
+      transform: translate(2px, -2px);
+      opacity: 1;
+    }
+
+    /* Sección Batocera con animación de respiración vertical */
+    .batocera-hero-row {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-batocera-link {
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .batocera-logo-btn {
+      width: 150px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.35));
+      animation: floatUpDown 2.8s ease-in-out infinite;
+      transition: filter 0.25s ease;
+    }
+
+    .btn-batocera-link:hover .batocera-logo-btn {
+      filter: drop-shadow(0 0 28px rgba(0, 212, 255, 0.85));
+    }
+
+    .batocera-tag-hint {
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0d1117;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-size: 0.65rem;
+      font-weight: 800;
+      white-space: nowrap;
+      padding: 0.15rem 0.5rem;
+      border-radius: 20px;
+    }
+
+    .sub-card-pack {
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.12), rgba(0, 212, 255, 0.08));
+      border: 1px solid rgba(147, 51, 234, 0.35);
+      border-radius: 14px;
+      padding: 1.4rem;
+      margin-top: 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+    }
+
+    .pack-gamepad-icon {
+      width: 52px;
+      height: auto;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 12px rgba(147, 51, 234, 0.6));
+      animation: floatUpDown 3s ease-in-out infinite;
+    }
+
+    @keyframes floatUpDown {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .pack-content h4 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #c084fc;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .badge-38gb {
+      background: rgba(147, 51, 234, 0.25);
+      border: 1px solid #c084fc;
+      color: #fff;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Tarjeta CachyOS y Sistema Portátil */
+    .cachyos-tags-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+
+    .cachy-tag {
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+    }
+
+    .one-click-banner {
+      background: linear-gradient(135deg, rgba(0, 94, 255, 0.2), rgba(0, 212, 255, 0.15));
+      border: 2px solid var(--cyan);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-glow);
+      margin-top: 1rem;
+    }
+
+    .one-click-banner h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
 
     /* =====================================================================
-       💾 REQUISITOS Y CONSEJO WALLAPOP
+       💾 REQUISITOS (SOLO 3GB EN GRANDE CON BRILLO ANIMADO) Y CONSEJO
        ===================================================================== */
     .specs-grid {
       display: grid;
       grid-template-columns: 1fr 1.3fr;
       gap: 1.8rem;
       margin-bottom: 6rem;
+      align-items: stretch;
     }
 
     .requirements-box {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 18px;
-      padding: 2rem;
+      padding: 2.2rem;
       backdrop-filter: blur(14px);
-    }
-
-    .requirements-box h3 {
-      font-size: 1.3rem;
-      margin-bottom: 1.2rem;
       display: flex;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 0.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .req-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      font-size: 0.95rem;
+    .glow-bg-animated {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.45), transparent 70%);
+      filter: blur(50px);
+      animation: pulseGlow 3.5s ease-in-out infinite alternate;
+      z-index: 0;
+      pointer-events: none;
     }
-    .req-item span.icon {
-      color: var(--cyan);
+
+    @keyframes pulseGlow {
+      0% {
+        transform: scale(0.85) translate(-10px, -10px);
+        opacity: 0.4;
+      }
+      100% {
+        transform: scale(1.3) translate(10px, 10px);
+        opacity: 0.9;
+      }
+    }
+
+    .req-hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .req-mini-tag {
+      font-size: 0.8rem;
       font-weight: 800;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .giant-3gb {
+      font-size: clamp(3.8rem, 7vw, 5.2rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--cyan) 80%, var(--blue-electric) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 35px rgba(0, 212, 255, 0.6);
+    }
+
+    .req-desc-text {
+      font-size: 1.05rem;
+      color: var(--text-main);
+      line-height: 1.65;
+      max-width: 320px;
+      margin: 0 auto;
     }
 
     .savyn-tip-box {
@@ -826,6 +1239,9 @@
       padding: 2rem;
       box-shadow: var(--shadow-glow);
       backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .tip-header {
@@ -866,23 +1282,23 @@
     }
 
     /* =====================================================================
-       🎵 MINI REPRODUCTOR: ANCHO FIJO (410px) Y MARQUESINA DESPLAZABLE
+       🎵 MINI REPRODUCTOR: ANCHO FIJO BLINDADO Y VOLUMEN SIN DESBORDE
        ===================================================================== */
     .mini-player {
       position: fixed;
       bottom: 25px;
       right: 25px;
       z-index: 1000;
-      background: rgba(13, 17, 23, 0.88);
+      background: rgba(13, 17, 23, 0.92);
       border: 1px solid var(--cyan);
       border-radius: 50px;
-      padding: 0.5rem 1.1rem 0.5rem 0.65rem;
+      padding: 0.5rem 1.45rem 0.5rem 0.75rem; /* Margen derecho reforzado para no cortar la barra */
       box-shadow: var(--shadow-glow), 0 10px 30px rgba(0,0,0,0.6);
       backdrop-filter: blur(20px);
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      width: 410px;
+      width: 425px; /* 15px extra para que el slider respire */
       box-sizing: border-box;
       justify-content: space-between;
     }
@@ -1009,12 +1425,14 @@
       align-items: center;
       gap: 0.35rem;
       padding-left: 0.35rem;
+      padding-right: 0.15rem;
       border-left: 1px solid rgba(255, 255, 255, 0.1);
       flex-shrink: 0;
     }
 
+    /* Slider compacto para no chocar con el borde redondeado */
     .vol-slider {
-      width: 55px;
+      width: 48px;
       height: 4px;
       -webkit-appearance: none;
       background: rgba(255, 255, 255, 0.2);
@@ -1024,8 +1442,8 @@
     }
     .vol-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 11px;
-      height: 11px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: var(--cyan);
       cursor: pointer;
@@ -1062,14 +1480,17 @@
         flex: 1;
       }
       .vol-slider { width: 45px; }
+      .tools-categories-grid { grid-template-columns: 1fr; }
+      .sub-card-pack { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <!-- Fondo de vídeo animado con blur -->
+  <!-- Fondo de vídeo animado con blur en formato WebM (fallback a MP4) -->
   <div class="bg-video-wrap active" id="bgVideoWrap">
     <video id="bgVideo" loop muted playsinline autoplay preload="auto">
-      <source id="bgVideoSource" src="media/videos/1.mp4" type="video/mp4" />
+      <source id="bgVideoSource" src="media/videos/1.webm" type="video/webm" />
+      <source src="media/videos/1.mp4" type="video/mp4" />
     </video>
     <div class="bg-video-overlay"></div>
   </div>
@@ -1110,9 +1531,39 @@
     </div>
   </nav>
 
+  <!-- =====================================================================
+       🧭 ÍNDICE LATERAL MINIMALISTA (DERECHA) CON SCROLLSPY Y TOOLTIPS
+       ===================================================================== -->
+  <aside class="side-index-nav" id="sideIndexNav" aria-label="Índice de secciones">
+    <a href="#sec-hero" class="side-index-dot active">
+      <span class="side-dot-label">Inicio</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-video" class="side-index-dot">
+      <span class="side-dot-label">Vídeo Tutorial</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-kit" class="side-index-dot">
+      <span class="side-dot-label">Kit de Herramientas</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-batocera" class="side-index-dot">
+      <span class="side-dot-label">Batocera Retrogaming</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-sistema" class="side-index-dot">
+      <span class="side-dot-label">Sistema Portátil</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-requisitos" class="side-index-dot">
+      <span class="side-dot-label">Requisitos Mínimos</span>
+      <span class="side-dot-bar"></span>
+    </a>
+  </aside>
+
   <!-- WIDGET FIJO: EL CABALLERO + BOTÓN MONEDA -->
   <aside class="fixed-knight-container" id="fixedKnightWidget">
-    <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar en Ko-fi)">
+    <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar el proyecto)">
       <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
       <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="95" height="95" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
     </button>
@@ -1130,8 +1581,8 @@
 
   <main class="container">
     <!-- HERO SECTION -->
-    <section class="hero">
-      <div class="badge-safe">🛡️ 100% SEGURO // NO MODIFICA EL PC ANFITRIÓN</div>
+    <section class="hero" id="sec-hero">
+      <div class="badge-safe">🛡️ 100% SEGURO // TODO FUNCIONA DENTRO DEL USB!!</div>
       <h1>El Kit Más Potente del Mundo <span class="gradient-text">en tu Bolsillo</span></h1>
       <p>
         Convierte cualquier USB o disco externo en una bestia de rescate y sistemas portátiles con <strong>Batocera</strong> y <strong>CachyOS</strong>, con total libertad para añadir tus propias <strong>ISOs</strong>.<br />
@@ -1165,7 +1616,7 @@
     </section>
 
     <!-- PREVISUALIZACIÓN VÍDEO YOUTUBE -->
-    <section class="video-section">
+    <section class="video-section" id="sec-video">
       <div class="video-card">
         <div class="video-header">
           <div class="video-title">
@@ -1185,58 +1636,235 @@
       </div>
     </section>
 
-    <!-- PILARES DEL SISTEMA -->
-    <section>
-      <div class="section-title">
-        <h2>¿Qué incluye tu HollowDrive?</h2>
+    <!-- =====================================================================
+         🔥 SECCIÓN "¿QUÉ HACE HOLLOWDRIVE?"
+         ===================================================================== -->
+    <section style="margin-bottom: 5rem;">
+      <div class="section-header-block">
+        <h2>¿Qué hace Hollowdrive?</h2>
+        <p class="section-intro-text">
+          Hollowdrive convierte cualquier memoria USB o disco duro en un kit personalizado con:
+        </p>
       </div>
 
-      <div class="grid-pillars">
-        <div class="pillar-card">
-          <div class="pillar-icon">📂</div>
-          <h3>Tus Propias ISOs</h3>
-          <p>Copia y pega cualquier imagen ISO (Windows, Linux, antivirus, diagnósticos). Ventoy las arrancará directamente sin descomprimir ni quemar una a una.</p>
+      <!-- 1. KIT DE HERRAMIENTAS -->
+      <article class="action-pillar-card" id="sec-kit">
+        <div class="pillar-header-row">
+          <div class="pillar-title-wrap">
+            <span class="pillar-num-badge">01</span>
+            <h3>Kit de Herramientas</h3>
+          </div>
         </div>
 
-        <div class="pillar-card">
-          <div class="pillar-icon">🎮</div>
-          <h3>Batocera Retrogaming</h3>
-          <p>Convierte al instante cualquier ordenador en una consola retro sin arriesgar datos: arranca directamente desde el USB.</p>
+        <!-- HUECO LISTO PARA media/videos/kit.webm -->
+        <div class="section-video-slot">
+          <video class="section-preview-video" loop muted playsinline preload="none">
+            <source src="media/videos/kit.webm" type="video/webm" />
+            <source src="media/videos/kit.mp4" type="video/mp4" />
+          </video>
         </div>
 
-        <div class="pillar-card">
-          <div class="pillar-icon">🚀</div>
-          <h3>CachyOS Portátil</h3>
-          <p>Distribución Arch Linux ultra-optimizada con Hyprland. Lleva tu estación de trabajo, aplicaciones y configuración en el bolsillo.</p>
+        <p class="pillar-body-text">
+          He creado un kit de herramientas booteables que funciona con Ventoy, con un menú personalizado para rescatar ordenadores, gestionar particiones... etc, esto es lo que incluye:
+        </p>
+
+        <div class="tools-categories-grid">
+          <!-- Antivirus -->
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/antivirus.png" alt="Antivirus" class="tool-cat-icon" onerror="this.src='media/images/liveos.png';" />
+              <span class="tool-cat-title">Antivirus</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.malwarebytes.com/" target="_blank" rel="noopener" class="tool-file-link" title="Malwarebytes Oficial">
+                <span class="tool-file-name">Malwarebytes.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Backups y Clonación -->
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/backup.png" alt="Backups" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Backups y Clonación de Discos/Sistemas</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.ubackup.com/" target="_blank" rel="noopener" class="tool-file-link" title="AOMEI Backupper Oficial">
+                <span class="tool-file-name">AOMEI_Backupper_Technician_Plus_8.4.0.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://clonezilla.org/" target="_blank" rel="noopener" class="tool-file-link" title="Clonezilla Oficial">
+                <span class="tool-file-name">clonezilla-live-3.3.1-35-amd64.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://rescuezilla.com/" target="_blank" rel="noopener" class="tool-file-link" title="Rescuezilla Oficial">
+                <span class="tool-file-name">rescuezilla-2.6.2-64bit.resolute.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Sistema Live -->
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/liveos.png" alt="Sistema Live" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Sistema Live lleno de Herramientas</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.hirensbootcd.org/" target="_blank" rel="noopener" class="tool-file-link" title="Hiren's BootCD PE Oficial">
+                <span class="tool-file-name">HBCD_PE_x64.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Carpeta para Propias ISOs -->
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/osimages.png" alt="Tus ISOs" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Carpeta para dejar tus propias ISOs</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.ventoy.net/" target="_blank" rel="noopener" class="tool-file-link" title="Documentación Ventoy">
+                <span class="tool-file-name">Directorio nativo Ventoy (Copia y pega cualquier ISO)</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Herramientas de Particiones -->
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/partition.png" alt="Particiones" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Herramientas de Particiones</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://gparted.org/" target="_blank" rel="noopener" class="tool-file-link" title="GParted Oficial">
+                <span class="tool-file-name">gparted-live-1.8.1-2-amd64.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://www.diskpart.com/" target="_blank" rel="noopener" class="tool-file-link" title="AOMEI Partition Assistant Oficial">
+                <span class="tool-file-name">PartAssist_WinPE_Technician_10.11.0.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Rescate de Arranque -->
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/supergrub.png" alt="Arranque" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Rescate de Arranque</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.supergrubdisk.org/super-grub2-disk/" target="_blank" rel="noopener" class="tool-file-link" title="Super GRUB2 Disk Oficial">
+                <span class="tool-file-name">Super_GRUB2_Disk.efi</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://www.supergrubdisk.org/super-grub2-disk/" target="_blank" rel="noopener" class="tool-file-link" title="Super GRUB2 Disk Oficial">
+                <span class="tool-file-name">Super_GRUB2_Disk.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. BATOCERA -->
+      <article class="action-pillar-card" id="sec-batocera">
+        <div class="pillar-header-row">
+          <div class="pillar-title-wrap">
+            <span class="pillar-num-badge">02</span>
+            <h3>BATOCERA</h3>
+          </div>
         </div>
 
-        <div class="pillar-card">
-          <div class="pillar-icon">🛠️</div>
-          <h3>HollowTools</h3>
-          <p>Gestor de mantenimiento integrado para añadir ISOs por Drag & Drop o redimensionar particiones sin formatear tu disco.</p>
+        <!-- HUECO LISTO PARA media/videos/batocera.webm -->
+        <div class="section-video-slot">
+          <video class="section-preview-video" loop muted playsinline preload="none">
+            <source src="media/videos/batocera.webm" type="video/webm" />
+            <source src="media/videos/batocera.mp4" type="video/mp4" />
+          </video>
         </div>
-      </div>
+
+        <div class="batocera-hero-row">
+          <a href="https://batocera.org" target="_blank" rel="noopener" class="btn-batocera-link" title="Visitar la web oficial de Batocera">
+            <img src="media/images/batocera.png" alt="Batocera Linux" class="batocera-logo-btn" onerror="this.src='assets/icon.ico';" />
+            <span class="batocera-tag-hint">Página oficial ↗</span>
+          </a>
+          <div style="flex: 1; min-width: 260px;">
+            <p class="pillar-body-text" style="margin-bottom: 0;">
+              He optimizado al máximo la gestión del pincho para que puedas usar Batocera sin malgastar ni un megabyte de espacio, te lo explico:<br /><br />
+              Hollowdrive usa una ISO que he modificado personalmente para que ocupe lo menos posible y, al ejecutarla desde Ventoy, detecte la carpeta del sistema <strong>"batocera/"</strong> de la partición HOLLOWDRIVE con todos sus juegos y personalización. Si no existe, la crea de cero, pero siempre puedes gestionar las roms, partidas y el sistema entero con total libertad, ya que podrás ver los archivos desde el explorador de archivos de tu ordenador, o incluso desde CachyOS.<br /><br />
+              <strong>De esta manera puedes usar Batocera sin siquiera tenerlo instalado en el USB!!</strong> Así no devora todo tu pincho, es un dolor de cabeza intentar hacer que batocera conviva con otros sistemas y particiones.
+            </p>
+          </div>
+        </div>
+
+        <!-- Subcard: Pack de Juegos -->
+        <div class="sub-card-pack">
+          <img src="media/images/gamepad.png" alt="Mando" class="pack-gamepad-icon" onerror="this.src='assets/icon.ico';" />
+          <div class="pack-content">
+            <h4>
+              <span>PACK DE JUEGOS</span>
+              <span class="badge-38gb">38 GB</span>
+            </h4>
+            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+              He añadido la opción de descargar un pack de batocera con el sistema ya configurado y preparado para ejecutar roms de varias consolas, ocupa 38GB, pero si quieres que prepare una opción más ligera o por el contrario con más juegos o consolas, <strong>hazmelo saber en los comentarios de mi vídeo de yt ;)</strong>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3. SISTEMA PORTÁTIL -->
+      <article class="action-pillar-card" id="sec-sistema">
+        <div class="pillar-header-row">
+          <div class="pillar-title-wrap">
+            <span class="pillar-num-badge">03</span>
+            <h3>Sistema Portátil</h3>
+          </div>
+        </div>
+
+        <!-- HUECO LISTO PARA media/videos/sistema.webm -->
+        <div class="section-video-slot">
+          <video class="section-preview-video" loop muted playsinline preload="none">
+            <source src="media/videos/sistema.webm" type="video/webm" />
+            <source src="media/videos/sistema.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        <div class="cachyos-tags-row">
+          <span class="cachy-tag">Arch Linux Optimizado</span>
+          <span class="cachy-tag">Entorno Hyprland</span>
+          <span class="cachy-tag">Steam Gaming</span>
+          <span class="cachy-tag">Máquinas Virtuales</span>
+          <span class="cachy-tag">Conexión Remota</span>
+        </div>
+
+        <p class="pillar-body-text">
+          Lleva un sistema preparado para que se pueda ejecutar desde casi cualquier ordenador para poder llevarte tu trabajo como máquinas virtuales encima o <strong>saltarte las restricciones de los ordenadores de clase (guiño guiño)</strong>, y todas las funciones que tú elijas.<br /><br />
+          Personalmente lo he usado para máquinas virtuales, para llevarme mis videojuegos encima (ya que puedes instalar steam dentro de cachyos y dejar tus juegos en Hollowdrive), para conectarme remotamente al ordenador de mi casa desde clase y más .Por ahora la única opción es cachyos pero si este proyecto recibe apoyo traeré más sistemas como <strong>zorinos, debian, ubuntu</strong> o los que queráis.
+        </p>
+
+        <div class="one-click-banner">
+          <h3>⚡ ¡Todo esto puedes generarlo en un click!</h3>
+        </div>
+      </article>
     </section>
 
-    <!-- REQUISITOS Y CONSEJO DE SAVYN -->
-    <section class="specs-grid">
+    <!-- =====================================================================
+       💾 REQUISITO MÍNIMO (SOLO 3GB EN GRANDE) Y CONSEJO WALLAPOP
+       ===================================================================== -->
+    <section class="specs-grid" id="sec-requisitos">
       <div class="requirements-box">
-        <h3>📋 Requisitos Mínimos</h3>
-        <div class="req-item">
-          <span class="icon">✔</span>
-          <div><strong>Almacenamiento:</strong> Pendrive USB o disco externo de <strong>al menos 10 GB</strong>.</div>
-        </div>
-        <div class="req-item">
-          <span class="icon">✔</span>
-          <div><strong>Sistema Operativo:</strong> Windows 10 u 11 (64 bits).</div>
-        </div>
-        <div class="req-item">
-          <span class="icon">✔</span>
-          <div><strong>Permisos:</strong> Ejecutar como Administrador (para escribir en sectores físicos).</div>
-        </div>
-        <div class="req-item">
-          <span class="icon">✔</span>
-          <div><strong>Seguridad Host:</strong> El sistema de tu PC queda intacto durante el arranque.</div>
+        <div class="glow-bg-animated"></div>
+        <div class="req-hero-content">
+          <span class="req-mini-tag">Requisito Mínimo</span>
+          <div class="giant-3gb">3 GB</div>
+          <p class="req-desc-text">
+            Lo único que necesitas es un <strong>USB de al menos 3 GB</strong>! Eso sí, si quieres sacarle el máximo partido, lee mis recomendaciones a la derecha ;)
+          </p>
         </div>
       </div>
 
@@ -1258,7 +1886,6 @@
     </section>
   </main>
 
-  <!-- MODAL EXCLUSIVO DE KO-FI -->
   <!-- MODAL DE DONACIÓN CON KO-FI Y PAYPAL -->
   <div class="modal-backdrop" id="donateModalBackdrop">
     <div class="donate-modal">
@@ -1272,13 +1899,11 @@
       </p>
 
       <div class="donate-buttons-list">
-        <!-- Opción Ko-fi -->
         <a href="https://ko-fi.com/t0xic4rea" target="_blank" rel="noopener" class="btn-kofi-direct">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.047 3.974-4.047 3.974s-2.8-2.521-4.047-3.974c-1.332-1.556-.838-3.877 1.007-4.432 1.845-.555 3.04 1.137 3.04 1.137s1.195-1.692 3.04-1.137c1.845.555 2.339 2.876 1.007 4.432zm7.14-1.277c-.439 2.327-2.736 2.344-2.736 2.344v-4.688s2.297.017 2.736 2.344z"/></svg>
           <span>Invítame a un café (Ko-fi)</span>
         </a>
 
-        <!-- Opción PayPal (Pon aquí tu enlace de paypal.me) -->
         <a href="https://paypal.me/T0xicArea" target="_blank" rel="noopener" class="btn-paypal-direct">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.586c3.084 0 5.378.694 6.438 2.059.984 1.268 1.168 3.064.551 5.341-1.026 3.782-3.843 5.76-7.857 5.76H8.736a.785.785 0 0 0-.773.654l-.887 4.457z"/></svg>
           <span>Donar con PayPal</span>
@@ -1331,7 +1956,7 @@
   <!-- SCRIPTS -->
   <script>
     // =====================================================================
-    // 1. GESTIÓN DEL FONDO ANIMADO
+    // 1. GESTIÓN DEL FONDO ANIMADO (.webm CON FALLBACK A .mp4)
     // =====================================================================
     let modoAnimadoActivo = true;
 
@@ -1363,14 +1988,14 @@
         circleBtns.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        bgVideoSource.src = `media/videos/${num}.mp4`;
+        bgVideoSource.src = `media/videos/${num}.webm`;
         bgVideo.load();
         bgVideo.play().catch(() => {});
       });
     });
 
     // =====================================================================
-    // 2. MODAL DE DONACIÓN EXCLUSIVO KO-FI (AL PULSAR LA MONEDA)
+    // 2. MODAL DE DONACIÓN AL PULSAR LA MONEDA
     // =====================================================================
     const btnCoinDonate = document.getElementById("btnCoinDonate");
     const btnCloseDonate = document.getElementById("btnCloseDonate");
@@ -1391,7 +2016,7 @@
     });
 
     // =====================================================================
-    // 3. REPRODUCTOR MULTIMEDIA (RUTA NATIVA SIN CODIFICACIÓN ARTIFICIAL)
+    // 3. REPRODUCTOR MULTIMEDIA CON TUS 11 CANCIONES
     // =====================================================================
     const CANCIONES_POR_DEFECTO = [
       "ambient resonance.mp3",
@@ -1557,6 +2182,70 @@
     });
 
     cargarPista(0, false);
+
+    // =====================================================================
+    // 4. CONTROL INTELIGENTE DE VÍDEOS DE SECCIONES (PAUSA FUERA DE VISTA)
+    // =====================================================================
+    const sectionVideos = document.querySelectorAll('.section-preview-video');
+    if ('IntersectionObserver' in window) {
+      const videoObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.25 });
+
+      sectionVideos.forEach((video) => {
+        videoObserver.observe(video);
+      });
+    }
+
+    // =====================================================================
+    // 5. SCROLLSPY INTELIGENTE (ACTIVA LA ÚLTIMA BARRA AL LLEGAR AL FINAL)
+    // =====================================================================
+    const sideDots = document.querySelectorAll('.side-index-dot');
+    const trackedSections = [
+      document.getElementById('sec-hero'),
+      document.getElementById('sec-video'),
+      document.getElementById('sec-kit'),
+      document.getElementById('sec-batocera'),
+      document.getElementById('sec-sistema'),
+      document.getElementById('sec-requisitos')
+    ].filter(Boolean);
+
+    function actualizarIndiceScroll() {
+      let currentId = '';
+
+      // Comprobamos si el usuario ha llegado al fondo de la pantalla
+      const alFondo = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 80);
+
+      if (alFondo && trackedSections.length > 0) {
+        // Forzar la última sección si se llega al final
+        currentId = trackedSections[trackedSections.length - 1].getAttribute('id');
+      } else {
+        const scrollPos = window.scrollY + (window.innerHeight / 2.5);
+        trackedSections.forEach(section => {
+          if (scrollPos >= section.offsetTop) {
+            currentId = section.getAttribute('id');
+          }
+        });
+      }
+
+      sideDots.forEach(dot => {
+        dot.classList.remove('active');
+        if (dot.getAttribute('href') === `#${currentId}`) {
+          dot.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', actualizarIndiceScroll, { passive: true });
+    // Ejecutar una vez al cargar para activar la barra correcta de inicio
+    actualizarIndiceScroll();
   </script>
 </body>
 </html>
