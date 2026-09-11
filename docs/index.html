@@ -6,7 +6,7 @@
   <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
   <link rel="icon" type="image/x-icon" href="assets/icon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 
   <style>
@@ -22,6 +22,7 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --cyan: #00d4ff;
+      --cyan-glow: rgba(0, 212, 255, 0.45);
       --blue-electric: #005eff;
       --gold: #fbbf24;
       --gold-glow: rgba(251, 191, 36, 0.35);
@@ -50,7 +51,7 @@
     }
 
     /* =====================================================================
-       🎥 FONDO DE VÍDEO ANIMADO CON BLUR Y ACELERACIÓN GPU
+       🎥 FONDO DE VÍDEO ANIMADO
        ===================================================================== */
     .bg-video-wrap {
       position: fixed;
@@ -162,7 +163,6 @@
       position: relative;
     }
 
-    /* Texto azul explicativo a la izquierda */
     .wallpapers-hint {
       color: var(--cyan);
       font-size: 0.78rem;
@@ -234,10 +234,7 @@
       padding: 0;
       outline: none;
       flex-shrink: 0;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  background-color 0.2s,
-                  border-color 0.2s,
-                  box-shadow 0.25s;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, border-color 0.2s, box-shadow 0.25s;
     }
 
     .circle-btn:hover {
@@ -281,7 +278,7 @@
     }
 
     /* =====================================================================
-       🧭 ÍNDICE LATERAL MINIMALISTA FLOTANTE (DERECHA)
+       🧭 ÍNDICE LATERAL FLOTANTE
        ===================================================================== */
     .side-index-nav {
       position: fixed;
@@ -418,13 +415,11 @@
       border-radius: 20px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
       animation: floatBubble 2.5s ease-in-out infinite;
-      /* Clickeable */
       pointer-events: auto;
       cursor: pointer;
       transition: box-shadow 0.25s ease;
     }
 
-    /* Brillo amarillo suave idéntico al original en hover */
     .coin-btn-interactive:hover .coin-speech-bubble {
       box-shadow: 0 0 16px var(--gold-glow), 0 4px 15px rgba(0, 0, 0, 0.6);
     }
@@ -451,27 +446,13 @@
     }
 
     @media (max-width: 1400px) {
-      .fixed-knight-container {
-        transform: scale(0.85);
-        transform-origin: bottom left;
-        left: -15px;
-      }
+      .fixed-knight-container { transform: scale(0.85); transform-origin: bottom left; left: -15px; }
     }
     @media (max-width: 1100px) {
-      .fixed-knight-container {
-        transform: scale(0.68);
-        transform-origin: bottom left;
-        left: -20px;
-        opacity: 0.85;
-      }
+      .fixed-knight-container { transform: scale(0.68); transform-origin: bottom left; left: -20px; opacity: 0.85; }
     }
     @media (max-width: 800px) {
-      .fixed-knight-container {
-        transform: scale(0.5);
-        transform-origin: bottom left;
-        left: -25px;
-        bottom: -20px;
-      }
+      .fixed-knight-container { transform: scale(0.5); transform-origin: bottom left; left: -25px; bottom: -20px; }
     }
 
     /* =====================================================================
@@ -621,7 +602,7 @@
     }
 
     /* =====================================================================
-       🪙 MODAL DE DONACIÓN CON KO-FI Y PAYPAL
+       🪙 MODAL DE DONACIÓN
        ===================================================================== */
     .modal-backdrop {
       position: fixed;
@@ -657,9 +638,7 @@
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .modal-backdrop.open .donate-modal {
-      transform: scale(1);
-    }
+    .modal-backdrop.open .donate-modal { transform: scale(1); }
 
     .modal-close-btn {
       position: absolute;
@@ -771,7 +750,7 @@
     .video-header {
       display: flex;
       justify-content: space-between;
-      align-center: center;
+      align-items: center;
       margin-bottom: 1.25rem;
       flex-wrap: wrap;
       gap: 0.75rem;
@@ -853,7 +832,7 @@
     }
 
     /* =====================================================================
-       🔥 ESTILO DEL TÍTULO DESTACADO "¿QUÉ HACE HOLLOWDRIVE?"
+       🔥 SECCIÓN "¿QUÉ HACE HOLLOWDRIVE?"
        ===================================================================== */
     .section-header-block {
       text-align: center;
@@ -1242,14 +1221,8 @@
     }
 
     @keyframes pulseGlow {
-      0% {
-        transform: scale(0.85) translate(-10px, -10px);
-        opacity: 0.4;
-      }
-      100% {
-        transform: scale(1.3) translate(10px, 10px);
-        opacity: 0.9;
-      }
+      0% { transform: scale(0.85) translate(-10px, -10px); opacity: 0.4; }
+      100% { transform: scale(1.3) translate(10px, 10px); opacity: 0.9; }
     }
 
     .req-hero-content {
@@ -1337,79 +1310,138 @@
     }
 
     /* =====================================================================
-       🎵 MINI REPRODUCTOR
+       🌊 REPRODUCTOR COMPACTO FLOTANTE 100% NEÓN AZUL TRANSPARENTE
        ===================================================================== */
-    .mini-player {
+    .floating-audio-widget {
       position: fixed;
-      bottom: 25px;
-      right: 25px;
+      bottom: 20px;
+      right: 20px;
       z-index: 1000;
-      background: rgba(13, 17, 23, 0.92);
-      border: 1px solid var(--cyan);
-      border-radius: 50px;
-      padding: 0.5rem 1.45rem 0.5rem 0.75rem;
-      box-shadow: var(--shadow-glow), 0 10px 30px rgba(0,0,0,0.6);
-      backdrop-filter: blur(20px);
+      width: 250px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.85rem;
-      width: 425px;
-      box-sizing: border-box;
-      justify-content: space-between;
+      gap: 0.45rem;
+      user-select: none;
     }
 
-    .vinyl-record {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: radial-gradient(circle at center,
-        #0a0a0a 0%, #0a0a0a 16%,
-        #00d4ff 17%, #005eff 34%,
-        #111 35%, #191919 44%,
-        #0b0b0b 45%, #242424 55%,
-        #111 56%, #1c1c1c 70%,
-        #090909 71%, #222 85%,
-        #111 86%, #050505 100%
-      );
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 212, 255, 0.3);
+    /* Menú de radios flotante sin contenedores visibles, aparece en hover */
+    .floating-radio-menu {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      width: 260px;
+      padding-bottom: 15px; /* Puente anti-pérdida de cursor */
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    /* Al colocar el cursor sobre el widget, aparece la lista de radios flotante */
+    .floating-audio-widget:hover .floating-radio-menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .menu-header-minimal {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: rgba(0, 212, 255, 0.7);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 0.2rem;
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    }
+
+    .radio-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      background: transparent;
+    }
+
+    /* Botones de radio: texto puro azul neón flotante con transparencia */
+    .radio-opt-btn {
+      background: transparent;
+      border: none;
+      padding: 0.35rem 0.6rem;
+      color: rgba(0, 212, 255, 0.65);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.25);
+    }
+
+    .radio-opt-btn:hover {
+      color: #ffffff;
+      text-shadow: 0 0 12px var(--cyan), 0 0 25px var(--blue-electric);
+      transform: translateX(4px);
+    }
+
+    .radio-opt-btn.active {
+      color: #ffffff;
+      text-shadow: 0 0 12px var(--cyan), 0 0 20px var(--blue-electric);
+    }
+
+    .radio-genre-tag {
+      font-size: 0.62rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 20px;
+      background: rgba(0, 212, 255, 0.08);
+      color: rgba(0, 212, 255, 0.75);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .radio-opt-btn.active .radio-genre-tag {
+      background: rgba(0, 212, 255, 0.25);
+      border-color: var(--cyan);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    }
+
+    /* Contenedor del visualizador con fade transparente en ambos lados */
+    .floating-wave-wrapper {
+      width: 100%;
+      height: 44px;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
+      mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
     }
 
-    .vinyl-record::after {
-      content: "";
-      width: 6px;
-      height: 6px;
-      background: #ffffff;
-      border-radius: 50%;
-      position: absolute;
+    #cavaCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
     }
 
-    .vinyl-record.spinning {
-      animation: spinRecord 2.4s linear infinite;
-    }
-
-    @keyframes spinRecord {
-      100% { transform: rotate(360deg); }
-    }
-
-    .player-info {
-      display: flex;
-      flex-direction: column;
-      width: 140px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .player-tag {
-      font-size: 0.62rem;
-      font-weight: 700;
-      color: var(--cyan);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    /* Título de la pista flotante con brillo azul translúcido */
+    .floating-track-info {
+      width: 100%;
+      text-align: center;
     }
 
     .marquee-container {
@@ -1417,17 +1449,18 @@
       overflow: hidden;
       white-space: nowrap;
       position: relative;
-      mask-image: linear-gradient(to right, transparent 0%, black 6%, black 92%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 92%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
     }
 
     .player-title {
       display: inline-block;
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 700;
       white-space: nowrap;
-      color: #fff;
-      will-change: transform;
+      color: rgba(0, 212, 255, 0.95);
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.5), 0 0 20px rgba(0, 94, 255, 0.35);
+      letter-spacing: 0.4px;
     }
 
     .marquee-active {
@@ -1435,73 +1468,97 @@
     }
 
     @keyframes marqueeBounce {
-      0%, 25% { transform: translateX(0); }
-      75%, 100% { transform: translateX(var(--scroll-offset, -40px)); }
+      0%, 20% { transform: translateX(0); }
+      80%, 100% { transform: translateX(var(--scroll-offset, -50px)); }
     }
 
-    .player-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      flex-shrink: 0;
-    }
-
-    .ctrl-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
+    /* Botones compactos y transparentes en azul neón */
+    .floating-controls-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 5px;
-      border-radius: 50%;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .ctrl-btn:hover {
-      color: #fff;
-      transform: scale(1.1);
+      gap: 0.55rem;
+      width: 100%;
     }
 
-    .ctrl-play {
-      width: 32px;
-      height: 32px;
-      background: var(--cyan);
-      color: #05080a;
+    .neon-ctrl-btn {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.35);
+      color: var(--cyan);
+      width: 27px;
+      height: 27px;
       border-radius: 50%;
-    }
-    .ctrl-play:hover {
-      background: #fff;
-      color: #05080a;
-    }
-
-    .vol-control {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
-      padding-left: 0.35rem;
-      padding-right: 0.15rem;
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
-      flex-shrink: 0;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 8px rgba(0, 212, 255, 0.25), inset 0 0 6px rgba(0, 212, 255, 0.1);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .vol-slider {
-      width: 48px;
-      height: 4px;
+    .neon-ctrl-btn:hover {
+      background: rgba(0, 212, 255, 0.2);
+      color: #ffffff;
+      border-color: #ffffff;
+      box-shadow: 0 0 18px rgba(0, 212, 255, 0.8), 0 0 6px #ffffff;
+      transform: scale(1.14);
+    }
+
+    .neon-play-main {
+      width: 33px;
+      height: 33px;
+      background: rgba(0, 212, 255, 0.15);
+      border: 1px solid rgba(0, 212, 255, 0.75);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(0, 212, 255, 0.55), inset 0 0 8px rgba(0, 212, 255, 0.25);
+    }
+
+    .neon-play-main:hover {
+      background: rgba(0, 212, 255, 0.4);
+      color: #ffffff;
+      border-color: #ffffff;
+      box-shadow: 0 0 25px var(--cyan), 0 0 10px #ffffff;
+      transform: scale(1.15);
+    }
+
+    .floating-vol-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-left: 0.15rem;
+    }
+
+    .vol-mute-btn {
+      width: 23px;
+      height: 23px;
+      padding: 0;
+    }
+
+    .neon-vol-slider {
+      width: 40px;
+      height: 2px;
       -webkit-appearance: none;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(0, 212, 255, 0.2);
       border-radius: 10px;
       outline: none;
       cursor: pointer;
+      box-shadow: 0 0 6px rgba(0, 212, 255, 0.3);
     }
-    .vol-slider::-webkit-slider-thumb {
+
+    .neon-vol-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--cyan);
       cursor: pointer;
-      box-shadow: 0 0 6px var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      transition: transform 0.15s ease;
+    }
+
+    .neon-vol-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
     }
 
     /* FOOTER */
@@ -1523,27 +1580,22 @@
       .specs-grid { grid-template-columns: 1fr; }
       .video-player-mockup { height: 260px; }
       nav { padding: 0.8rem 1rem; }
-      .mini-player {
-        width: auto;
-        bottom: 12px;
-        right: 12px;
-        left: 12px;
-      }
-      .player-info {
-        width: auto;
-        flex: 1;
-      }
-      .vol-slider { width: 45px; }
       .tools-categories-grid { grid-template-columns: 1fr; }
       .sub-card-pack { flex-direction: column; }
     }
 
     @media (max-width: 768px) {
-      .wallpapers-hint {
-        display: none;
+      .wallpapers-hint { display: none; }
+    }
+
+    @media (max-width: 500px) {
+      .floating-audio-widget {
+        right: 15px;
+        bottom: 15px;
+        width: 230px;
       }
     }
-    
+
     .cachyos-text-link {
       font-weight: 800;
       background: linear-gradient(135deg, var(--cyan), #38bdf8);
@@ -1561,7 +1613,7 @@
   </style>
 </head>
 <body>
-  <!-- Fondo de vídeo animado con blur en formato WebM (fallback a MP4) -->
+  <!-- Fondo animado -->
   <div class="bg-video-wrap active" id="bgVideoWrap">
     <video id="bgVideo" loop muted playsinline autoplay preload="auto">
       <source id="bgVideoSource" src="media/videos/1.webm" type="video/webm" />
@@ -1583,7 +1635,6 @@
 
     <div class="nav-controls">
       <div class="anim-widget">
-        <!-- Texto azul señalando sin emoticonos -->
         <span class="wallpapers-hint">
           Si la pagina te va lenta dale aqui <span class="arrow-tip">&rarr;</span>
         </span>
@@ -1609,9 +1660,7 @@
     </div>
   </nav>
 
-  <!-- =====================================================================
-       🧭 ÍNDICE LATERAL MINIMALISTA (DERECHA) CON SCROLLSPY Y TOOLTIPS
-       ===================================================================== -->
+  <!-- ÍNDICE LATERAL -->
   <aside class="side-index-nav" id="sideIndexNav" aria-label="Índice de secciones">
     <a href="#sec-hero" class="side-index-dot active">
       <span class="side-dot-label">Inicio</span>
@@ -1639,7 +1688,7 @@
     </a>
   </aside>
 
-  <!-- WIDGET FIJO: EL CABALLERO + BOTÓN MONEDA -->
+  <!-- EL CABALLERO + BOTÓN MONEDA -->
   <aside class="fixed-knight-container" id="fixedKnightWidget">
     <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar el proyecto)">
       <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
@@ -1647,13 +1696,7 @@
     </button>
 
     <div class="knight-wrapper">
-      <img 
-        src="assets/knight-cuenco.png" 
-        alt="Hollow Knight con cuenco" 
-        class="knight-large-img" 
-        id="knightPngImg"
-        onerror="this.style.display='none';" 
-      />
+      <img src="assets/knight-cuenco.png" alt="Hollow Knight con cuenco" class="knight-large-img" id="knightPngImg" onerror="this.style.display='none';" />
     </div>
   </aside>
 
@@ -1667,7 +1710,6 @@
         <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
       </p>
 
-      <!-- BOTÓN DE DESCARGA DIRECTA A GITHUB RELEASES -->
       <div class="download-widget">
         <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
@@ -1714,9 +1756,7 @@
       </div>
     </section>
 
-    <!-- =====================================================================
-         🔥 SECCIÓN "¿QUÉ HACE HOLLOWDRIVE?"
-         ===================================================================== -->
+    <!-- ¿QUÉ HACE HOLLOWDRIVE? -->
     <section style="margin-bottom: 5rem;">
       <div class="section-header-block">
         <div class="section-badge-tag">CAPACIDADES & POTENCIA</div>
@@ -1748,7 +1788,6 @@
         </p>
 
         <div class="tools-categories-grid">
-          <!-- Antivirus -->
           <div class="tool-category-item">
             <div class="tool-cat-head">
               <img src="media/images/antivirus.png" alt="Antivirus" class="tool-cat-icon" onerror="this.src='media/images/liveos.png';" />
@@ -1762,7 +1801,6 @@
             </div>
           </div>
 
-          <!-- Backups y Clonación -->
           <div class="tool-category-item">
             <div class="tool-cat-head">
               <img src="media/images/backup.png" alt="Backups" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
@@ -1784,7 +1822,6 @@
             </div>
           </div>
 
-          <!-- Sistema Live -->
           <div class="tool-category-item">
             <div class="tool-cat-head">
               <img src="media/images/liveos.png" alt="Sistema Live" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
@@ -1798,7 +1835,6 @@
             </div>
           </div>
 
-          <!-- Carpeta para Propias ISOs -->
           <div class="tool-category-item">
             <div class="tool-cat-head">
               <img src="media/images/osimages.png" alt="Tus ISOs" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
@@ -1812,7 +1848,6 @@
             </div>
           </div>
 
-          <!-- Herramientas de Particiones -->
           <div class="tool-category-item">
             <div class="tool-cat-head">
               <img src="media/images/partition.png" alt="Particiones" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
@@ -1830,7 +1865,6 @@
             </div>
           </div>
 
-          <!-- Rescate de Arranque -->
           <div class="tool-category-item">
             <div class="tool-cat-head">
               <img src="media/images/supergrub.png" alt="Arranque" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
@@ -1874,13 +1908,12 @@
           <div style="flex: 1; min-width: 260px;">
             <p class="pillar-body-text" style="margin-bottom: 0;">
               He optimizado al máximo la gestión del pincho para que puedas usar Batocera sin malgastar ni un megabyte de espacio, te lo explico:<br /><br />
-              Hollowdrive usa una ISO que he modificado personalmente para que ocupe lo menos posible y, al ejecutarla desde Ventoy, detecte la carpeta del sistema <strong>"batocera/"</strong> de la partición HOLLOWDRIVE con todos sus juegos y personalización. Si no existe, la crea de cero, pero siempre puedes gestionar las roms, partidas y el sistema entero con total libertad, ya que podrás ver los archivos desde el explorador de archivos de tu ordenador, o incluso desde CachyOS.<br /><br />
+              Hollowdrive usa una imagen que he modificado personalmente para que ocupe lo menos posible y, al ejecutarla desde Ventoy, detecte la carpeta del sistema <strong>"batocera/"</strong> de la partición HOLLOWDRIVE con todos sus juegos y personalización. Si no existe, la crea de cero, pero siempre puedes gestionar las roms, partidas y el sistema entero con total libertad, ya que podrás ver los archivos desde el explorador de archivos de tu ordenador, o incluso desde CachyOS.<br /><br />
               <strong>De esta manera puedes usar Batocera sin siquiera tenerlo instalado en el USB!!</strong> Así no devora todo tu pincho, es un dolor de cabeza intentar hacer que batocera conviva con otros sistemas y particiones.
             </p>
           </div>
         </div>
 
-        <!-- Subcard: Pack de Juegos -->
         <div class="sub-card-pack">
           <img src="media/images/gamepad.png" alt="Mando" class="pack-gamepad-icon" onerror="this.src='assets/icon.ico';" />
           <div class="pack-content">
@@ -1930,9 +1963,7 @@
       </article>
     </section>
 
-    <!-- =====================================================================
-        REQUISITO MÍNIMO Y CONSEJO WALLAPOP
-       ===================================================================== -->
+    <!-- REQUISITOS Y CONSEJO -->
     <section class="specs-grid" id="sec-requisitos">
       <div class="requirements-box">
         <div class="glow-bg-animated"></div>
@@ -1963,7 +1994,7 @@
     </section>
   </main>
 
-  <!-- MODAL DE DONACIÓN CON KO-FI Y PAYPAL -->
+  <!-- MODAL DE DONACIÓN -->
   <div class="modal-backdrop" id="donateModalBackdrop">
     <div class="donate-modal">
       <button class="modal-close-btn" id="btnCloseDonate">&times;</button>
@@ -1989,38 +2020,50 @@
     </div>
   </div>
 
-  <!-- MINI REPRODUCTOR MULTIMEDIA -->
-  <aside class="mini-player" id="miniPlayer">
-    <div class="vinyl-record" id="vinylRecord" title="Disco de vinilo"></div>
+  <!-- REPRODUCTOR COMPACTO FLOTANTE 100% NEÓN AZUL TRANSPARENTE -->
+  <aside class="floating-audio-widget" id="cavaPlayer">
+    <!-- Menú de radios flotante: Aparece automáticamente al pasar el ratón -->
+    <div class="floating-radio-menu" id="radioDrawer">
+      <div class="menu-header-minimal">SELECCIONAR EMISORA</div>
+      <div class="radio-options-list" id="radioOptionsList"></div>
+    </div>
 
-    <div class="player-info">
-      <span class="player-tag">RADIO EN VIVO 24/7</span>
+    <!-- Visualizador de ondas simétrico con difuminado transparente lateral -->
+    <div class="floating-wave-wrapper">
+      <canvas id="cavaCanvas" width="250" height="44"></canvas>
+    </div>
+
+    <!-- Nombre de la emisora en rotación / marquesina -->
+    <div class="floating-track-info">
       <div class="marquee-container" id="marqueeContainer">
         <span class="player-title" id="trackTitle">Conectando señal...</span>
       </div>
     </div>
 
-    <div class="player-controls">
-      <button class="ctrl-btn" id="btnPrev" title="Pista Anterior">
-        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+    <!-- Controles transparentes en azul eléctrico con brillo neón -->
+    <div class="floating-controls-row">
+      <button class="neon-ctrl-btn" id="btnPrev" title="Emisora Anterior">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
       </button>
-      <button class="ctrl-btn ctrl-play" id="btnPlay" title="Reproducir / Pausar">
-        <svg width="14" height="14" id="playIcon" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-      </button>
-      <button class="ctrl-btn" id="btnNext" title="Pista Siguiente">
-        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-      </button>
-    </div>
 
-    <div class="vol-control">
-      <button class="ctrl-btn" id="btnMute" title="Silenciar / Activar sonido">
-        <svg id="volIcon" width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      <button class="neon-ctrl-btn neon-play-main" id="btnPlay" title="Reproducir / Pausar">
+        <svg width="13" height="13" id="playIcon" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
       </button>
-      <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.02" value="0.75" title="Volumen" />
+
+      <button class="neon-ctrl-btn" id="btnNext" title="Emisora Siguiente">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+
+      <div class="floating-vol-wrap">
+        <button class="neon-ctrl-btn vol-mute-btn" id="btnMute" title="Silenciar">
+          <svg id="volIcon" width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+        <input type="range" class="neon-vol-slider" id="volSlider" min="0" max="1" step="0.02" value="0.75" />
+      </div>
     </div>
   </aside>
 
-  <audio id="audioElement" preload="metadata"></audio>
+  <audio id="audioElement" preload="none" crossorigin="anonymous"></audio>
 
   <!-- PIE DE PÁGINA -->
   <footer>
@@ -2033,7 +2076,7 @@
   <!-- SCRIPTS -->
   <script>
     // =====================================================================
-    // 1. GESTIÓN DEL FONDO ANIMADO (.webm CON FALLBACK A .mp4)
+    // 1. GESTIÓN DEL FONDO ANIMADO
     // =====================================================================
     let modoAnimadoActivo = true;
 
@@ -2072,7 +2115,7 @@
     });
 
     // =====================================================================
-    // 2. MODAL DE DONACIÓN AL PULSAR LA MONEDA
+    // 2. MODAL DE DONACIÓN
     // =====================================================================
     const btnCoinDonate = document.getElementById("btnCoinDonate");
     const btnCloseDonate = document.getElementById("btnCloseDonate");
@@ -2093,42 +2136,62 @@
     });
 
     // =====================================================================
-    // 3. REPRODUCTOR DE RADIOS SYNTHWAVE EN VIVO (100% LEGAL)
+    // 3. REPRODUCTOR COMPACTO Y MOTOR DE AUDIO NEÓN AZUL (VOLUMEN CORREGIDO)
     // =====================================================================
-    const ESTACIONES_RADIO = [
-      {
-        title: "Nightride FM // Synthwave & Outrun",
-        streamUrl: "https://stream.nightride.fm/nightride.mp3"
-      },
-      {
-        title: "Chillsynth FM // Chillwave & Lofi Retro",
-        streamUrl: "https://stream.nightride.fm/chillsynth.mp3"
-      },
-      {
-        title: "Nightwave Plaza // Vaporwave & Future Funk",
-        streamUrl: "https://radio.plaza.one/mp3"
-      },
-      {
-        title: "Darksynth FM // Cyberpunk & Dark Electro",
-        streamUrl: "https://stream.nightride.fm/darksynth.mp3"
-      }
+    const RADIOS = [
+      { name: "Chillsynth FM", genre: "Lofi Retro", url: "https://stream.nightride.fm/chillsynth.mp3" },
+      { name: "Nightride FM", genre: "Synthwave", url: "https://stream.nightride.fm/nightride.mp3" },
+      { name: "Nightwave Plaza", genre: "Vaporwave", url: "https://radio.plaza.one/mp3" },
+      { name: "Darksynth Radio", genre: "Cyberpunk", url: "https://stream.nightride.fm/darksynth.mp3" },
+      { name: "Lofi Cafe Beat", genre: "Chill Lofi", url: "https://streams.ilovemusic.de/iloveradio17.mp3" },
+      { name: "Kohina Retro", genre: "8-Bit Chiptune", url: "https://stream.kohina.com:8000/stream.mp3" }
     ];
 
-    let indiceEstacion = 0;
+    let currentRadioIdx = 0;
+    let isPlaying = false;
 
     const audioElement = document.getElementById("audioElement");
-    const marqueeContainer = document.getElementById("marqueeContainer");
     const trackTitle = document.getElementById("trackTitle");
+    const marqueeContainer = document.getElementById("marqueeContainer");
     const btnPlay = document.getElementById("btnPlay");
     const playIcon = document.getElementById("playIcon");
     const btnPrev = document.getElementById("btnPrev");
     const btnNext = document.getElementById("btnNext");
-    const vinylRecord = document.getElementById("vinylRecord");
     const volSlider = document.getElementById("volSlider");
     const btnMute = document.getElementById("btnMute");
     const volIcon = document.getElementById("volIcon");
+    const radioOptionsList = document.getElementById("radioOptionsList");
 
-    audioElement.volume = 0.75;
+    // Función que blinda el volumen para que NUNCA suene al 100% al inicio
+    function sincronizarVolumen() {
+      const vol = parseFloat(volSlider.value);
+      audioElement.volume = isNaN(vol) ? 0.75 : vol;
+      actualizarIconoVol(audioElement.volume);
+      if (gainNode && audioCtx) {
+        gainNode.gain.setValueAtTime(audioElement.volume, audioCtx.currentTime);
+      }
+    }
+
+    // Forzar el volumen en el milisegundo exacto en que arranca el stream
+    audioElement.addEventListener("play", sincronizarVolumen);
+    audioElement.addEventListener("playing", sincronizarVolumen);
+    audioElement.addEventListener("canplay", sincronizarVolumen);
+
+    function renderizarOpcionesRadio() {
+      radioOptionsList.innerHTML = "";
+      RADIOS.forEach((r, idx) => {
+        const btn = document.createElement("button");
+        btn.className = `radio-opt-btn ${idx === currentRadioIdx ? "active" : ""}`;
+        btn.innerHTML = `
+          <span>${r.name}</span>
+          <span class="radio-genre-tag">${r.genre}</span>
+        `;
+        btn.addEventListener("click", () => {
+          cargarEmisora(idx, true);
+        });
+        radioOptionsList.appendChild(btn);
+      });
+    }
 
     function actualizarMarquesina() {
       trackTitle.classList.remove("marquee-active");
@@ -2147,84 +2210,77 @@
       }, 50);
     }
 
-    function cargarEstacion(index, reproducir = false) {
-      if (index < 0) index = ESTACIONES_RADIO.length - 1;
-      if (index >= ESTACIONES_RADIO.length) index = 0;
-      indiceEstacion = index;
+    function cargarEmisora(index, autoPlay = false) {
+      if (index < 0) index = RADIOS.length - 1;
+      if (index >= RADIOS.length) index = 0;
+      currentRadioIdx = index;
 
-      const estacion = ESTACIONES_RADIO[indiceEstacion];
-      trackTitle.textContent = estacion.title;
-      trackTitle.style.color = "#fff";
-      trackTitle.title = estacion.title;
-
+      const radio = RADIOS[currentRadioIdx];
+      trackTitle.textContent = `${radio.name} // ${radio.genre}`;
       actualizarMarquesina();
+      renderizarOpcionesRadio();
 
-      if (reproducir) {
-        // Al ser radio en vivo, asignamos el stream y reproducimos al instante
-        audioElement.src = estacion.streamUrl;
+      if (autoPlay) {
+        audioElement.src = radio.url;
+        sincronizarVolumen(); // Fijamos volumen ANTES de reproducir
+        iniciarAudioContext();
         audioElement.play()
-          .then(() => actualizarEstadoPlay(true))
-          .catch(() => actualizarEstadoPlay(false));
+          .then(() => {
+            setPlayingState(true);
+            sincronizarVolumen(); // Reaseguramos volumen justo tras arrancar
+          })
+          .catch(() => setPlayingState(false));
       }
     }
 
-    function alternarPlayPausa() {
-      if (audioElement.paused || !audioElement.src) {
-        // Conectar a la emisión en directo en tiempo real
-        audioElement.src = ESTACIONES_RADIO[indiceEstacion].streamUrl;
+    function togglePlay() {
+      if (!isPlaying) {
+        audioElement.src = RADIOS[currentRadioIdx].url;
+        sincronizarVolumen(); // Fijamos volumen ANTES de reproducir
+        iniciarAudioContext();
         audioElement.play()
-          .then(() => actualizarEstadoPlay(true))
-          .catch(() => actualizarEstadoPlay(false));
+          .then(() => {
+            setPlayingState(true);
+            sincronizarVolumen(); // Reaseguramos volumen justo tras arrancar
+          })
+          .catch(() => setPlayingState(false));
       } else {
         audioElement.pause();
-        audioElement.src = ""; // Corta la conexión para no gastar datos de fondo
-        actualizarEstadoPlay(false);
+        audioElement.src = "";
+        setPlayingState(false);
       }
     }
 
-    function actualizarEstadoPlay(sonando) {
-      if (sonando) {
-        playIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>`;
-        vinylRecord.classList.add("spinning");
+    function setPlayingState(playing) {
+      isPlaying = playing;
+      if (playing) {
+        playIcon.innerHTML = `<rect x="5" y="4" width="4" height="16"></rect><rect x="15" y="4" width="4" height="16"></rect>`;
       } else {
         playIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
-        vinylRecord.classList.remove("spinning");
       }
     }
 
-    btnPlay.addEventListener("click", alternarPlayPausa);
-
-    btnNext.addEventListener("click", () => {
-      const estabaSonando = !audioElement.paused && audioElement.src !== "";
-      cargarEstacion(indiceEstacion + 1, estabaSonando);
-    });
-
-    btnPrev.addEventListener("click", () => {
-      const estabaSonando = !audioElement.paused && audioElement.src !== "";
-      cargarEstacion(indiceEstacion - 1, estabaSonando);
-    });
+    btnPlay.addEventListener("click", togglePlay);
+    btnNext.addEventListener("click", () => cargarEmisora(currentRadioIdx + 1, isPlaying));
+    btnPrev.addEventListener("click", () => cargarEmisora(currentRadioIdx - 1, isPlaying));
 
     volSlider.addEventListener("input", (e) => {
-      const vol = parseFloat(e.target.value);
-      audioElement.volume = vol;
-      actualizarIconoVolumen(vol);
+      sincronizarVolumen();
     });
 
-    let volumenPrevio = 0.75;
+    let prevVol = 0.75;
     btnMute.addEventListener("click", () => {
       if (audioElement.volume > 0) {
-        volumenPrevio = audioElement.volume;
-        audioElement.volume = 0;
+        prevVol = audioElement.volume;
         volSlider.value = 0;
-        actualizarIconoVolumen(0);
+        sincronizarVolumen();
       } else {
-        audioElement.volume = volumenPrevio || 0.75;
-        volSlider.value = audioElement.volume;
-        actualizarIconoVolumen(audioElement.volume);
+        volSlider.value = prevVol || 0.75;
+        sincronizarVolumen();
       }
     });
 
-    function actualizarIconoVolumen(vol) {
+    function actualizarIconoVol(vol) {
       if (vol === 0) {
         volIcon.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
       } else {
@@ -2232,11 +2288,111 @@
       }
     }
 
-    // Cargar la primera emisora en espera (sin reproducir hasta que el usuario dé a play)
-    cargarEstacion(0, false);
-
     // =====================================================================
-    // 4. CONTROL INTELIGENTE DE VÍDEOS DE SECCIONES (PAUSA FUERA DE VISTA)
+    // CANVAS: ESPECTRO SIMÉTRICO 100% NEÓN AZUL TRANSPARENTE
+    // =====================================================================
+    const canvas = document.getElementById("cavaCanvas");
+    const ctx = canvas.getContext("2d");
+    let audioCtx = null;
+    let analyser = null;
+    let gainNode = null;
+    let dataArray = null;
+    let audioSourceConnected = false;
+
+    function iniciarAudioContext() {
+      if (!audioCtx) {
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioCtx.createAnalyser();
+          gainNode = audioCtx.createGain(); // Control físico de ganancia
+
+          analyser.fftSize = 128;
+          analyser.smoothingTimeConstant = 0.85;
+
+          const source = audioCtx.createMediaElementSource(audioElement);
+          source.connect(analyser);
+          analyser.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          
+          audioSourceConnected = true;
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
+        } catch (e) {
+          // Modo reactivo fluido si CORS no está habilitado
+        }
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      sincronizarVolumen();
+    }
+
+    const TOTAL_BARS = 28;
+    let currentHeights = new Array(TOTAL_BARS).fill(2);
+
+    function dibujarOnda() {
+      requestAnimationFrame(dibujarOnda);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerY = canvas.height / 2;
+      const barWidth = 3.6;
+      const gap = 4.2;
+      const totalWidth = TOTAL_BARS * (barWidth + gap) - gap;
+      const startX = (canvas.width - totalWidth) / 2;
+
+      const gradiente = ctx.createLinearGradient(startX, 0, startX + totalWidth, 0);
+      gradiente.addColorStop(0.0, "rgba(0, 94, 255, 0.2)");
+      gradiente.addColorStop(0.2, "rgba(0, 212, 255, 0.65)");
+      gradiente.addColorStop(0.5, "rgba(200, 245, 255, 0.95)");
+      gradiente.addColorStop(0.8, "rgba(0, 212, 255, 0.65)");
+      gradiente.addColorStop(1.0, "rgba(0, 94, 255, 0.2)");
+
+      ctx.fillStyle = gradiente;
+
+      let realData = false;
+      if (analyser && isPlaying && audioSourceConnected) {
+        analyser.getByteFrequencyData(dataArray);
+        realData = dataArray.some(v => v > 0);
+      }
+
+      for (let i = 0; i < TOTAL_BARS; i++) {
+        let targetH = 2;
+        const curve = Math.sin((i / (TOTAL_BARS - 1)) * Math.PI);
+
+        if (isPlaying) {
+          if (realData) {
+            const fIdx = Math.floor((i / TOTAL_BARS) * (dataArray.length * 0.65));
+            const val = dataArray[fIdx] || 0;
+            targetH = Math.max(2, (val / 255) * (centerY - 4) * curve);
+          } else {
+            const time = performance.now() * 0.005;
+            const wave1 = Math.sin(time + i * 0.4);
+            const wave2 = Math.cos(time * 0.7 + i * 0.25);
+            targetH = Math.max(2, Math.abs(wave1 * wave2) * (centerY - 4) * curve * 1.3);
+          }
+        }
+
+        currentHeights[i] += (targetH - currentHeights[i]) * 0.22;
+        const h = currentHeights[i];
+
+        const x = startX + i * (barWidth + gap);
+        const radius = barWidth / 2;
+
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x, centerY - h, barWidth, h * 2, [radius]);
+        } else {
+          ctx.rect(x, centerY - h, barWidth, h * 2);
+        }
+        ctx.fill();
+      }
+    }
+
+    dibujarOnda();
+    cargarEmisora(0, false);
+    sincronizarVolumen(); // Ejecución inmediata al cargar la web
+    
+    // =====================================================================
+    // 4. CONTROL INTELIGENTE DE VÍDEOS DE SECCIONES
     // =====================================================================
     const sectionVideos = document.querySelectorAll('.section-preview-video');
     if ('IntersectionObserver' in window) {
@@ -2257,7 +2413,7 @@
     }
 
     // =====================================================================
-    // 5. SCROLLSPY INTELIGENTE
+    // 5. SCROLLSPY
     // =====================================================================
     const sideDots = document.querySelectorAll('.side-index-dot');
     const trackedSections = [
@@ -2271,7 +2427,6 @@
 
     function actualizarIndiceScroll() {
       let currentId = '';
-
       const alFondo = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 80);
 
       if (alFondo && trackedSections.length > 0) {
