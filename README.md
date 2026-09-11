@@ -159,12 +159,3 @@ SAVIN-HOLLOWDRIVE integra, enlaza o interactúa con proyectos de código abierto
 
 ### Reconocimiento de Inspiración Técnica
 El diseño de la partición de utilidades y la estructura de herramientas de diagnóstico de este software reconoce como referente conceptual al proyecto comunitario **MediCat USB**.
-
----
-
-## 8. Descargo de Responsabilidad Legal
-
-1. **Propiedad Intelectual y Contenidos:**  
-   SAVIN-HOLLOWDRIVE no incluye, aloja ni redistribuye imágenes de juegos (ROMs), material con derechos de autor sin autorización ni software comercial privativo. Las descargas de paquetes de emulación o sistemas operativos provienen de repositorios públicos o plataformas libres asociadas a sus respectivos mantenedores.
-2. **Responsabilidad de Uso:**  
-   El usuario asume la responsabilidad exclusiva respecto a las imágenes ISO, ROMs o archivos que agregue a la unidad y respecto a la correcta selección de la unidad destino durante el proceso de instalación. Los desarrolladores no asumen responsabilidad por pérdidas accidentales de datos debidas a negligencia o selección incorrecta de dispositivos por parte del usuario.
