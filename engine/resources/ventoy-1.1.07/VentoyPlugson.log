@@ -1,0 +1,44 @@
+[2026/05/15 11:36:37] ====================== Ventoy Plugson =========================
+[2026/05/15 11:36:37] Current Directory <C:\PROGRAMAS\ventoy-1.1.07>
+[2026/05/15 11:36:37] Exe file path <C:\PROGRAMAS\ventoy-1.1.07\VentoyPlugson.exe>
+[2026/05/15 11:36:37] Current directory check OK.
+[2026/05/15 11:36:37] ===============================================
+[2026/05/15 11:36:37] ========= Ventoy Plugson 127.0.0.1:24681 =========
+[2026/05/15 11:36:37] ===============================================
+[2026/05/15 11:36:37] ventoy disk init ...
+[2026/05/15 11:36:37] Partition offset is NOT 1MB. This is NOT ventoy image partition (227540992)
+[2026/05/15 11:36:37] C: is NOT ventoy disk
+[2026/05/15 11:36:37] Partition offset is NOT 1MB. This is NOT ventoy image partition (16777216)
+[2026/05/15 11:36:37] D: is NOT ventoy disk
+[2026/05/15 11:36:37] Invalid MBR Code 0
+[2026/05/15 11:36:37] GetVentoyVersion failed 183
+[2026/05/15 11:36:37] E: is NOT ventoy disk
+[2026/05/15 11:36:37] F: is ventoy disk
+[2026/05/15 11:36:37] xzlen:1017952 rawdata size:3594240
+[2026/05/15 11:36:37] Plugson buildtime 20230623 19:05:00
+[2026/05/15 11:36:37] Total extract 129 files from tar file.
+[2026/05/15 11:36:41] VentoyStartService ...
+[2026/05/15 11:36:41] Start service at F: INTENSO SSD 1.1.07 ...
+[2026/05/19 11:31:55] ====================== Ventoy Plugson =========================
+[2026/05/19 11:31:55] Current Directory <C:\PROGRAMAS\ventoy-1.1.07>
+[2026/05/19 11:31:55] Exe file path <C:\PROGRAMAS\ventoy-1.1.07\VentoyPlugson.exe>
+[2026/05/19 11:31:55] Current directory check OK.
+[2026/05/19 11:31:55] ===============================================
+[2026/05/19 11:31:55] ========= Ventoy Plugson 127.0.0.1:24681 =========
+[2026/05/19 11:31:55] ===============================================
+[2026/05/19 11:31:55] ventoy disk init ...
+[2026/05/19 11:31:55] Partition offset is NOT 1MB. This is NOT ventoy image partition (227540992)
+[2026/05/19 11:31:55] C: is NOT ventoy disk
+[2026/05/19 11:31:55] Partition offset is NOT 1MB. This is NOT ventoy image partition (16777216)
+[2026/05/19 11:31:55] D: is NOT ventoy disk
+[2026/05/19 11:31:55] Invalid MBR Code 0
+[2026/05/19 11:31:55] GetVentoyVersion failed 183
+[2026/05/19 11:31:55] E: is NOT ventoy disk
+[2026/05/19 11:31:55] Partition offset is NOT 1MB. This is NOT ventoy image partition (916835340288)
+[2026/05/19 11:31:55] F: is NOT ventoy disk
+[2026/05/19 11:31:55] H: is ventoy disk
+[2026/05/19 11:31:55] xzlen:1017952 rawdata size:3594240
+[2026/05/19 11:31:55] Plugson buildtime 20230623 19:05:00
+[2026/05/19 11:31:55] Total extract 129 files from tar file.
+[2026/05/19 11:31:58] VentoyStartService ...
+[2026/05/19 11:31:58] Start service at H: INTENSO SSD 1.1.07 ...

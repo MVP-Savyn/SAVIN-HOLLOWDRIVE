@@ -1994,9 +1994,9 @@
     <div class="vinyl-record" id="vinylRecord" title="Disco de vinilo"></div>
 
     <div class="player-info">
-      <span class="player-tag">Reproduciendo</span>
+      <span class="player-tag">RADIO EN VIVO 24/7</span>
       <div class="marquee-container" id="marqueeContainer">
-        <span class="player-title" id="trackTitle">Cargando pistas...</span>
+        <span class="player-title" id="trackTitle">Conectando señal...</span>
       </div>
     </div>
 
@@ -2093,31 +2093,28 @@
     });
 
     // =====================================================================
-    // 3. REPRODUCTOR MULTIMEDIA CON TUS 11 CANCIONES
+    // 3. REPRODUCTOR DE RADIOS SYNTHWAVE EN VIVO (100% LEGAL)
     // =====================================================================
-    const CANCIONES_POR_DEFECTO = [
-      "ambient resonance.mp3",
-      "Billie Eilish - BITTERSUITE.mp3",
-      "Billie Eilish - ilomilo.mp3",
-      "Cyter - Lunar.mp3",
-      "FrankJavCee - Ｓｉｍｐｓｏｎｗａｖｅ １９９５.mp3",
-      "HOME - Resonance.mp3",
-      "Roi (Instrumental).mp3",
-      "Stephen Sanchez - Evangeline.mp3",
-      "TWO DOOR CINEMA CLUB UNDERCOVER MARTYN.mp3",
-      "VISIONS.mp3",
-      "Were Finally Landing.mp3"
+    const ESTACIONES_RADIO = [
+      {
+        title: "Nightride FM // Synthwave & Outrun",
+        streamUrl: "https://stream.nightride.fm/nightride.mp3"
+      },
+      {
+        title: "Chillsynth FM // Chillwave & Lofi Retro",
+        streamUrl: "https://stream.nightride.fm/chillsynth.mp3"
+      },
+      {
+        title: "Nightwave Plaza // Vaporwave & Future Funk",
+        streamUrl: "https://radio.plaza.one/mp3"
+      },
+      {
+        title: "Darksynth FM // Cyberpunk & Dark Electro",
+        streamUrl: "https://stream.nightride.fm/darksynth.mp3"
+      }
     ];
 
-    let LISTA_CANCIONES = CANCIONES_POR_DEFECTO.map((nombre) => {
-      const limpio = nombre.replace(/\.[^/.]+$/, "").replace(/_/g, " ").trim();
-      return {
-        title: limpio,
-        file: `media/songs/${nombre}`
-      };
-    });
-
-    let indiceCancion = 0;
+    let indiceEstacion = 0;
 
     const audioElement = document.getElementById("audioElement");
     const marqueeContainer = document.getElementById("marqueeContainer");
@@ -2150,64 +2147,43 @@
       }, 50);
     }
 
-    function cargarPista(index, iniciarReproduccion = false) {
-      if (!LISTA_CANCIONES || LISTA_CANCIONES.length === 0) return;
+    function cargarEstacion(index, reproducir = false) {
+      if (index < 0) index = ESTACIONES_RADIO.length - 1;
+      if (index >= ESTACIONES_RADIO.length) index = 0;
+      indiceEstacion = index;
 
-      if (index < 0) index = LISTA_CANCIONES.length - 1;
-      if (index >= LISTA_CANCIONES.length) index = 0;
-      indiceCancion = index;
-
-      const track = LISTA_CANCIONES[indiceCancion];
-      trackTitle.textContent = track.title;
+      const estacion = ESTACIONES_RADIO[indiceEstacion];
+      trackTitle.textContent = estacion.title;
       trackTitle.style.color = "#fff";
-      trackTitle.title = track.title;
-      audioElement.src = track.file;
+      trackTitle.title = estacion.title;
 
       actualizarMarquesina();
 
-      if (iniciarReproduccion) {
+      if (reproducir) {
+        // Al ser radio en vivo, asignamos el stream y reproducimos al instante
+        audioElement.src = estacion.streamUrl;
         audioElement.play()
           .then(() => actualizarEstadoPlay(true))
-          .catch(e => {
-            console.warn("Autoplay bloqueado por navegador:", e);
-            actualizarEstadoPlay(false);
-          });
+          .catch(() => actualizarEstadoPlay(false));
       }
     }
 
-    audioElement.addEventListener("error", () => {
-      const ruta = LISTA_CANCIONES[indiceCancion]?.file || "";
-      trackTitle.textContent = `⚠️ No encontrada (${ruta})`;
-      trackTitle.style.color = "#ff4d4d";
-      actualizarEstadoPlay(false);
-      actualizarMarquesina();
-    });
-
-    audioElement.addEventListener("canplay", () => {
-      trackTitle.style.color = "#fff";
-    });
-
     function alternarPlayPausa() {
-      if (!audioElement.src || audioElement.src === "") {
-        cargarPista(indiceCancion, true);
-        return;
-      }
-
-      if (audioElement.paused) {
+      if (audioElement.paused || !audioElement.src) {
+        // Conectar a la emisión en directo en tiempo real
+        audioElement.src = ESTACIONES_RADIO[indiceEstacion].streamUrl;
         audioElement.play()
           .then(() => actualizarEstadoPlay(true))
-          .catch(e => {
-            console.warn("Fallo al reproducir:", e);
-            actualizarEstadoPlay(false);
-          });
+          .catch(() => actualizarEstadoPlay(false));
       } else {
         audioElement.pause();
+        audioElement.src = ""; // Corta la conexión para no gastar datos de fondo
         actualizarEstadoPlay(false);
       }
     }
 
-    function actualizarEstadoPlay(estaSonando) {
-      if (estaSonando) {
+    function actualizarEstadoPlay(sonando) {
+      if (sonando) {
         playIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>`;
         vinylRecord.classList.add("spinning");
       } else {
@@ -2219,11 +2195,13 @@
     btnPlay.addEventListener("click", alternarPlayPausa);
 
     btnNext.addEventListener("click", () => {
-      cargarPista(indiceCancion + 1, !audioElement.paused);
+      const estabaSonando = !audioElement.paused && audioElement.src !== "";
+      cargarEstacion(indiceEstacion + 1, estabaSonando);
     });
 
     btnPrev.addEventListener("click", () => {
-      cargarPista(indiceCancion - 1, !audioElement.paused);
+      const estabaSonando = !audioElement.paused && audioElement.src !== "";
+      cargarEstacion(indiceEstacion - 1, estabaSonando);
     });
 
     volSlider.addEventListener("input", (e) => {
@@ -2254,11 +2232,8 @@
       }
     }
 
-    audioElement.addEventListener("ended", () => {
-      cargarPista(indiceCancion + 1, true);
-    });
-
-    cargarPista(0, false);
+    // Cargar la primera emisora en espera (sin reproducir hasta que el usuario dé a play)
+    cargarEstacion(0, false);
 
     // =====================================================================
     // 4. CONTROL INTELIGENTE DE VÍDEOS DE SECCIONES (PAUSA FUERA DE VISTA)
