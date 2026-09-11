@@ -1,0 +1,892 @@
+2026-09-11 22:30:53,348 [INFO] === INICIANDO HOLLOWDRIVE V12.5 ===
+2026-09-11 22:30:53,349 [INFO] Ruta base del programa: D:\Documents\vscode\SAVIN-HOLLOWDRIVE
+2026-09-11 22:30:53,349 [INFO] Archivo de registro de la sesión: D:\Documents\vscode\SAVIN-HOLLOWDRIVE\logs\hollowdrive_2026-09-11_22-30-51.log
+2026-09-11 22:30:53,351 [DEBUG] Starting new HTTPS connection (1): raw.githubusercontent.com:443
+2026-09-11 22:30:53,585 [DEBUG] https://raw.githubusercontent.com:443 "GET /MVP-Savyn/SAVIN-HOLLOWDRIVE/main/engine/mirrors.json HTTP/1.1" 200 577
+2026-09-11 22:30:53,586 [INFO] [MIRRORS] mirrors.json actualizado dinámicamente desde GitHub.
+2026-09-11 22:30:53,716 [DEBUG] Importing PngImagePlugin
+2026-09-11 22:30:53,727 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,728 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,728 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,728 [DEBUG] STREAM b'iTXt' 254 1377
+2026-09-11 22:30:53,728 [DEBUG] STREAM b'IDAT' 1643 8192
+2026-09-11 22:30:53,728 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,728 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,729 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,729 [DEBUG] STREAM b'iTXt' 254 1377
+2026-09-11 22:30:53,729 [DEBUG] STREAM b'IDAT' 1643 8192
+2026-09-11 22:30:53,729 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,729 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,729 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,729 [DEBUG] STREAM b'iTXt' 254 1379
+2026-09-11 22:30:53,730 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-09-11 22:30:53,730 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,730 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,730 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,730 [DEBUG] STREAM b'iTXt' 254 1379
+2026-09-11 22:30:53,730 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-09-11 22:30:53,730 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'iTXt' 254 1390
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'IDAT' 1656 8192
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,731 [DEBUG] STREAM b'iTXt' 254 1379
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'IDAT' 1645 8192
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'iTXt' 254 1386
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,732 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,733 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,733 [DEBUG] STREAM b'iTXt' 254 1390
+2026-09-11 22:30:53,733 [DEBUG] STREAM b'IDAT' 1656 8192
+2026-09-11 22:30:53,733 [DEBUG] Importing GifImagePlugin
+2026-09-11 22:30:53,742 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,742 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,742 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,742 [DEBUG] STREAM b'iTXt' 254 1386
+2026-09-11 22:30:53,742 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-09-11 22:30:53,743 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:53,743 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:53,743 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:53,743 [DEBUG] STREAM b'iTXt' 254 1386
+2026-09-11 22:30:53,743 [DEBUG] STREAM b'IDAT' 1652 8192
+2026-09-11 22:30:54,680 [INFO] ✔ Proceso Watchdog de soporte iniciado para PID 28808
+-> Usando tamaño local predefinido para bato_64: 0 bytes.
+-> Usando tamaño local predefinido para batocera_64: 0 bytes.
+-> Usando tamaño local predefinido para bato_32: 0 bytes.
+-> Usando tamaño local predefinido para batocera_32: 0 bytes.
+-> Usando tamaño local predefinido para pack_hollow: 0 bytes.
+-> Usando tamaño local predefinido para pack_hollow: 0 bytes.
+2026-09-11 22:30:55,061 [DEBUG] STREAM b'IHDR' 16 13
+2026-09-11 22:30:55,061 [DEBUG] STREAM b'eXIf' 41 180
+2026-09-11 22:30:55,062 [DEBUG] STREAM b'pHYs' 233 9
+2026-09-11 22:30:55,062 [DEBUG] STREAM b'iTXt' 254 1377
+2026-09-11 22:30:55,062 [DEBUG] STREAM b'IDAT' 1643 8192
+2026-09-11 22:30:55,721 [DEBUG] Starting new HTTPS connection (1): api.github.com:443
+2026-09-11 22:30:56,284 [DEBUG] https://api.github.com:443 "GET /repos/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest HTTP/1.1" 200 976
+2026-09-11 22:32:00,852 [DEBUG] Starting new HTTPS connection (1): huggingface.co:443
+2026-09-11 22:32:01,180 [DEBUG] https://huggingface.co:443 "HEAD / HTTP/1.1" 200 0
+2026-09-11 22:32:29,331 [INFO] Exclusión de Windows Defender añadida para: F:\
+2026-09-11 22:32:29,372 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-09-11 22:32:30,006 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "HEAD /HollowdrivePackV1.tar HTTP/1.1" 200 0
+2026-09-11 22:32:30,507 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "GET /HollowdrivePackV1.tar HTTP/1.1" 200 8661701120
+2026-09-11 22:39:23,555 [INFO] ✔ Parte descargada con éxito (8260.4 MB).
+2026-09-11 22:39:23,562 [DEBUG] Starting new HTTPS connection (1): pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443
+2026-09-11 22:39:24,037 [DEBUG] https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443 "HEAD /batocerumen.img HTTP/1.1" 200 0
+2026-09-11 22:39:24,135 [DEBUG] https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev:443 "GET /batocerumen.img HTTP/1.1" 200 4949278720
+2026-09-11 22:41:02,830 [INFO] ✔ Parte descargada con éxito (4720.0 MB).
+[+] Letra asignada dinámicamente para GRUB: G:
+2026-09-11 22:41:09,747 [INFO] =======================================================
+2026-09-11 22:41:09,747 [INFO] [DIAGNÓSTICO RAM] Iniciando Stream Directo a USB: \\.\G:
+2026-09-11 22:41:09,747 [INFO] =======================================================
+2026-09-11 22:41:09,750 [DEBUG] Starting new HTTPS connection (1): pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443
+2026-09-11 22:41:10,012 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "HEAD /grub_boot.img HTTP/1.1" 200 0
+2026-09-11 22:41:10,013 [INFO] [RAM -> USB] Llenando colchón inicial de precarga en RAM...
+2026-09-11 22:41:10,134 [DEBUG] https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev:443 "GET /grub_boot.img HTTP/1.1" 200 537587712
+2026-09-11 22:41:10,204 [INFO] [RED -> RAM] Descargados: 0 MB | Vel. Red: 2.6 MB/s | Cola: 1/256
+2026-09-11 22:41:10,973 [INFO] [  4.9%] [RAM -> USB] 25 MB | WriteFile:     1 ms | Cola:  24/256
+2026-09-11 22:41:11,256 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 40.2 MB/s | Cola: 1/256
+2026-09-11 22:41:11,257 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 40.6 MB/s | Cola: 2/256
+2026-09-11 22:41:11,258 [INFO] [  9.8%] [RAM -> USB] 50 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:41:11,756 [INFO] [ 14.6%] [RAM -> USB] 75 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:12,219 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 45.3 MB/s | Cola: 1/256
+2026-09-11 22:41:12,220 [INFO] [ 19.5%] [RAM -> USB] 100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:12,245 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 45.0 MB/s | Cola: 1/256
+2026-09-11 22:41:12,794 [INFO] [ 24.4%] [RAM -> USB] 125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:13,375 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 44.6 MB/s | Cola: 1/256
+2026-09-11 22:41:13,377 [INFO] [ 29.3%] [RAM -> USB] 150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:13,383 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 44.7 MB/s | Cola: 1/256
+2026-09-11 22:41:13,972 [INFO] [ 34.1%] [RAM -> USB] 175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:14,573 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 43.9 MB/s | Cola: 1/256
+2026-09-11 22:41:14,575 [INFO] [ 39.0%] [RAM -> USB] 200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:14,586 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 43.8 MB/s | Cola: 1/256
+2026-09-11 22:41:15,097 [INFO] [ 43.9%] [RAM -> USB] 225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:15,744 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 43.6 MB/s | Cola: 1/256
+2026-09-11 22:41:15,745 [INFO] [ 48.8%] [RAM -> USB] 250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:15,759 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 43.6 MB/s | Cola: 1/256
+2026-09-11 22:41:16,446 [INFO] [ 53.6%] [RAM -> USB] 275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:17,128 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 42.2 MB/s | Cola: 1/256
+2026-09-11 22:41:17,129 [INFO] [ 58.5%] [RAM -> USB] 300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:17,136 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 42.2 MB/s | Cola: 1/256
+2026-09-11 22:41:17,602 [INFO] [ 63.4%] [RAM -> USB] 325 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:41:18,106 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 43.2 MB/s | Cola: 3/256
+2026-09-11 22:41:18,109 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 43.3 MB/s | Cola: 2/256
+2026-09-11 22:41:18,111 [INFO] [ 68.3%] [RAM -> USB] 350 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:41:18,723 [INFO] [ 73.1%] [RAM -> USB] 375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:19,322 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 43.0 MB/s | Cola: 1/256
+2026-09-11 22:41:19,323 [INFO] [ 78.0%] [RAM -> USB] 400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:19,334 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 43.0 MB/s | Cola: 1/256
+2026-09-11 22:41:19,843 [INFO] [ 82.9%] [RAM -> USB] 425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:20,368 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 43.5 MB/s | Cola: 1/256
+2026-09-11 22:41:20,370 [INFO] [ 87.8%] [RAM -> USB] 450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:20,376 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 43.5 MB/s | Cola: 1/256
+2026-09-11 22:41:20,977 [INFO] [ 92.6%] [RAM -> USB] 475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:21,499 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 43.5 MB/s | Cola: 1/256
+2026-09-11 22:41:21,501 [INFO] [ 97.5%] [RAM -> USB] 500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:21,506 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 43.5 MB/s | Cola: 1/256
+2026-09-11 22:41:21,737 [INFO] ✔ Parte descargada con éxito (512.7 MB).
+2026-09-11 22:41:21,748 [INFO] =======================================================
+
+[+] Letra asignada dinámicamente para CachyOS: H:
+2026-09-11 22:41:28,839 [INFO] =======================================================
+2026-09-11 22:41:28,839 [INFO] [DIAGNÓSTICO RAM] Iniciando Stream Directo a USB: \\.\H:
+2026-09-11 22:41:28,840 [INFO] =======================================================
+2026-09-11 22:41:28,843 [DEBUG] Starting new HTTPS connection (1): pub-a129edcf7e704b7b925dfafc7a876a15.r2.dev:443
+2026-09-11 22:41:29,423 [DEBUG] https://pub-a129edcf7e704b7b925dfafc7a876a15.r2.dev:443 "HEAD /cachyos_system.img HTTP/1.1" 200 0
+2026-09-11 22:41:29,424 [INFO] [RAM -> USB] Llenando colchón inicial de precarga en RAM...
+2026-09-11 22:41:29,758 [DEBUG] https://pub-a129edcf7e704b7b925dfafc7a876a15.r2.dev:443 "GET /cachyos_system.img HTTP/1.1" 200 9799991296
+2026-09-11 22:41:29,843 [INFO] [RED -> RAM] Descargados: 0 MB | Vel. Red: 1.2 MB/s | Cola: 1/256
+2026-09-11 22:41:31,366 [INFO] [  0.3%] [RAM -> USB] 25 MB | WriteFile:     1 ms | Cola:  26/256
+2026-09-11 22:41:31,620 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 22.8 MB/s | Cola: 1/256
+2026-09-11 22:41:31,622 [INFO] [  0.5%] [RAM -> USB] 50 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:31,677 [INFO] [RED -> RAM] Descargados: 50 MB | Vel. Red: 22.4 MB/s | Cola: 1/256
+2026-09-11 22:41:32,467 [INFO] [  0.8%] [RAM -> USB] 75 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:33,605 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:41:33,606 [INFO] [  1.1%] [RAM -> USB] 100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:33,653 [INFO] [RED -> RAM] Descargados: 100 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:41:34,239 [INFO] [  1.3%] [RAM -> USB] 125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:35,837 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:41:35,839 [INFO] [  1.6%] [RAM -> USB] 150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:36,035 [INFO] [RED -> RAM] Descargados: 150 MB | Vel. Red: 22.8 MB/s | Cola: 1/256
+2026-09-11 22:41:37,583 [INFO] [  1.9%] [RAM -> USB] 175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:38,493 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 22.1 MB/s | Cola: 1/256
+2026-09-11 22:41:38,494 [INFO] [  2.1%] [RAM -> USB] 200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:38,582 [INFO] [RED -> RAM] Descargados: 200 MB | Vel. Red: 21.9 MB/s | Cola: 1/256
+2026-09-11 22:41:39,637 [INFO] [  2.4%] [RAM -> USB] 225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:40,911 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 21.8 MB/s | Cola: 1/256
+2026-09-11 22:41:40,913 [INFO] [  2.7%] [RAM -> USB] 250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:41,091 [INFO] [RED -> RAM] Descargados: 250 MB | Vel. Red: 21.5 MB/s | Cola: 1/256
+2026-09-11 22:41:41,947 [INFO] [  2.9%] [RAM -> USB] 275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:42,725 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 22.6 MB/s | Cola: 1/256
+2026-09-11 22:41:42,726 [INFO] [  3.2%] [RAM -> USB] 300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:42,732 [INFO] [RED -> RAM] Descargados: 300 MB | Vel. Red: 22.6 MB/s | Cola: 1/256
+2026-09-11 22:41:43,624 [INFO] [  3.5%] [RAM -> USB] 325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:44,799 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 22.8 MB/s | Cola: 2/256
+2026-09-11 22:41:44,802 [INFO] [  3.7%] [RAM -> USB] 350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:44,844 [INFO] [RED -> RAM] Descargados: 350 MB | Vel. Red: 22.7 MB/s | Cola: 1/256
+2026-09-11 22:41:45,687 [INFO] [  4.0%] [RAM -> USB] 375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:46,545 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:41:46,547 [INFO] [  4.3%] [RAM -> USB] 400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:46,609 [INFO] [RED -> RAM] Descargados: 400 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:41:47,470 [INFO] [  4.5%] [RAM -> USB] 425 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:41:48,464 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 23.6 MB/s | Cola: 3/256
+2026-09-11 22:41:48,468 [INFO] [  4.8%] [RAM -> USB] 450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:48,763 [INFO] [RED -> RAM] Descargados: 450 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:41:49,967 [INFO] [  5.1%] [RAM -> USB] 475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:51,215 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 22.9 MB/s | Cola: 1/256
+2026-09-11 22:41:51,217 [INFO] [  5.3%] [RAM -> USB] 500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:51,251 [INFO] [RED -> RAM] Descargados: 500 MB | Vel. Red: 22.9 MB/s | Cola: 1/256
+2026-09-11 22:41:52,095 [INFO] [  5.6%] [RAM -> USB] 525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:53,223 [INFO] [RED -> RAM] Descargados: 550 MB | Vel. Red: 23.1 MB/s | Cola: 1/256
+2026-09-11 22:41:53,224 [INFO] [  5.9%] [RAM -> USB] 550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:53,313 [INFO] [RED -> RAM] Descargados: 550 MB | Vel. Red: 23.0 MB/s | Cola: 1/256
+2026-09-11 22:41:54,368 [INFO] [  6.2%] [RAM -> USB] 575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:55,828 [INFO] [RED -> RAM] Descargados: 600 MB | Vel. Red: 22.7 MB/s | Cola: 2/256
+2026-09-11 22:41:55,831 [INFO] [  6.4%] [RAM -> USB] 600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:56,039 [INFO] [RED -> RAM] Descargados: 600 MB | Vel. Red: 22.6 MB/s | Cola: 1/256
+2026-09-11 22:41:56,965 [INFO] [  6.7%] [RAM -> USB] 625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:57,905 [INFO] [RED -> RAM] Descargados: 650 MB | Vel. Red: 22.8 MB/s | Cola: 3/256
+2026-09-11 22:41:57,909 [INFO] [  7.0%] [RAM -> USB] 650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:58,024 [INFO] [RED -> RAM] Descargados: 650 MB | Vel. Red: 22.7 MB/s | Cola: 1/256
+2026-09-11 22:41:58,782 [INFO] [  7.2%] [RAM -> USB] 675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:59,628 [INFO] [RED -> RAM] Descargados: 700 MB | Vel. Red: 23.2 MB/s | Cola: 1/256
+2026-09-11 22:41:59,629 [INFO] [  7.5%] [RAM -> USB] 700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:41:59,792 [INFO] [RED -> RAM] Descargados: 700 MB | Vel. Red: 23.1 MB/s | Cola: 1/256
+2026-09-11 22:42:00,893 [INFO] [  7.8%] [RAM -> USB] 725 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:01,537 [INFO] [RED -> RAM] Descargados: 750 MB | Vel. Red: 23.4 MB/s | Cola: 2/256
+2026-09-11 22:42:01,540 [INFO] [  8.0%] [RAM -> USB] 750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:01,625 [INFO] [RED -> RAM] Descargados: 750 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:42:02,938 [INFO] [  8.3%] [RAM -> USB] 775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:03,745 [INFO] [RED -> RAM] Descargados: 800 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:42:03,746 [INFO] [  8.6%] [RAM -> USB] 800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:03,890 [INFO] [RED -> RAM] Descargados: 800 MB | Vel. Red: 23.2 MB/s | Cola: 1/256
+2026-09-11 22:42:04,945 [INFO] [  8.8%] [RAM -> USB] 825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:06,181 [INFO] [RED -> RAM] Descargados: 850 MB | Vel. Red: 23.1 MB/s | Cola: 4/256
+2026-09-11 22:42:06,187 [INFO] [  9.1%] [RAM -> USB] 850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:06,465 [INFO] [RED -> RAM] Descargados: 850 MB | Vel. Red: 23.0 MB/s | Cola: 1/256
+2026-09-11 22:42:07,558 [INFO] [  9.4%] [RAM -> USB] 875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:08,708 [INFO] [RED -> RAM] Descargados: 900 MB | Vel. Red: 22.9 MB/s | Cola: 1/256
+2026-09-11 22:42:08,708 [INFO] [RED -> RAM] Descargados: 900 MB | Vel. Red: 22.9 MB/s | Cola: 1/256
+2026-09-11 22:42:08,709 [INFO] [  9.6%] [RAM -> USB] 900 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:42:09,760 [INFO] [  9.9%] [RAM -> USB] 925 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:10,448 [INFO] [RED -> RAM] Descargados: 950 MB | Vel. Red: 23.2 MB/s | Cola: 3/256
+2026-09-11 22:42:10,452 [INFO] [ 10.2%] [RAM -> USB] 950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:10,535 [INFO] [RED -> RAM] Descargados: 950 MB | Vel. Red: 23.1 MB/s | Cola: 1/256
+2026-09-11 22:42:11,850 [INFO] [ 10.4%] [RAM -> USB] 975 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:42:12,857 [INFO] [RED -> RAM] Descargados: 1000 MB | Vel. Red: 23.0 MB/s | Cola: 1/256
+2026-09-11 22:42:12,858 [INFO] [RED -> RAM] Descargados: 1000 MB | Vel. Red: 23.0 MB/s | Cola: 2/256
+2026-09-11 22:42:12,860 [INFO] [ 10.7%] [RAM -> USB] 1000 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:42:13,668 [INFO] [ 11.0%] [RAM -> USB] 1025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:14,492 [INFO] [RED -> RAM] Descargados: 1050 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:42:14,494 [INFO] [ 11.2%] [RAM -> USB] 1050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:14,527 [INFO] [RED -> RAM] Descargados: 1050 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:42:15,686 [INFO] [ 11.5%] [RAM -> USB] 1075 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:42:16,371 [INFO] [RED -> RAM] Descargados: 1100 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:42:16,373 [INFO] [ 11.8%] [RAM -> USB] 1100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:16,377 [INFO] [RED -> RAM] Descargados: 1100 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:42:17,297 [INFO] [ 12.0%] [RAM -> USB] 1125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:18,455 [INFO] [RED -> RAM] Descargados: 1150 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:42:18,456 [INFO] [ 12.3%] [RAM -> USB] 1150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:18,596 [INFO] [RED -> RAM] Descargados: 1150 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:42:19,269 [INFO] [ 12.6%] [RAM -> USB] 1175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:20,339 [INFO] [RED -> RAM] Descargados: 1200 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:42:20,340 [INFO] [ 12.8%] [RAM -> USB] 1200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:20,360 [INFO] [RED -> RAM] Descargados: 1200 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:42:21,364 [INFO] [ 13.1%] [RAM -> USB] 1225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:22,339 [INFO] [RED -> RAM] Descargados: 1250 MB | Vel. Red: 23.6 MB/s | Cola: 3/256
+2026-09-11 22:42:22,339 [INFO] [RED -> RAM] Descargados: 1250 MB | Vel. Red: 23.6 MB/s | Cola: 3/256
+2026-09-11 22:42:22,343 [INFO] [ 13.4%] [RAM -> USB] 1250 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:42:23,572 [INFO] [ 13.6%] [RAM -> USB] 1275 MB | WriteFile:     4 ms | Cola:   0/256
+2026-09-11 22:42:24,444 [INFO] [RED -> RAM] Descargados: 1300 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:42:24,445 [INFO] [RED -> RAM] Descargados: 1300 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:42:24,446 [INFO] [ 13.9%] [RAM -> USB] 1300 MB | WriteFile:     1 ms | Cola:   3/256
+2026-09-11 22:42:25,362 [INFO] [ 14.2%] [RAM -> USB] 1325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:26,252 [INFO] [RED -> RAM] Descargados: 1350 MB | Vel. Red: 23.8 MB/s | Cola: 2/256
+2026-09-11 22:42:26,255 [INFO] [ 14.4%] [RAM -> USB] 1350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:26,337 [INFO] [RED -> RAM] Descargados: 1350 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:42:27,251 [INFO] [ 14.7%] [RAM -> USB] 1375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:27,993 [INFO] [RED -> RAM] Descargados: 1400 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:42:27,995 [INFO] [ 15.0%] [RAM -> USB] 1400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:28,013 [INFO] [RED -> RAM] Descargados: 1400 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:42:29,218 [INFO] [ 15.2%] [RAM -> USB] 1425 MB | WriteFile:     4 ms | Cola:   0/256
+2026-09-11 22:42:30,164 [INFO] [RED -> RAM] Descargados: 1450 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:42:30,165 [INFO] [ 15.5%] [RAM -> USB] 1450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:30,174 [INFO] [RED -> RAM] Descargados: 1450 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:42:31,278 [INFO] [ 15.8%] [RAM -> USB] 1475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:32,170 [INFO] [RED -> RAM] Descargados: 1500 MB | Vel. Red: 23.9 MB/s | Cola: 2/256
+2026-09-11 22:42:32,173 [INFO] [ 16.0%] [RAM -> USB] 1500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:32,354 [INFO] [RED -> RAM] Descargados: 1500 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:42:33,468 [INFO] [ 16.3%] [RAM -> USB] 1525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:34,436 [INFO] [RED -> RAM] Descargados: 1550 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:42:34,437 [INFO] [ 16.6%] [RAM -> USB] 1550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:34,448 [INFO] [RED -> RAM] Descargados: 1550 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:42:35,451 [INFO] [ 16.9%] [RAM -> USB] 1575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:36,048 [INFO] [RED -> RAM] Descargados: 1600 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:36,050 [INFO] [ 17.1%] [RAM -> USB] 1600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:36,057 [INFO] [RED -> RAM] Descargados: 1600 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:37,225 [INFO] [ 17.4%] [RAM -> USB] 1625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:38,701 [INFO] [RED -> RAM] Descargados: 1650 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:42:38,702 [INFO] [ 17.7%] [RAM -> USB] 1650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:38,742 [INFO] [RED -> RAM] Descargados: 1650 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:42:39,531 [INFO] [ 17.9%] [RAM -> USB] 1675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:40,682 [INFO] [RED -> RAM] Descargados: 1700 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:42:40,683 [INFO] [ 18.2%] [RAM -> USB] 1700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:40,832 [INFO] [RED -> RAM] Descargados: 1700 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:42:41,638 [INFO] [ 18.5%] [RAM -> USB] 1725 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:42,305 [INFO] [RED -> RAM] Descargados: 1750 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:42,307 [INFO] [ 18.7%] [RAM -> USB] 1750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:42,455 [INFO] [RED -> RAM] Descargados: 1750 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:43,369 [INFO] [ 19.0%] [RAM -> USB] 1775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:44,225 [INFO] [RED -> RAM] Descargados: 1800 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:42:44,227 [INFO] [ 19.3%] [RAM -> USB] 1800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:44,302 [INFO] [RED -> RAM] Descargados: 1800 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:45,341 [INFO] [ 19.5%] [RAM -> USB] 1825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:46,361 [INFO] [RED -> RAM] Descargados: 1850 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:46,362 [INFO] [ 19.8%] [RAM -> USB] 1850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:46,364 [INFO] [RED -> RAM] Descargados: 1850 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:42:47,090 [INFO] [ 20.1%] [RAM -> USB] 1875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:48,512 [INFO] [RED -> RAM] Descargados: 1900 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:48,514 [INFO] [ 20.3%] [RAM -> USB] 1900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:48,745 [INFO] [RED -> RAM] Descargados: 1900 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:49,446 [INFO] [ 20.6%] [RAM -> USB] 1925 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:50,289 [INFO] [RED -> RAM] Descargados: 1950 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:42:50,290 [INFO] [ 20.9%] [RAM -> USB] 1950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:50,529 [INFO] [RED -> RAM] Descargados: 1950 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:42:51,782 [INFO] [ 21.1%] [RAM -> USB] 1975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:52,968 [INFO] [RED -> RAM] Descargados: 2000 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:42:52,970 [INFO] [ 21.4%] [RAM -> USB] 2000 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:53,062 [INFO] [RED -> RAM] Descargados: 2000 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:42:53,696 [INFO] [ 21.7%] [RAM -> USB] 2025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:54,528 [INFO] [RED -> RAM] Descargados: 2050 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:42:54,530 [INFO] [ 21.9%] [RAM -> USB] 2050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:54,653 [INFO] [RED -> RAM] Descargados: 2050 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:42:55,458 [INFO] [ 22.2%] [RAM -> USB] 2075 MB | WriteFile:     4 ms | Cola:   0/256
+2026-09-11 22:42:56,384 [INFO] [RED -> RAM] Descargados: 2100 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:42:56,386 [INFO] [ 22.5%] [RAM -> USB] 2100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:56,404 [INFO] [RED -> RAM] Descargados: 2100 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:42:57,253 [INFO] [ 22.7%] [RAM -> USB] 2125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:58,191 [INFO] [RED -> RAM] Descargados: 2150 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:42:58,193 [INFO] [ 23.0%] [RAM -> USB] 2150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:42:58,285 [INFO] [RED -> RAM] Descargados: 2150 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:42:59,494 [INFO] [ 23.3%] [RAM -> USB] 2175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:00,281 [INFO] [RED -> RAM] Descargados: 2200 MB | Vel. Red: 24.2 MB/s | Cola: 2/256
+2026-09-11 22:43:00,284 [INFO] [ 23.5%] [RAM -> USB] 2200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:00,336 [INFO] [RED -> RAM] Descargados: 2200 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:01,083 [INFO] [ 23.8%] [RAM -> USB] 2225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:02,065 [INFO] [RED -> RAM] Descargados: 2250 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:02,066 [INFO] [RED -> RAM] Descargados: 2250 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:02,067 [INFO] [ 24.1%] [RAM -> USB] 2250 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:43:02,998 [INFO] [ 24.3%] [RAM -> USB] 2275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:03,990 [INFO] [RED -> RAM] Descargados: 2300 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:03,991 [INFO] [ 24.6%] [RAM -> USB] 2300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:04,291 [INFO] [RED -> RAM] Descargados: 2300 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:05,049 [INFO] [ 24.9%] [RAM -> USB] 2325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:06,243 [INFO] [RED -> RAM] Descargados: 2350 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:06,245 [INFO] [ 25.1%] [RAM -> USB] 2350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:06,473 [INFO] [RED -> RAM] Descargados: 2350 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:07,547 [INFO] [ 25.4%] [RAM -> USB] 2375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:08,299 [INFO] [RED -> RAM] Descargados: 2400 MB | Vel. Red: 24.3 MB/s | Cola: 2/256
+2026-09-11 22:43:08,302 [INFO] [ 25.7%] [RAM -> USB] 2400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:08,392 [INFO] [RED -> RAM] Descargados: 2400 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:09,739 [INFO] [ 25.9%] [RAM -> USB] 2425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:10,720 [INFO] [RED -> RAM] Descargados: 2450 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:10,721 [INFO] [ 26.2%] [RAM -> USB] 2450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:10,764 [INFO] [RED -> RAM] Descargados: 2450 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:11,659 [INFO] [ 26.5%] [RAM -> USB] 2475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:12,924 [INFO] [RED -> RAM] Descargados: 2500 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:12,926 [INFO] [ 26.7%] [RAM -> USB] 2500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:12,976 [INFO] [RED -> RAM] Descargados: 2500 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:14,158 [INFO] [ 27.0%] [RAM -> USB] 2525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:15,074 [INFO] [RED -> RAM] Descargados: 2550 MB | Vel. Red: 24.1 MB/s | Cola: 2/256
+2026-09-11 22:43:15,080 [INFO] [ 27.3%] [RAM -> USB] 2550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:15,177 [INFO] [RED -> RAM] Descargados: 2550 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:16,207 [INFO] [ 27.6%] [RAM -> USB] 2575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:17,559 [INFO] [RED -> RAM] Descargados: 2600 MB | Vel. Red: 24.0 MB/s | Cola: 2/256
+2026-09-11 22:43:17,562 [INFO] [ 27.8%] [RAM -> USB] 2600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:17,605 [INFO] [RED -> RAM] Descargados: 2600 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:43:18,589 [INFO] [ 28.1%] [RAM -> USB] 2625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:19,393 [INFO] [RED -> RAM] Descargados: 2650 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:19,395 [INFO] [ 28.4%] [RAM -> USB] 2650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:19,416 [INFO] [RED -> RAM] Descargados: 2650 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:20,321 [INFO] [ 28.6%] [RAM -> USB] 2675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:21,419 [INFO] [RED -> RAM] Descargados: 2700 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:21,420 [INFO] [ 28.9%] [RAM -> USB] 2700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:21,697 [INFO] [RED -> RAM] Descargados: 2700 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:22,767 [INFO] [ 29.2%] [RAM -> USB] 2725 MB | WriteFile:     4 ms | Cola:   0/256
+2026-09-11 22:43:23,767 [INFO] [RED -> RAM] Descargados: 2750 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:23,769 [INFO] [ 29.4%] [RAM -> USB] 2750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:23,777 [INFO] [RED -> RAM] Descargados: 2750 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:24,733 [INFO] [ 29.7%] [RAM -> USB] 2775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:25,716 [INFO] [RED -> RAM] Descargados: 2800 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:25,717 [INFO] [ 30.0%] [RAM -> USB] 2800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:25,900 [INFO] [RED -> RAM] Descargados: 2800 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:43:26,768 [INFO] [ 30.2%] [RAM -> USB] 2825 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:43:27,531 [INFO] [RED -> RAM] Descargados: 2850 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:27,532 [INFO] [ 30.5%] [RAM -> USB] 2850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:27,627 [INFO] [RED -> RAM] Descargados: 2850 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:28,662 [INFO] [ 30.8%] [RAM -> USB] 2875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:29,795 [INFO] [RED -> RAM] Descargados: 2900 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:29,796 [INFO] [ 31.0%] [RAM -> USB] 2900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:29,859 [INFO] [RED -> RAM] Descargados: 2900 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:30,815 [INFO] [ 31.3%] [RAM -> USB] 2925 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:31,681 [INFO] [RED -> RAM] Descargados: 2950 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:31,682 [INFO] [ 31.6%] [RAM -> USB] 2950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:31,819 [INFO] [RED -> RAM] Descargados: 2950 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:32,787 [INFO] [ 31.8%] [RAM -> USB] 2975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:34,138 [INFO] [RED -> RAM] Descargados: 3000 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:34,139 [INFO] [ 32.1%] [RAM -> USB] 3000 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:34,147 [INFO] [RED -> RAM] Descargados: 3000 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:43:34,798 [INFO] [ 32.4%] [RAM -> USB] 3025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:35,651 [INFO] [RED -> RAM] Descargados: 3050 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:35,652 [INFO] [ 32.6%] [RAM -> USB] 3050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:35,681 [INFO] [RED -> RAM] Descargados: 3050 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:36,490 [INFO] [ 32.9%] [RAM -> USB] 3075 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:37,296 [INFO] [RED -> RAM] Descargados: 3100 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:37,297 [INFO] [ 33.2%] [RAM -> USB] 3100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:37,375 [INFO] [RED -> RAM] Descargados: 3100 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:38,668 [INFO] [ 33.4%] [RAM -> USB] 3125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:39,339 [INFO] [RED -> RAM] Descargados: 3150 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:39,341 [INFO] [ 33.7%] [RAM -> USB] 3150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:39,351 [INFO] [RED -> RAM] Descargados: 3150 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:40,898 [INFO] [ 34.0%] [RAM -> USB] 3175 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:43:41,652 [INFO] [RED -> RAM] Descargados: 3200 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:41,653 [INFO] [ 34.2%] [RAM -> USB] 3200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:41,698 [INFO] [RED -> RAM] Descargados: 3200 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:42,532 [INFO] [ 34.5%] [RAM -> USB] 3225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:43,455 [INFO] [RED -> RAM] Descargados: 3250 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:43,456 [INFO] [ 34.8%] [RAM -> USB] 3250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:43,478 [INFO] [RED -> RAM] Descargados: 3250 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:44,868 [INFO] [ 35.0%] [RAM -> USB] 3275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:45,733 [INFO] [RED -> RAM] Descargados: 3300 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:45,734 [INFO] [ 35.3%] [RAM -> USB] 3300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:45,826 [INFO] [RED -> RAM] Descargados: 3300 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:46,609 [INFO] [ 35.6%] [RAM -> USB] 3325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:47,674 [INFO] [RED -> RAM] Descargados: 3350 MB | Vel. Red: 24.2 MB/s | Cola: 2/256
+2026-09-11 22:43:47,678 [INFO] [ 35.8%] [RAM -> USB] 3350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:47,770 [INFO] [RED -> RAM] Descargados: 3350 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:48,631 [INFO] [ 36.1%] [RAM -> USB] 3375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:49,563 [INFO] [RED -> RAM] Descargados: 3400 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:49,565 [INFO] [ 36.4%] [RAM -> USB] 3400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:49,596 [INFO] [RED -> RAM] Descargados: 3400 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:50,695 [INFO] [ 36.6%] [RAM -> USB] 3425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:51,707 [INFO] [RED -> RAM] Descargados: 3450 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:43:51,708 [INFO] [RED -> RAM] Descargados: 3450 MB | Vel. Red: 24.3 MB/s | Cola: 2/256
+2026-09-11 22:43:51,710 [INFO] [ 36.9%] [RAM -> USB] 3450 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:43:52,465 [INFO] [ 37.2%] [RAM -> USB] 3475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:53,394 [INFO] [RED -> RAM] Descargados: 3500 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:53,396 [INFO] [ 37.4%] [RAM -> USB] 3500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:53,487 [INFO] [RED -> RAM] Descargados: 3500 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:54,538 [INFO] [ 37.7%] [RAM -> USB] 3525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:55,659 [INFO] [RED -> RAM] Descargados: 3550 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:55,661 [INFO] [ 38.0%] [RAM -> USB] 3550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:55,695 [INFO] [RED -> RAM] Descargados: 3550 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:56,752 [INFO] [ 38.3%] [RAM -> USB] 3575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:57,614 [INFO] [RED -> RAM] Descargados: 3600 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:57,616 [INFO] [ 38.5%] [RAM -> USB] 3600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:43:57,840 [INFO] [RED -> RAM] Descargados: 3600 MB | Vel. Red: 24.3 MB/s | Cola: 1/256
+2026-09-11 22:43:59,161 [INFO] [ 38.8%] [RAM -> USB] 3625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:00,488 [INFO] [RED -> RAM] Descargados: 3650 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:00,490 [INFO] [ 39.1%] [RAM -> USB] 3650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:00,580 [INFO] [RED -> RAM] Descargados: 3650 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:01,324 [INFO] [ 39.3%] [RAM -> USB] 3675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:02,545 [INFO] [RED -> RAM] Descargados: 3700 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:02,546 [INFO] [ 39.6%] [RAM -> USB] 3700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:02,547 [INFO] [RED -> RAM] Descargados: 3700 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:03,198 [INFO] [ 39.9%] [RAM -> USB] 3725 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:04,466 [INFO] [RED -> RAM] Descargados: 3750 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:04,467 [INFO] [ 40.1%] [RAM -> USB] 3750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:04,468 [INFO] [RED -> RAM] Descargados: 3750 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:05,536 [INFO] [ 40.4%] [RAM -> USB] 3775 MB | WriteFile:     1 ms | Cola:   3/256
+2026-09-11 22:44:06,465 [INFO] [RED -> RAM] Descargados: 3800 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:06,466 [INFO] [ 40.7%] [RAM -> USB] 3800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:06,518 [INFO] [RED -> RAM] Descargados: 3800 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:07,421 [INFO] [ 40.9%] [RAM -> USB] 3825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:08,383 [INFO] [RED -> RAM] Descargados: 3850 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:08,385 [INFO] [ 41.2%] [RAM -> USB] 3850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:08,665 [INFO] [RED -> RAM] Descargados: 3850 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:09,728 [INFO] [ 41.5%] [RAM -> USB] 3875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:10,554 [INFO] [RED -> RAM] Descargados: 3900 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:10,555 [INFO] [ 41.7%] [RAM -> USB] 3900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:10,829 [INFO] [RED -> RAM] Descargados: 3900 MB | Vel. Red: 24.2 MB/s | Cola: 1/256
+2026-09-11 22:44:12,255 [INFO] [ 42.0%] [RAM -> USB] 3925 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:44:13,229 [INFO] [RED -> RAM] Descargados: 3950 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:44:13,231 [INFO] [ 42.3%] [RAM -> USB] 3950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:13,381 [INFO] [RED -> RAM] Descargados: 3950 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:44:14,549 [INFO] [ 42.5%] [RAM -> USB] 3975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:15,700 [INFO] [RED -> RAM] Descargados: 4000 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:44:15,701 [INFO] [ 42.8%] [RAM -> USB] 4000 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:15,996 [INFO] [RED -> RAM] Descargados: 4000 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:16,583 [INFO] [ 43.1%] [RAM -> USB] 4025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:17,698 [INFO] [RED -> RAM] Descargados: 4050 MB | Vel. Red: 24.1 MB/s | Cola: 1/256
+2026-09-11 22:44:17,700 [INFO] [ 43.3%] [RAM -> USB] 4050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:17,863 [INFO] [RED -> RAM] Descargados: 4050 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:18,817 [INFO] [ 43.6%] [RAM -> USB] 4075 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:20,381 [INFO] [RED -> RAM] Descargados: 4100 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:20,382 [INFO] [ 43.9%] [RAM -> USB] 4100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:20,419 [INFO] [RED -> RAM] Descargados: 4100 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:21,230 [INFO] [ 44.1%] [RAM -> USB] 4125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:22,255 [INFO] [RED -> RAM] Descargados: 4150 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:22,256 [INFO] [ 44.4%] [RAM -> USB] 4150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:22,357 [INFO] [RED -> RAM] Descargados: 4150 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:23,484 [INFO] [ 44.7%] [RAM -> USB] 4175 MB | WriteFile:     3 ms | Cola:   0/256
+2026-09-11 22:44:24,626 [INFO] [RED -> RAM] Descargados: 4200 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:24,628 [INFO] [ 44.9%] [RAM -> USB] 4200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:24,918 [INFO] [RED -> RAM] Descargados: 4200 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:44:25,684 [INFO] [ 45.2%] [RAM -> USB] 4225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:26,677 [INFO] [RED -> RAM] Descargados: 4250 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:26,679 [INFO] [ 45.5%] [RAM -> USB] 4250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:26,848 [INFO] [RED -> RAM] Descargados: 4250 MB | Vel. Red: 24.0 MB/s | Cola: 1/256
+2026-09-11 22:44:28,441 [INFO] [ 45.7%] [RAM -> USB] 4275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:29,747 [INFO] [RED -> RAM] Descargados: 4300 MB | Vel. Red: 23.8 MB/s | Cola: 2/256
+2026-09-11 22:44:29,750 [INFO] [ 46.0%] [RAM -> USB] 4300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:29,857 [INFO] [RED -> RAM] Descargados: 4300 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:31,217 [INFO] [ 46.3%] [RAM -> USB] 4325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:32,626 [INFO] [RED -> RAM] Descargados: 4350 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:32,628 [INFO] [ 46.5%] [RAM -> USB] 4350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:32,917 [INFO] [RED -> RAM] Descargados: 4350 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:34,178 [INFO] [ 46.8%] [RAM -> USB] 4375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:35,206 [INFO] [RED -> RAM] Descargados: 4400 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:35,207 [INFO] [ 47.1%] [RAM -> USB] 4400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:35,219 [INFO] [RED -> RAM] Descargados: 4400 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:36,231 [INFO] [ 47.3%] [RAM -> USB] 4425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:37,177 [INFO] [RED -> RAM] Descargados: 4450 MB | Vel. Red: 23.7 MB/s | Cola: 2/256
+2026-09-11 22:44:37,180 [INFO] [ 47.6%] [RAM -> USB] 4450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:37,256 [INFO] [RED -> RAM] Descargados: 4450 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:38,119 [INFO] [ 47.9%] [RAM -> USB] 4475 MB | WriteFile:     1 ms | Cola:   4/256
+2026-09-11 22:44:38,902 [INFO] [RED -> RAM] Descargados: 4500 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:38,903 [INFO] [ 48.1%] [RAM -> USB] 4500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:39,148 [INFO] [RED -> RAM] Descargados: 4500 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:40,310 [INFO] [ 48.4%] [RAM -> USB] 4525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:41,034 [INFO] [RED -> RAM] Descargados: 4550 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:41,036 [INFO] [ 48.7%] [RAM -> USB] 4550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:41,135 [INFO] [RED -> RAM] Descargados: 4550 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:42,138 [INFO] [ 49.0%] [RAM -> USB] 4575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:43,050 [INFO] [RED -> RAM] Descargados: 4600 MB | Vel. Red: 23.8 MB/s | Cola: 3/256
+2026-09-11 22:44:43,054 [INFO] [ 49.2%] [RAM -> USB] 4600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:43,109 [INFO] [RED -> RAM] Descargados: 4600 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:44,016 [INFO] [ 49.5%] [RAM -> USB] 4625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:44,868 [INFO] [RED -> RAM] Descargados: 4650 MB | Vel. Red: 23.8 MB/s | Cola: 2/256
+2026-09-11 22:44:44,871 [INFO] [ 49.8%] [RAM -> USB] 4650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:44,901 [INFO] [RED -> RAM] Descargados: 4650 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:45,726 [INFO] [ 50.0%] [RAM -> USB] 4675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:46,959 [INFO] [RED -> RAM] Descargados: 4700 MB | Vel. Red: 23.8 MB/s | Cola: 2/256
+2026-09-11 22:44:46,962 [INFO] [ 50.3%] [RAM -> USB] 4700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:47,253 [INFO] [RED -> RAM] Descargados: 4700 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:48,072 [INFO] [ 50.6%] [RAM -> USB] 4725 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:49,636 [INFO] [RED -> RAM] Descargados: 4750 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:49,638 [INFO] [ 50.8%] [RAM -> USB] 4750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:49,698 [INFO] [RED -> RAM] Descargados: 4750 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:50,542 [INFO] [ 51.1%] [RAM -> USB] 4775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:51,423 [INFO] [RED -> RAM] Descargados: 4800 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:51,424 [INFO] [ 51.4%] [RAM -> USB] 4800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:51,709 [INFO] [RED -> RAM] Descargados: 4800 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:52,665 [INFO] [ 51.6%] [RAM -> USB] 4825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:53,643 [INFO] [RED -> RAM] Descargados: 4850 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:44:53,644 [INFO] [RED -> RAM] Descargados: 4850 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:53,644 [INFO] [ 51.9%] [RAM -> USB] 4850 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:44:54,520 [INFO] [ 52.2%] [RAM -> USB] 4875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:55,158 [INFO] [RED -> RAM] Descargados: 4900 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:55,160 [INFO] [ 52.4%] [RAM -> USB] 4900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:55,371 [INFO] [RED -> RAM] Descargados: 4900 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:55,992 [INFO] [ 52.7%] [RAM -> USB] 4925 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:56,939 [INFO] [RED -> RAM] Descargados: 4950 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:44:56,941 [INFO] [ 53.0%] [RAM -> USB] 4950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:56,969 [INFO] [RED -> RAM] Descargados: 4950 MB | Vel. Red: 23.9 MB/s | Cola: 1/256
+2026-09-11 22:44:57,885 [INFO] [ 53.2%] [RAM -> USB] 4975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:59,130 [INFO] [RED -> RAM] Descargados: 5000 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:44:59,132 [INFO] [ 53.5%] [RAM -> USB] 5000 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:44:59,450 [INFO] [RED -> RAM] Descargados: 5000 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:45:00,794 [INFO] [ 53.8%] [RAM -> USB] 5025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:01,847 [INFO] [RED -> RAM] Descargados: 5050 MB | Vel. Red: 23.8 MB/s | Cola: 1/256
+2026-09-11 22:45:01,849 [INFO] [ 54.0%] [RAM -> USB] 5050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:02,292 [INFO] [RED -> RAM] Descargados: 5050 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:45:03,306 [INFO] [ 54.3%] [RAM -> USB] 5075 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:04,345 [INFO] [RED -> RAM] Descargados: 5100 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:45:04,346 [INFO] [ 54.6%] [RAM -> USB] 5100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:04,442 [INFO] [RED -> RAM] Descargados: 5100 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:45:05,391 [INFO] [ 54.8%] [RAM -> USB] 5125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:06,801 [INFO] [RED -> RAM] Descargados: 5150 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:45:06,802 [INFO] [ 55.1%] [RAM -> USB] 5150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:07,126 [INFO] [RED -> RAM] Descargados: 5150 MB | Vel. Red: 23.7 MB/s | Cola: 1/256
+2026-09-11 22:45:08,689 [INFO] [ 55.4%] [RAM -> USB] 5175 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:45:09,842 [INFO] [RED -> RAM] Descargados: 5200 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:45:09,844 [INFO] [ 55.6%] [RAM -> USB] 5200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:09,875 [INFO] [RED -> RAM] Descargados: 5200 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:45:11,123 [INFO] [ 55.9%] [RAM -> USB] 5225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:12,145 [INFO] [RED -> RAM] Descargados: 5250 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:45:12,147 [INFO] [ 56.2%] [RAM -> USB] 5250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:12,351 [INFO] [RED -> RAM] Descargados: 5250 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:45:13,267 [INFO] [ 56.4%] [RAM -> USB] 5275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:14,439 [INFO] [RED -> RAM] Descargados: 5300 MB | Vel. Red: 23.6 MB/s | Cola: 1/256
+2026-09-11 22:45:14,440 [INFO] [ 56.7%] [RAM -> USB] 5300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:14,577 [INFO] [RED -> RAM] Descargados: 5300 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:45:15,696 [INFO] [ 57.0%] [RAM -> USB] 5325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:17,294 [INFO] [RED -> RAM] Descargados: 5350 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:45:17,295 [INFO] [ 57.2%] [RAM -> USB] 5350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:17,405 [INFO] [RED -> RAM] Descargados: 5350 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:45:18,629 [INFO] [ 57.5%] [RAM -> USB] 5375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:19,693 [INFO] [RED -> RAM] Descargados: 5400 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:45:19,694 [INFO] [ 57.8%] [RAM -> USB] 5400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:20,013 [INFO] [RED -> RAM] Descargados: 5400 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:21,143 [INFO] [ 58.0%] [RAM -> USB] 5425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:22,370 [INFO] [RED -> RAM] Descargados: 5450 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:22,373 [INFO] [ 58.3%] [RAM -> USB] 5450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:22,447 [INFO] [RED -> RAM] Descargados: 5450 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:23,786 [INFO] [ 58.6%] [RAM -> USB] 5475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:24,962 [INFO] [RED -> RAM] Descargados: 5500 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:24,964 [INFO] [ 58.8%] [RAM -> USB] 5500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:25,170 [INFO] [RED -> RAM] Descargados: 5500 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:26,096 [INFO] [ 59.1%] [RAM -> USB] 5525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:26,927 [INFO] [RED -> RAM] Descargados: 5550 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:26,929 [INFO] [ 59.4%] [RAM -> USB] 5550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:26,986 [INFO] [RED -> RAM] Descargados: 5550 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:27,851 [INFO] [ 59.7%] [RAM -> USB] 5575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:28,727 [INFO] [RED -> RAM] Descargados: 5600 MB | Vel. Red: 23.4 MB/s | Cola: 5/256
+2026-09-11 22:45:28,734 [INFO] [ 59.9%] [RAM -> USB] 5600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:28,873 [INFO] [RED -> RAM] Descargados: 5600 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:29,822 [INFO] [ 60.2%] [RAM -> USB] 5625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:30,776 [INFO] [RED -> RAM] Descargados: 5650 MB | Vel. Red: 23.4 MB/s | Cola: 2/256
+2026-09-11 22:45:30,779 [INFO] [ 60.5%] [RAM -> USB] 5650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:30,799 [INFO] [RED -> RAM] Descargados: 5650 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:31,696 [INFO] [ 60.7%] [RAM -> USB] 5675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:32,829 [INFO] [RED -> RAM] Descargados: 5700 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:32,830 [INFO] [ 61.0%] [RAM -> USB] 5700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:33,021 [INFO] [RED -> RAM] Descargados: 5700 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:33,777 [INFO] [ 61.3%] [RAM -> USB] 5725 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:34,694 [INFO] [RED -> RAM] Descargados: 5750 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:34,695 [INFO] [ 61.5%] [RAM -> USB] 5750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:34,700 [INFO] [RED -> RAM] Descargados: 5750 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:35,560 [INFO] [ 61.8%] [RAM -> USB] 5775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:36,730 [INFO] [RED -> RAM] Descargados: 5800 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:45:36,732 [INFO] [ 62.1%] [RAM -> USB] 5800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:36,738 [INFO] [RED -> RAM] Descargados: 5800 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:45:38,040 [INFO] [ 62.3%] [RAM -> USB] 5825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:38,976 [INFO] [RED -> RAM] Descargados: 5850 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:38,977 [INFO] [ 62.6%] [RAM -> USB] 5850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:38,993 [INFO] [RED -> RAM] Descargados: 5850 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:39,975 [INFO] [ 62.9%] [RAM -> USB] 5875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:41,066 [INFO] [RED -> RAM] Descargados: 5900 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:41,067 [INFO] [ 63.1%] [RAM -> USB] 5900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:41,298 [INFO] [RED -> RAM] Descargados: 5900 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:42,579 [INFO] [ 63.4%] [RAM -> USB] 5925 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:45:43,903 [INFO] [RED -> RAM] Descargados: 5950 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:43,905 [INFO] [ 63.7%] [RAM -> USB] 5950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:44,158 [INFO] [RED -> RAM] Descargados: 5950 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:45,195 [INFO] [ 63.9%] [RAM -> USB] 5975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:46,764 [INFO] [RED -> RAM] Descargados: 6000 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:46,766 [INFO] [ 64.2%] [RAM -> USB] 6000 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:46,784 [INFO] [RED -> RAM] Descargados: 6000 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:48,110 [INFO] [ 64.5%] [RAM -> USB] 6025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:49,157 [INFO] [RED -> RAM] Descargados: 6050 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:49,159 [INFO] [ 64.7%] [RAM -> USB] 6050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:49,205 [INFO] [RED -> RAM] Descargados: 6050 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:50,046 [INFO] [ 65.0%] [RAM -> USB] 6075 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:50,887 [INFO] [RED -> RAM] Descargados: 6100 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:50,888 [INFO] [ 65.3%] [RAM -> USB] 6100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:50,936 [INFO] [RED -> RAM] Descargados: 6100 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:51,916 [INFO] [ 65.5%] [RAM -> USB] 6125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:53,241 [INFO] [RED -> RAM] Descargados: 6150 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:53,243 [INFO] [ 65.8%] [RAM -> USB] 6150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:53,243 [INFO] [RED -> RAM] Descargados: 6150 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:54,075 [INFO] [ 66.1%] [RAM -> USB] 6175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:55,242 [INFO] [RED -> RAM] Descargados: 6200 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:55,243 [INFO] [ 66.3%] [RAM -> USB] 6200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:55,296 [INFO] [RED -> RAM] Descargados: 6200 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:56,154 [INFO] [ 66.6%] [RAM -> USB] 6225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:57,004 [INFO] [RED -> RAM] Descargados: 6250 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:45:57,006 [INFO] [ 66.9%] [RAM -> USB] 6250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:57,140 [INFO] [RED -> RAM] Descargados: 6250 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:45:58,374 [INFO] [ 67.1%] [RAM -> USB] 6275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:45:59,657 [INFO] [RED -> RAM] Descargados: 6300 MB | Vel. Red: 23.3 MB/s | Cola: 2/256
+2026-09-11 22:45:59,658 [INFO] [RED -> RAM] Descargados: 6300 MB | Vel. Red: 23.3 MB/s | Cola: 3/256
+2026-09-11 22:45:59,660 [INFO] [ 67.4%] [RAM -> USB] 6300 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:46:00,618 [INFO] [ 67.7%] [RAM -> USB] 6325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:01,381 [INFO] [RED -> RAM] Descargados: 6350 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:46:01,383 [INFO] [ 67.9%] [RAM -> USB] 6350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:01,573 [INFO] [RED -> RAM] Descargados: 6350 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:46:02,267 [INFO] [ 68.2%] [RAM -> USB] 6375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:03,267 [INFO] [RED -> RAM] Descargados: 6400 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:03,270 [INFO] [ 68.5%] [RAM -> USB] 6400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:03,319 [INFO] [RED -> RAM] Descargados: 6400 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:04,142 [INFO] [ 68.7%] [RAM -> USB] 6425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:05,297 [INFO] [RED -> RAM] Descargados: 6450 MB | Vel. Red: 23.4 MB/s | Cola: 3/256
+2026-09-11 22:46:05,298 [INFO] [RED -> RAM] Descargados: 6450 MB | Vel. Red: 23.4 MB/s | Cola: 3/256
+2026-09-11 22:46:05,302 [INFO] [ 69.0%] [RAM -> USB] 6450 MB | WriteFile:     1 ms | Cola:   4/256
+2026-09-11 22:46:06,162 [INFO] [ 69.3%] [RAM -> USB] 6475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:07,085 [INFO] [RED -> RAM] Descargados: 6500 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:07,086 [INFO] [RED -> RAM] Descargados: 6500 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:07,087 [INFO] [ 69.5%] [RAM -> USB] 6500 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:46:07,798 [INFO] [ 69.8%] [RAM -> USB] 6525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:08,879 [INFO] [RED -> RAM] Descargados: 6550 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:08,880 [INFO] [ 70.1%] [RAM -> USB] 6550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:08,913 [INFO] [RED -> RAM] Descargados: 6550 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:09,854 [INFO] [ 70.4%] [RAM -> USB] 6575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:10,857 [INFO] [RED -> RAM] Descargados: 6600 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:10,858 [INFO] [ 70.6%] [RAM -> USB] 6600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:10,887 [INFO] [RED -> RAM] Descargados: 6600 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:11,550 [INFO] [ 70.9%] [RAM -> USB] 6625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:13,171 [INFO] [RED -> RAM] Descargados: 6650 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:13,172 [INFO] [ 71.2%] [RAM -> USB] 6650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:13,231 [INFO] [RED -> RAM] Descargados: 6650 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:14,004 [INFO] [ 71.4%] [RAM -> USB] 6675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:15,147 [INFO] [RED -> RAM] Descargados: 6700 MB | Vel. Red: 23.4 MB/s | Cola: 2/256
+2026-09-11 22:46:15,147 [INFO] [RED -> RAM] Descargados: 6700 MB | Vel. Red: 23.5 MB/s | Cola: 3/256
+2026-09-11 22:46:15,150 [INFO] [ 71.7%] [RAM -> USB] 6700 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:46:16,202 [INFO] [ 72.0%] [RAM -> USB] 6725 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:17,461 [INFO] [RED -> RAM] Descargados: 6750 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:17,462 [INFO] [ 72.2%] [RAM -> USB] 6750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:17,820 [INFO] [RED -> RAM] Descargados: 6750 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:18,470 [INFO] [ 72.5%] [RAM -> USB] 6775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:19,115 [INFO] [RED -> RAM] Descargados: 6800 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:19,116 [INFO] [ 72.8%] [RAM -> USB] 6800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:19,122 [INFO] [RED -> RAM] Descargados: 6800 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:20,140 [INFO] [ 73.0%] [RAM -> USB] 6825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:21,571 [INFO] [RED -> RAM] Descargados: 6850 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:21,573 [INFO] [ 73.3%] [RAM -> USB] 6850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:21,662 [INFO] [RED -> RAM] Descargados: 6850 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:22,417 [INFO] [ 73.6%] [RAM -> USB] 6875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:23,657 [INFO] [RED -> RAM] Descargados: 6900 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:23,658 [INFO] [ 73.8%] [RAM -> USB] 6900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:23,665 [INFO] [RED -> RAM] Descargados: 6900 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:24,909 [INFO] [ 74.1%] [RAM -> USB] 6925 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:26,045 [INFO] [RED -> RAM] Descargados: 6950 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:26,047 [INFO] [ 74.4%] [RAM -> USB] 6950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:26,060 [INFO] [RED -> RAM] Descargados: 6950 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:27,291 [INFO] [ 74.6%] [RAM -> USB] 6975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:28,176 [INFO] [RED -> RAM] Descargados: 7000 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:28,177 [INFO] [ 74.9%] [RAM -> USB] 7000 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:28,240 [INFO] [RED -> RAM] Descargados: 7000 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:29,103 [INFO] [ 75.2%] [RAM -> USB] 7025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:29,965 [INFO] [RED -> RAM] Descargados: 7050 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:29,970 [INFO] [ 75.4%] [RAM -> USB] 7050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:30,253 [INFO] [RED -> RAM] Descargados: 7050 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:31,634 [INFO] [ 75.7%] [RAM -> USB] 7075 MB | WriteFile:    31 ms | Cola:   4/256
+2026-09-11 22:46:32,374 [INFO] [RED -> RAM] Descargados: 7100 MB | Vel. Red: 23.4 MB/s | Cola: 3/256
+2026-09-11 22:46:32,379 [INFO] [ 76.0%] [RAM -> USB] 7100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:32,705 [INFO] [RED -> RAM] Descargados: 7100 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:34,036 [INFO] [ 76.2%] [RAM -> USB] 7125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:34,994 [INFO] [RED -> RAM] Descargados: 7150 MB | Vel. Red: 23.4 MB/s | Cola: 2/256
+2026-09-11 22:46:34,994 [INFO] [RED -> RAM] Descargados: 7150 MB | Vel. Red: 23.4 MB/s | Cola: 2/256
+2026-09-11 22:46:34,996 [INFO] [ 76.5%] [RAM -> USB] 7150 MB | WriteFile:     1 ms | Cola:   3/256
+2026-09-11 22:46:35,847 [INFO] [ 76.8%] [RAM -> USB] 7175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:36,970 [INFO] [RED -> RAM] Descargados: 7200 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:36,972 [INFO] [ 77.0%] [RAM -> USB] 7200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:37,156 [INFO] [RED -> RAM] Descargados: 7200 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:38,061 [INFO] [ 77.3%] [RAM -> USB] 7225 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:46:38,982 [INFO] [RED -> RAM] Descargados: 7250 MB | Vel. Red: 23.4 MB/s | Cola: 3/256
+2026-09-11 22:46:38,986 [INFO] [ 77.6%] [RAM -> USB] 7250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:39,136 [INFO] [RED -> RAM] Descargados: 7250 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:40,040 [INFO] [ 77.8%] [RAM -> USB] 7275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:41,603 [INFO] [RED -> RAM] Descargados: 7300 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:41,604 [INFO] [ 78.1%] [RAM -> USB] 7300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:41,610 [INFO] [RED -> RAM] Descargados: 7300 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:42,103 [INFO] [ 78.4%] [RAM -> USB] 7325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:43,286 [INFO] [RED -> RAM] Descargados: 7350 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:43,288 [INFO] [ 78.6%] [RAM -> USB] 7350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:43,415 [INFO] [RED -> RAM] Descargados: 7350 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:44,074 [INFO] [ 78.9%] [RAM -> USB] 7375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:44,786 [INFO] [RED -> RAM] Descargados: 7400 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:44,787 [INFO] [ 79.2%] [RAM -> USB] 7400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:44,877 [INFO] [RED -> RAM] Descargados: 7400 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:46,167 [INFO] [ 79.4%] [RAM -> USB] 7425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:47,061 [INFO] [RED -> RAM] Descargados: 7450 MB | Vel. Red: 23.5 MB/s | Cola: 3/256
+2026-09-11 22:46:47,065 [INFO] [ 79.7%] [RAM -> USB] 7450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:47,147 [INFO] [RED -> RAM] Descargados: 7450 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:48,149 [INFO] [ 80.0%] [RAM -> USB] 7475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:49,006 [INFO] [RED -> RAM] Descargados: 7500 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:49,007 [INFO] [ 80.2%] [RAM -> USB] 7500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:49,169 [INFO] [RED -> RAM] Descargados: 7500 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:50,063 [INFO] [ 80.5%] [RAM -> USB] 7525 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:51,090 [INFO] [RED -> RAM] Descargados: 7550 MB | Vel. Red: 23.5 MB/s | Cola: 2/256
+2026-09-11 22:46:51,093 [INFO] [ 80.8%] [RAM -> USB] 7550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:51,198 [INFO] [RED -> RAM] Descargados: 7550 MB | Vel. Red: 23.5 MB/s | Cola: 1/256
+2026-09-11 22:46:52,167 [INFO] [ 81.1%] [RAM -> USB] 7575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:53,637 [INFO] [RED -> RAM] Descargados: 7600 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:53,639 [INFO] [ 81.3%] [RAM -> USB] 7600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:53,787 [INFO] [RED -> RAM] Descargados: 7600 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:54,895 [INFO] [ 81.6%] [RAM -> USB] 7625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:56,553 [INFO] [RED -> RAM] Descargados: 7650 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:56,554 [INFO] [ 81.9%] [RAM -> USB] 7650 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:56,596 [INFO] [RED -> RAM] Descargados: 7650 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:57,824 [INFO] [ 82.1%] [RAM -> USB] 7675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:58,849 [INFO] [RED -> RAM] Descargados: 7700 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:46:58,850 [INFO] [ 82.4%] [RAM -> USB] 7700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:46:58,866 [INFO] [RED -> RAM] Descargados: 7700 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:00,011 [INFO] [ 82.7%] [RAM -> USB] 7725 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:02,019 [INFO] [RED -> RAM] Descargados: 7750 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:02,020 [INFO] [ 82.9%] [RAM -> USB] 7750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:02,073 [INFO] [RED -> RAM] Descargados: 7750 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:02,916 [INFO] [ 83.2%] [RAM -> USB] 7775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:03,968 [INFO] [RED -> RAM] Descargados: 7800 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:03,969 [INFO] [ 83.5%] [RAM -> USB] 7800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:04,143 [INFO] [RED -> RAM] Descargados: 7800 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:04,768 [INFO] [ 83.7%] [RAM -> USB] 7825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:05,612 [INFO] [RED -> RAM] Descargados: 7850 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:05,614 [INFO] [ 84.0%] [RAM -> USB] 7850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:05,688 [INFO] [RED -> RAM] Descargados: 7850 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:06,323 [INFO] [ 84.3%] [RAM -> USB] 7875 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:47:07,259 [INFO] [RED -> RAM] Descargados: 7900 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:07,261 [INFO] [ 84.5%] [RAM -> USB] 7900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:07,301 [INFO] [RED -> RAM] Descargados: 7900 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:08,284 [INFO] [ 84.8%] [RAM -> USB] 7925 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:47:08,990 [INFO] [RED -> RAM] Descargados: 7950 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:08,992 [INFO] [ 85.1%] [RAM -> USB] 7950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:09,154 [INFO] [RED -> RAM] Descargados: 7950 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:10,081 [INFO] [ 85.3%] [RAM -> USB] 7975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:11,165 [INFO] [RED -> RAM] Descargados: 8000 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:11,167 [INFO] [ 85.6%] [RAM -> USB] 8000 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:11,570 [INFO] [RED -> RAM] Descargados: 8000 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:12,692 [INFO] [ 85.9%] [RAM -> USB] 8025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:13,910 [INFO] [RED -> RAM] Descargados: 8050 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:13,911 [INFO] [ 86.1%] [RAM -> USB] 8050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:13,929 [INFO] [RED -> RAM] Descargados: 8050 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:14,718 [INFO] [ 86.4%] [RAM -> USB] 8075 MB | WriteFile:     1 ms | Cola:   4/256
+2026-09-11 22:47:15,623 [INFO] [RED -> RAM] Descargados: 8100 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:15,625 [INFO] [ 86.7%] [RAM -> USB] 8100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:15,690 [INFO] [RED -> RAM] Descargados: 8100 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:16,729 [INFO] [ 86.9%] [RAM -> USB] 8125 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:47:17,541 [INFO] [RED -> RAM] Descargados: 8150 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:17,543 [INFO] [ 87.2%] [RAM -> USB] 8150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:17,621 [INFO] [RED -> RAM] Descargados: 8150 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:18,286 [INFO] [ 87.5%] [RAM -> USB] 8175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:19,851 [INFO] [RED -> RAM] Descargados: 8200 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:19,853 [INFO] [ 87.7%] [RAM -> USB] 8200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:19,969 [INFO] [RED -> RAM] Descargados: 8200 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:20,800 [INFO] [ 88.0%] [RAM -> USB] 8225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:22,097 [INFO] [RED -> RAM] Descargados: 8250 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:22,098 [INFO] [ 88.3%] [RAM -> USB] 8250 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:22,107 [INFO] [RED -> RAM] Descargados: 8250 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:22,874 [INFO] [ 88.5%] [RAM -> USB] 8275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:23,968 [INFO] [RED -> RAM] Descargados: 8300 MB | Vel. Red: 23.4 MB/s | Cola: 3/256
+2026-09-11 22:47:23,972 [INFO] [ 88.8%] [RAM -> USB] 8300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:24,006 [INFO] [RED -> RAM] Descargados: 8300 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:25,218 [INFO] [ 89.1%] [RAM -> USB] 8325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:26,031 [INFO] [RED -> RAM] Descargados: 8350 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:26,033 [INFO] [ 89.3%] [RAM -> USB] 8350 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:26,086 [INFO] [RED -> RAM] Descargados: 8350 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:27,083 [INFO] [ 89.6%] [RAM -> USB] 8375 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:28,158 [INFO] [RED -> RAM] Descargados: 8400 MB | Vel. Red: 23.4 MB/s | Cola: 4/256
+2026-09-11 22:47:28,163 [INFO] [ 89.9%] [RAM -> USB] 8400 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:28,282 [INFO] [RED -> RAM] Descargados: 8400 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:29,349 [INFO] [ 90.1%] [RAM -> USB] 8425 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:30,148 [INFO] [RED -> RAM] Descargados: 8450 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:30,150 [INFO] [ 90.4%] [RAM -> USB] 8450 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:30,419 [INFO] [RED -> RAM] Descargados: 8450 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:31,657 [INFO] [ 90.7%] [RAM -> USB] 8475 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:33,619 [INFO] [RED -> RAM] Descargados: 8500 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:33,620 [INFO] [ 90.9%] [RAM -> USB] 8500 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:33,625 [INFO] [RED -> RAM] Descargados: 8500 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:34,573 [INFO] [ 91.2%] [RAM -> USB] 8525 MB | WriteFile:     3 ms | Cola:   0/256
+2026-09-11 22:47:36,177 [INFO] [RED -> RAM] Descargados: 8550 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:36,179 [INFO] [ 91.5%] [RAM -> USB] 8550 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:36,342 [INFO] [RED -> RAM] Descargados: 8550 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:37,304 [INFO] [ 91.8%] [RAM -> USB] 8575 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:38,477 [INFO] [RED -> RAM] Descargados: 8600 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:38,480 [INFO] [ 92.0%] [RAM -> USB] 8600 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:38,498 [INFO] [RED -> RAM] Descargados: 8600 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:39,222 [INFO] [ 92.3%] [RAM -> USB] 8625 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:40,007 [INFO] [RED -> RAM] Descargados: 8650 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:40,008 [INFO] [RED -> RAM] Descargados: 8650 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:40,009 [INFO] [ 92.6%] [RAM -> USB] 8650 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:47:40,732 [INFO] [ 92.8%] [RAM -> USB] 8675 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:42,158 [INFO] [RED -> RAM] Descargados: 8700 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:42,159 [INFO] [ 93.1%] [RAM -> USB] 8700 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:42,204 [INFO] [RED -> RAM] Descargados: 8700 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:43,424 [INFO] [ 93.4%] [RAM -> USB] 8725 MB | WriteFile:     1 ms | Cola:   1/256
+2026-09-11 22:47:44,231 [INFO] [RED -> RAM] Descargados: 8750 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:44,233 [INFO] [ 93.6%] [RAM -> USB] 8750 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:44,290 [INFO] [RED -> RAM] Descargados: 8750 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:45,341 [INFO] [ 93.9%] [RAM -> USB] 8775 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:46,123 [INFO] [RED -> RAM] Descargados: 8800 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:46,125 [INFO] [ 94.2%] [RAM -> USB] 8800 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:46,211 [INFO] [RED -> RAM] Descargados: 8800 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:47,404 [INFO] [ 94.4%] [RAM -> USB] 8825 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:48,916 [INFO] [RED -> RAM] Descargados: 8850 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:48,918 [INFO] [ 94.7%] [RAM -> USB] 8850 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:48,978 [INFO] [RED -> RAM] Descargados: 8850 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:49,785 [INFO] [ 95.0%] [RAM -> USB] 8875 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:51,141 [INFO] [RED -> RAM] Descargados: 8900 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:51,144 [INFO] [ 95.2%] [RAM -> USB] 8900 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:51,290 [INFO] [RED -> RAM] Descargados: 8900 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:52,194 [INFO] [ 95.5%] [RAM -> USB] 8925 MB | WriteFile:     5 ms | Cola:   0/256
+2026-09-11 22:47:53,365 [INFO] [RED -> RAM] Descargados: 8950 MB | Vel. Red: 23.3 MB/s | Cola: 2/256
+2026-09-11 22:47:53,367 [INFO] [ 95.8%] [RAM -> USB] 8950 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:53,451 [INFO] [RED -> RAM] Descargados: 8950 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:54,390 [INFO] [ 96.0%] [RAM -> USB] 8975 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:55,139 [INFO] [RED -> RAM] Descargados: 9000 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:55,140 [INFO] [RED -> RAM] Descargados: 9000 MB | Vel. Red: 23.3 MB/s | Cola: 2/256
+2026-09-11 22:47:55,141 [INFO] [ 96.3%] [RAM -> USB] 9000 MB | WriteFile:     1 ms | Cola:   2/256
+2026-09-11 22:47:56,238 [INFO] [ 96.6%] [RAM -> USB] 9025 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:56,980 [INFO] [RED -> RAM] Descargados: 9050 MB | Vel. Red: 23.4 MB/s | Cola: 2/256
+2026-09-11 22:47:56,984 [INFO] [ 96.8%] [RAM -> USB] 9050 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:57,057 [INFO] [RED -> RAM] Descargados: 9050 MB | Vel. Red: 23.3 MB/s | Cola: 1/256
+2026-09-11 22:47:57,650 [INFO] [ 97.1%] [RAM -> USB] 9075 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:58,642 [INFO] [RED -> RAM] Descargados: 9100 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:58,643 [INFO] [ 97.4%] [RAM -> USB] 9100 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:47:58,704 [INFO] [RED -> RAM] Descargados: 9100 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:47:59,567 [INFO] [ 97.6%] [RAM -> USB] 9125 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:00,221 [INFO] [RED -> RAM] Descargados: 9150 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:48:00,222 [INFO] [ 97.9%] [RAM -> USB] 9150 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:00,310 [INFO] [RED -> RAM] Descargados: 9150 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:48:01,147 [INFO] [ 98.2%] [RAM -> USB] 9175 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:02,391 [INFO] [RED -> RAM] Descargados: 9200 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:48:02,392 [INFO] [ 98.4%] [RAM -> USB] 9200 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:02,688 [INFO] [RED -> RAM] Descargados: 9200 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:48:03,360 [INFO] [ 98.7%] [RAM -> USB] 9225 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:04,293 [INFO] [RED -> RAM] Descargados: 9250 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:48:04,294 [INFO] [RED -> RAM] Descargados: 9250 MB | Vel. Red: 23.4 MB/s | Cola: 2/256
+2026-09-11 22:48:04,298 [INFO] [ 99.0%] [RAM -> USB] 9250 MB | WriteFile:     1 ms | Cola:   3/256
+2026-09-11 22:48:04,988 [INFO] [ 99.2%] [RAM -> USB] 9275 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:06,050 [INFO] [RED -> RAM] Descargados: 9300 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:48:06,052 [INFO] [ 99.5%] [RAM -> USB] 9300 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:06,055 [INFO] [RED -> RAM] Descargados: 9300 MB | Vel. Red: 23.4 MB/s | Cola: 1/256
+2026-09-11 22:48:06,878 [INFO] [ 99.8%] [RAM -> USB] 9325 MB | WriteFile:     1 ms | Cola:   0/256
+2026-09-11 22:48:07,485 [INFO] ✔ Parte descargada con éxito (9346.0 MB).
+2026-09-11 22:48:07,502 [INFO] =======================================================
+

@@ -229,11 +229,6 @@ class CTkToolTip:
             self.tooltip_window = None
 
 def hacer_combobox_clicable_total(combobox):
-    """
-    Permite abrir y contraer (toggle) el menú desplegable al hacer clic sobre cualquier
-    parte del control (caja de entrada, flecha o fondo) con cursor hand2 de forma totalmente segura.
-    Si el menú ya está desplegado, el clic lo contrae en lugar de volver a abrirlo desde cero.
-    """
     combobox._last_menu_close = 0.0
 
     orig_menu_open = combobox._dropdown_menu.open
@@ -251,7 +246,6 @@ def hacer_combobox_clicable_total(combobox):
             return "break"
         
         now = time.time()
-        # Si el menú se acaba de cerrar (por este mismo clic del usuario que lo contrae), no volver a desplegar
         if (now - getattr(combobox, "_last_menu_close", 0.0)) < 0.35:
             return "break"
         
@@ -273,18 +267,16 @@ def hacer_combobox_clicable_total(combobox):
     combobox.configure(cursor="hand2")
 
 # =====================================================================
-# 🛠️ UTILIDADES GLOBALES DE SISTEMA Y ENTORNO (COLUMNA 0)
+# 🛠️ UTILIDADES GLOBALES DE SISTEMA Y ENTORNO
 # =====================================================================
 
 def es_administrador():
-    """ Comprueba si la aplicación tiene privilegios de Administrador en Windows """
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except Exception:
         return False
 
 def enganchar_drag_drop_recursivo(widget, callback):
-    """ Engancha el evento drag & drop en el widget y en todos sus elementos hijos """
     if not HAS_WINDND: return
     try:
         windnd.hook_dropfiles(widget, func=callback)
@@ -295,7 +287,6 @@ def enganchar_drag_drop_recursivo(widget, callback):
         pass
 
 def enganchar_drag_drop_global_win32(hwnd_tkinter, callback):
-    """ Desbloquea UIPI y engancha windnd a la ventana raíz y a todos sus handles hijos en Win32 """
     if os.name != 'nt' or not HAS_WINDND: return
     try:
         user32 = ctypes.windll.user32
@@ -308,7 +299,6 @@ def enganchar_drag_drop_global_win32(hwnd_tkinter, callback):
         WM_COPYDATA = 0x004A
         WM_COPYGLOBALDATA = 0x0049
         
-        # Recopilar todos los handles de subventanas/canvases internos de Tkinter
         hwnds = [hwnd_root]
         WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
         
@@ -331,10 +321,6 @@ def enganchar_drag_drop_global_win32(hwnd_tkinter, callback):
         logging.warning(f"Error al configurar enganche Win32 Drag&Drop: {e}")
 
 def resource_path(relative_path):
-    """
-    Resuelve la ruta a los recursos internos empaquetados por Nuitka (--onefile)
-    o el entorno de desarrollo local.
-    """
     if "NUITKA_ONEFILE_DIRECTORY" in os.environ:
         base_path = os.environ["NUITKA_ONEFILE_DIRECTORY"]
     elif hasattr(sys, '_MEIPASS'):
@@ -352,10 +338,6 @@ else:
 CARPETA_MEDIA = resource_path("media")
 
 def asegurar_herramientas_externas():
-    """
-    Garantiza que la carpeta engine/ (con Ventoy y 7-Zip) exista físicamente
-    junto al ejecutable, extrayéndola del interior del .exe en el primer arranque.
-    """
     destino_engine = os.path.join(BASE_DIR, "engine")
     
     if os.path.exists(destino_engine):
@@ -384,7 +366,6 @@ def asegurar_herramientas_externas():
     return None
 
 def obtener_version_interna():
-    """ Lee dinámicamente la versión del ejecutable desde sus propiedades de Windows """
     exe_actual = os.path.abspath(sys.argv[0])
     if not exe_actual.endswith(".exe"):
         return "12.5"
@@ -447,7 +428,6 @@ try:
 except KeyError:
     URL_BATOCERA = "https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev/batocerumen.img" 
 
-# --- CONFIGURACIÓN ESTÉTICA ADAPTATIVA (CLARO / OSCURO) ---
 ctk.set_appearance_mode("Dark")
 
 AZUL_FONDO = ("#e2e8f0", "#05080a")
@@ -482,15 +462,13 @@ def _calc_sombra(hex_color, factor=0.65):
         return hex_color
 
 def color_canvas_actual():
-    """ Devuelve el color de fondo en formato string simple para los Canvas de Tkinter """
     return AZUL_CARD[0] if ctk.get_appearance_mode() == "Light" else AZUL_CARD[1]
 
 # =====================================================================
-# ⚡ MOTOR DE EXTRACCIÓN, RED Y ALMACENAMIENTO (COLUMNA 0)
+# ⚡ MOTOR DE EXTRACCIÓN, RED Y ALMACENAMIENTO
 # =====================================================================
 
 def formatear_eta(segundos):
-    """ Convierte segundos a formato hh:mm:ss o mm:ss """
     if segundos <= 0 or segundos > 86400: return "--:--"
     mins, secs = divmod(int(segundos), 60)
     hrs, mins = divmod(mins, 60)
@@ -583,7 +561,6 @@ class AsyncBufferStream(object):
         return data
 
 def obtener_ruta_7z():
-    """ Localiza el binario de consola 7z.exe en engine/resources """
     posibles_rutas = [
         resource_path(os.path.join("engine", "resources", "7z.exe")),
         resource_path(os.path.join("engine", "7z.exe")),
@@ -595,7 +572,6 @@ def obtener_ruta_7z():
     return None
 
 def agregar_exclusion_antivirus(ruta_o_unidad):
-    """ Añade la unidad/carpeta a las exclusiones de Windows Defender vía PowerShell """
     if os.name == 'nt' and es_administrador():
         try:
             cmd = f'powershell -Command "Add-MpPreference -ExclusionPath \'{ruta_o_unidad}\'"'
@@ -635,10 +611,6 @@ def obtener_stream_gdrive(file_id):
     return res
 
 def generar_stream_resiliente_v2(url, chunk_size=512*1024, abort_check=None):
-    """
-    Motor de Red de Flujo Continuo:
-    Descarga una parte completa con bypass de certificados interceptados por antivirus (session.verify = False).
-    """
     if not url or not isinstance(url, str) or not url.startswith("http"):
         raise ValueError(f"URL no válida: '{url}'")
 
@@ -821,7 +793,6 @@ def stream_download_file_direct(url_or_id, dest_path, is_gdrive=False, progress_
             progress_callback(bytes_read, total_size, "Descarga completada, vaciando búferes...")
 
 def stream_flash_image_direct(url, letra_unidad, progress_callback=None, abort_check=None, method="ram"):
-    """ Volcado RAW con precarga en RAM y diagnóstico calibrado """
     letra_limpia = letra_unidad.strip().replace("\\", "").replace("/", "")
     ruta_raw = f"\\\\.\\{letra_limpia}"
 
@@ -1197,7 +1168,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.gb_totales = 0.0 
         self.min_cachy = 20.0 
 
-        # Valores de particiones para la barra interactiva unificada
         self.val_hollow_gb = 150.0
         self.val_cachy_gb = 100.0
         self.val_libre_gb = 0.0
@@ -1205,7 +1175,6 @@ class SavinOceanicCommand(ctk.CTk):
         self._pos_h1 = 0
         self._pos_h2 = 0
 
-        # Adaptadores para que el instalador de fondo siga leyendo .get() sin tocar nada
         class _ValHolder:
             def __init__(self, getter): self.getter = getter
             def get(self): return self.getter()
@@ -1219,19 +1188,17 @@ class SavinOceanicCommand(ctk.CTk):
         self.bato_64_act = ctk.BooleanVar(value=True)
         self.bato_32_act = ctk.BooleanVar(value=False)
         self.preservar_espacio = ctk.BooleanVar(value=False)
-        self.descargar_pack_bato = ctk.BooleanVar(value=False)
         self.descargar_pack_hollow = ctk.BooleanVar(value=True)
         self.metodo_descarga = ctk.StringVar(value="ram")
         self._bloqueo_rebalanceo = False
         self.pestana_actual = "instalador"
 
         self.tool_bato_img = ctk.BooleanVar(value=False)
-        self.tool_pack_bato = ctk.BooleanVar(value=False)
         self.tool_pack_hollow = ctk.BooleanVar(value=False)
         self.lista_discos_hollow = []
 
-        self.tamanos_reales = {"bato_64": 4.60, "bato_32": 1.0, "pack_bato": 37.8, "pack_hollow": 8.66}
-        self.tamanos_formateados = {"bato_64": "4.60GB", "bato_32": "1GB", "pack_bato": "37.8GB", "pack_hollow": "8.66GB"}
+        self.tamanos_reales = {"bato_64": 4.60, "bato_32": 1.0, "pack_hollow": 8.66}
+        self.tamanos_formateados = {"bato_64": "4.60GB", "bato_32": "1GB", "pack_hollow": "8.66GB"}
 
         self.configure(fg_color=AZUL_FONDO) 
         self.attributes("-alpha", 1.0)
@@ -1258,107 +1225,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self.cerrar_aplicacion)
         self.after(1000, lambda: threading.Thread(target=self.comprobar_actualizaciones, daemon=True).start())
         self.after(1500, self.preguntar_telemetria_errores)
-
-    def descargar_y_extraer_batocera_pack(self, ruta_destino_batocera, callback_progreso_externo=None):
-        games_section = getattr(self, "mirrors", {}).get("batocera_games", MIRRORS_DATA.get("batocera_games", {}))
-        mirrors_list = games_section.get("parts", games_section.get("mirrors", []))
-        urls = [m["url"] for m in mirrors_list if isinstance(m, dict) and "url" in m]
-        
-        if not urls:
-            raise ValueError("No se encontraron URLs válidas para batocera_games en mirrors.json")
-
-        modo = self.metodo_descarga.get() if hasattr(self, "metodo_descarga") else "ram"
-        total_size = int(self.tamanos_reales.get("pack_bato", 37.8) * (1024**3))
-
-        def progreso_ui(bytes_read, t_size, msg):
-            pct = bytes_read / t_size if t_size and t_size > 0 else 0
-            if callback_progreso_externo:
-                callback_progreso_externo(pct, msg)
-            elif hasattr(self, 'tareas_activas') and "pack_bato" in self.tareas_activas:
-                task = self.tareas_activas["pack_bato"]
-                self.after(0, lambda: task.actualizar(pct, msg))
-
-        if modo == "disco":
-            temp_dir = os.path.join(BASE_DIR, "engine", "temp_downloads")
-            os.makedirs(temp_dir, exist_ok=True)
-            archivos_temporales = []
-
-            try:
-                bytes_totales_descargados = 0
-                eta_calc = ETACalculator(total_size)
-                
-                for idx, url in enumerate(urls, start=1):
-                    if getattr(self, "abortar_proceso", False):
-                        raise InterruptedError()
-                    
-                    nombre_parte = f"batocera_part_{idx}.tmp"
-                    dest_path = os.path.join(temp_dir, nombre_parte)
-                    archivos_temporales.append(dest_path)
-                    
-                    logging.info(f"💾 Descargando parte {idx}/{len(urls)} a disco: {url}")
-                    
-                    stream_gen, _ = generar_stream_resiliente_v2(
-                        url, 
-                        abort_check=lambda: getattr(self, "abortar_proceso", False)
-                    )
-                    
-                    with open(dest_path, "wb") as f_out:
-                        for chunk in stream_gen:
-                            if getattr(self, "abortar_proceso", False):
-                                raise InterruptedError()
-                            f_out.write(chunk)
-                            bytes_totales_descargados += len(chunk)
-                            mb_s, eta_sec = eta_calc.update(bytes_totales_descargados)
-                            if mb_s is not None:
-                                progreso_ui(bytes_totales_descargados, total_size, f"Descargando ({idx}/{len(urls)}): {mb_s:.1f} MB/s | Faltan: {formatear_eta(eta_sec)}")
-
-                def stream_desde_disco():
-                    for temp_file in archivos_temporales:
-                        with open(temp_file, "rb") as f_in:
-                            while True:
-                                if getattr(self, "abortar_proceso", False):
-                                    return
-                                buf = f_in.read(4 * 1024 * 1024)
-                                if not buf:
-                                    break
-                                yield buf
-
-                stream_extract_tar(
-                    target_dir=ruta_destino_batocera,
-                    progress_callback=progreso_ui,
-                    abort_check=lambda: getattr(self, "abortar_proceso", False),
-                    method="ram",
-                    custom_stream=stream_desde_disco(),
-                    custom_total_size=total_size
-                )
-
-            finally:
-                for temp_file in archivos_temporales:
-                    if os.path.exists(temp_file):
-                        try: os.remove(temp_file)
-                        except Exception: pass
-
-        else:
-            def stream_multi_parte():
-                for index, url in enumerate(urls, start=1):
-                    logging.info(f"🔗 Extrayendo al vuelo parte {index}/{len(urls)}")
-                    stream_gen, _ = generar_stream_resiliente_v2(
-                        url, 
-                        abort_check=lambda: getattr(self, "abortar_proceso", False)
-                    )
-                    for chunk in stream_gen:
-                        if getattr(self, "abortar_proceso", False):
-                            return
-                        yield chunk
-
-            stream_extract_tar(
-                target_dir=ruta_destino_batocera,
-                progress_callback=progreso_ui,
-                abort_check=lambda: getattr(self, "abortar_proceso", False),
-                method="ram", 
-                custom_stream=stream_multi_parte(),
-                custom_total_size=total_size
-            )
 
     def verificar_conexion_servidores(self):
         urls = ["https://huggingface.co", "https://pub-988eebcee5e94631a55af8a89d12129d.r2.dev"]
@@ -1564,7 +1430,6 @@ class SavinOceanicCommand(ctk.CTk):
     def abrir_url(self, url): webbrowser.open_new_tab(url)
 
     def crear_boton_info(self, master, comando):
-        """ Vuelve al diseño original transparente con el triángulo """
         return ctk.CTkButton(
             master, 
             image=getattr(self, 'img_triangulo', None), 
@@ -1576,7 +1441,6 @@ class SavinOceanicCommand(ctk.CTk):
         )
 
     def abrir_info_barra(self):
-        """ Explicación exclusiva de la rueda del ratón, con letra grande y sin emoticonos """
         v = self.creventana_info_base("AJUSTE DE PRECISIÓN", 500, 240)
         f_in = ctk.CTkFrame(v, fg_color="transparent")
         f_in.pack(expand=True, fill="both", padx=25, pady=20)
@@ -1639,7 +1503,7 @@ class SavinOceanicCommand(ctk.CTk):
                 self.p_task.pack(fill="x", padx=5, pady=2)
             if not self.p_total.winfo_ismapped():
                 self.p_total.pack(fill="x", padx=5, pady=2)
-        # En alternar_modo_instalacion (alrededor de la línea 715):
+
             if getattr(self, 'pestana_actual', 'instalador') == 'instalador':
                 if hasattr(self, 'btn_start') and self.btn_start.winfo_exists():
                     self.btn_start.pack(side="bottom", pady=(2, 6))
@@ -1666,7 +1530,6 @@ class SavinOceanicCommand(ctk.CTk):
         if not self.verificar_conexion_servidores():
             afectados = []
             if self.instalar_bato.get(): afectados.append("Batocera OS (.img)")
-            if self.descargar_pack_bato.get(): afectados.append("Pack Batocera ROMs (37.8GB)")
             if self.descargar_pack_hollow.get(): afectados.append("Pack HollowDrive (8.06GB)")
             if self.instalar_cachy.get(): afectados.append("Imágenes de CachyOS / GRUB")
 
@@ -1692,13 +1555,6 @@ class SavinOceanicCommand(ctk.CTk):
                 if not self.lbl_status.winfo_ismapped():
                     self.lbl_status.pack(anchor="w", padx=5, pady=(2, 2))
                 self.lbl_status.configure(text="CANCELANDO Y LIMPIANDO... ESPERA POR FAVOR", text_color="#ff4d4d")
-
-    def mostrar_info_particion(self, key):
-        tit = t(f"storage.legend_{key}", size="").replace(" ()", "").strip()
-        msg = t(f"storage.desc_{key}")
-        self.mostrar_info(tit, msg)
-
-    def mostrar_info(self, titulo, mensaje): messagebox.showinfo(titulo, mensaje)
 
     def cerrar_aplicacion(self):
         if self.en_proceso:
@@ -1827,10 +1683,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.frames_breakdance = self.cargar_gif_pil(os.path.join(CARPETA_MEDIA, "breakdance.gif"), size=None)
         self.dummy_img = ctk.CTkImage(Image.new("RGBA", (1, 1), (0, 0, 0, 0)), size=(1, 1))
 
-    def al_clicar_pack_batocera(self):
-        if self.descargar_pack_bato.get(): self.abrir_info_roms()
-        self.rebalancear()
-
     def abrir_info_motor(self):
         v = self.creventana_info_base(t("modals.motor_title"), 740, 540)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
@@ -1851,16 +1703,6 @@ class SavinOceanicCommand(ctk.CTk):
             except Exception: continue
         return default_bytes
 
-    def abrir_info_roms(self):
-        v = self.creventana_info_base(t("modals.legal_title"), 620, 360)
-        v.configure(fg_color="#1a0a0a") 
-        frame_interno = ctk.CTkFrame(v, fg_color="transparent")
-        frame_interno.pack(expand=True, fill="both", padx=25, pady=20)
-        ctk.CTkLabel(frame_interno, text=t("modals.legal_header"), font=("Impact", 32), text_color="#ff4d4d").pack(pady=(0, 15))
-        ctk.CTkLabel(frame_interno, text=t("modals.legal_body"), font=("Segoe UI", 15), justify="center", wraplength=550).pack(pady=10)
-        ctk.CTkButton(frame_interno, text=t("modals.legal_accept"), font=("Segoe UI", 14, "bold"), fg_color="#444", height=40, width=220, command=v.destroy).pack(pady=(15, 0))
-        v.update(); v.grab_set()
-
     def abrir_info_pack_hollow(self):
         v = self.creventana_info_base(t("modals.pack_hollow_title"), 640, 420)
         frame_interno = ctk.CTkFrame(v, fg_color="transparent")
@@ -1871,7 +1713,7 @@ class SavinOceanicCommand(ctk.CTk):
         v.update(); v.grab_set()
 
     def cargar_tamanos_reales_hilo(self):
-        fallbacks = {"bato_64": 4.60*(1024**3), "bato_32": 1.0*(1024**3), "pack_bato": 37.8*(1024**3), "pack_hollow": 8.66*(1024**3)}
+        fallbacks = {"bato_64": 4.60*(1024**3), "bato_32": 1.0*(1024**3), "pack_hollow": 8.66*(1024**3)}
         for clave, fb_val in fallbacks.items():
             tam_bytes = self.consultar_tamano(clave, fb_val)
             self.tamanos_reales[clave] = tam_bytes / (1024**3) 
@@ -1884,8 +1726,6 @@ class SavinOceanicCommand(ctk.CTk):
             self.ch_b64.configure(text=t("batocera.arch_64", size=self.tamanos_formateados['bato_64']))
         if hasattr(self, 'ch_b32'):
             self.ch_b32.configure(text=t("batocera.arch_32"))
-        if hasattr(self, 'ch_pack_bato'):
-            self.ch_pack_bato.configure(text=t("batocera.pack_bato", size=self.tamanos_formateados['pack_bato']))
         if hasattr(self, 'ch_pack_hollow'):
             self.ch_pack_hollow.configure(text=t("batocera.pack_hollow", size=self.tamanos_formateados['pack_hollow']))
         self.rebalancear()
@@ -1919,11 +1759,25 @@ class SavinOceanicCommand(ctk.CTk):
         self.nav_bar = ctk.CTkFrame(self, fg_color=AZUL_CARD, height=45, corner_radius=10, border_width=1, border_color="#222")
         self.nav_bar.pack(fill="x", padx=20, pady=(0, 5))
         
-        self.btn_modo_installer = ctk.CTkButton(self.nav_bar, text="🚀 INSTALADOR PRINCIPAL", font=("Segoe UI", 12, "bold"), fg_color=AZUL_ELECTRICO, width=220, command=lambda: self.cambiar_pestana("instalador"))
-        self.btn_modo_installer.pack(side="left", padx=10, pady=5)
+        self.btn_modo_installer = ctk.CTkButton(self.nav_bar, text="🚀 INSTALADOR PRINCIPAL", font=("Segoe UI", 12, "bold"), fg_color=AZUL_ELECTRICO, width=200, command=lambda: self.cambiar_pestana("instalador"))
+        self.btn_modo_installer.pack(side="left", padx=8, pady=5)
         
-        self.btn_modo_tools = ctk.CTkButton(self.nav_bar, text="🛠️ HOLLOWTOOLS (MANTENIMIENTO)", font=("Segoe UI", 12, "bold"), fg_color="transparent", border_width=1, border_color=AZUL_CIAN, text_color=AZUL_CIAN, width=260, command=lambda: self.cambiar_pestana("tools"))
+        self.btn_modo_tools = ctk.CTkButton(self.nav_bar, text="🛠️ HOLLOWTOOLS (MANTENIMIENTO)", font=("Segoe UI", 12, "bold"), fg_color="transparent", border_width=1, border_color=AZUL_CIAN, text_color=AZUL_CIAN, width=240, command=lambda: self.cambiar_pestana("tools"))
         self.btn_modo_tools.pack(side="left", padx=5, pady=5)
+
+        # NUEVA PESTAÑA ADDONS BLOQUEADA (PRÓXIMAMENTE)
+        self.btn_modo_addons = ctk.CTkButton(
+            self.nav_bar, 
+            text="🧩 ADDONS (PRÓXIMAMENTE)", 
+            font=("Segoe UI", 12, "bold"), 
+            fg_color="transparent", 
+            border_width=1, 
+            border_color="#334155", 
+            text_color="#64748b", 
+            state="disabled", 
+            width=200
+        )
+        self.btn_modo_addons.pack(side="left", padx=5, pady=5)
 
         saved_lang = i18n.get_current_language()
         init_name = i18n.LANGUAGE_NAMES.get(saved_lang, "Español")
@@ -1936,7 +1790,7 @@ class SavinOceanicCommand(ctk.CTk):
             fg_color="transparent",
             hover_color="#1e293b",
             text_color=AZUL_CIAN,
-            width=130,
+            width=120,
             height=30,
             cursor="hand2"
         )
@@ -1989,9 +1843,7 @@ class SavinOceanicCommand(ctk.CTk):
         # --- CONTENEDOR INSTALADOR MAESTRO ---
         self.main_container = ctk.CTkFrame(self, fg_color="transparent")
 
-        # =====================================================================
-        # 🚀 BOTÓN INSTALAR FIJO (Sin zoom para no empujar nada hacia arriba)
-        # =====================================================================
+        # BOTÓN INSTALAR
         if getattr(self, 'img_instalar', None):
             self.btn_start = ctk.CTkButton(
                 self.main_container, 
@@ -2005,7 +1857,6 @@ class SavinOceanicCommand(ctk.CTk):
                 cursor="hand2",
                 command=self.confirmar_inicio
             )
-            # Sin animación de tamaño: tamaño fijo y estable
         else:
             self.btn_start = ctk.CTkButton(
                 self.main_container, 
@@ -2021,9 +1872,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.btn_start.pack(side="bottom", pady=(2, 6))
         self.widgets_interactivos.append(self.btn_start)
 
-        # =====================================================================
-        # 🎚️ PANEL DE PARTICIONES INVISIBLE (Sin recuadro)
-        # =====================================================================
+        # PANEL DE PARTICIONES
         self.p_bottom = ctk.CTkFrame(self.main_container, fg_color="transparent", border_width=0)
         self.p_bottom.pack(side="bottom", fill="x", padx=0, pady=(2, 4))
 
@@ -2068,9 +1917,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.canvas.bind("<Left>", self._on_bar_key_left)
         self.canvas.bind("<Right>", self._on_bar_key_right)
 
-        # =====================================================================
-        # 📦 PANELES SUPERIORES (50/50 BLOQUEADO)
-        # =====================================================================
+        # PANELES SUPERIORES (50/50 BLOQUEADO)
         self.f_panels = ctk.CTkFrame(self.main_container, fg_color="transparent")
         self.f_panels.pack(side="top", fill="both", expand=True, pady=(0, 4))
 
@@ -2078,13 +1925,10 @@ class SavinOceanicCommand(ctk.CTk):
         self.f_panels.grid_columnconfigure(1, weight=1, uniform="columna_panel")
         self.f_panels.grid_rowconfigure(0, weight=1)
 
-        # ---------------------------------------------------------------------
-        # 🔵 PANEL IZQUIERDO: MOTOR + BATOCERA Y PACKS ABAJO
-        # ---------------------------------------------------------------------
+        # PANEL IZQUIERDO: MOTOR + BATOCERA Y PACK HOLLOW
         self.p_left = ctk.CTkFrame(self.f_panels, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         self.p_left.grid(row=0, column=0, sticky="nsew", padx=(0, 6), pady=0)
 
-        # Motor de extracción
         self.f_motor = ctk.CTkFrame(self.p_left, fg_color=AZUL_CARD_INNER, corner_radius=8, border_width=1, border_color=COLOR_BORDE)
         self.f_motor.pack(fill="x", padx=15, pady=(10, 6))
         f_motor_h = ctk.CTkFrame(self.f_motor, fg_color="transparent")
@@ -2101,15 +1945,12 @@ class SavinOceanicCommand(ctk.CTk):
         self.r_motor_disco.pack(side="left")
         self.widgets_interactivos.extend([self.r_motor_ram, self.r_motor_disco])
 
-        # Fila Batocera
         f_bato_row = ctk.CTkFrame(self.p_left, fg_color="transparent")
         f_bato_row.pack(fill="both", expand=True, padx=15, pady=(4, 6))
 
-        # Columna izquierda
         f_bato_left = ctk.CTkFrame(f_bato_row, fg_color="transparent")
         f_bato_left.pack(side="left", fill="both", expand=True)
 
-        # Switch Batocera (Arriba)
         self.f_bato_h = ctk.CTkFrame(f_bato_left, fg_color="transparent")
         self.f_bato_h.pack(side="top", fill="x", pady=(2, 2))
         self.sw_bato = ctk.CTkSwitch(self.f_bato_h, text=t("batocera.switch"), font=("Segoe UI", 12, "bold"), variable=self.instalar_bato, command=self.actualizar_estados_bato, progress_color=AZUL_CIAN)
@@ -2117,7 +1958,6 @@ class SavinOceanicCommand(ctk.CTk):
         self.widgets_interactivos.append(self.sw_bato)
         self.crear_boton_info(self.f_bato_h, self.abrir_info_batocera).pack(side="left", padx=5)
 
-        # Opciones Batocera (Aparecen entre el switch y los packs sin empujar nada hacia abajo)
         self.f_bato_opts = ctk.CTkFrame(f_bato_left, fg_color="transparent")
         self.ch_b64 = ctk.CTkCheckBox(self.f_bato_opts, text="Batocera 64bits (4.6 GB)", variable=self.bato_64_act, command=self.rebalancear)
         self.ch_b64.pack(pady=2, padx=4, anchor="w")
@@ -2125,7 +1965,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.ch_b32.pack(pady=2, padx=4, anchor="w")
         self.widgets_interactivos.append(self.ch_b64)
 
-        # 2- PACKS ABAJO DEL TODO DESDE EL PRINCIPIO (side="bottom" para no saltar)
+        # Único pack restante en este contenedor: Pack HollowDrive
         f_packs_container = ctk.CTkFrame(
             f_bato_left, 
             fg_color=AZUL_CARD_INNER, 
@@ -2133,24 +1973,15 @@ class SavinOceanicCommand(ctk.CTk):
             border_width=1, 
             border_color="#1e293b"
         )
-        # pady=(4, 14) separa la pastilla de la curva inferior del panel
         f_packs_container.pack(side="bottom", anchor="w", padx=2, pady=(4, 14))
 
-        f_pack_bato = ctk.CTkFrame(f_packs_container, fg_color="transparent")
-        f_pack_bato.pack(fill="x", padx=8, pady=3)
-        self.ch_pack_bato = ctk.CTkCheckBox(f_pack_bato, text="PACK BATOCERA (37.8 GB)", variable=self.descargar_pack_bato, command=self.al_clicar_pack_batocera)
-        self.ch_pack_bato.pack(side="left", anchor="w")
-        self.widgets_interactivos.append(self.ch_pack_bato)
-        self.crear_boton_info(f_pack_bato, self.abrir_info_roms).pack(side="left", padx=4)
-
         f_pack_hollow = ctk.CTkFrame(f_packs_container, fg_color="transparent")
-        f_pack_hollow.pack(fill="x", padx=8, pady=3)
+        f_pack_hollow.pack(fill="x", padx=8, pady=5)
         self.ch_pack_hollow = ctk.CTkCheckBox(f_pack_hollow, text="PACK HOLLOWDRIVE (8.7 GB)", variable=self.descargar_pack_hollow, command=self.rebalancear)
         self.ch_pack_hollow.pack(side="left", anchor="w")
         self.widgets_interactivos.append(self.ch_pack_hollow)
         self.crear_boton_info(f_pack_hollow, self.abrir_info_pack_hollow).pack(side="left", padx=4)
 
-        # Mando Batocera a la derecha
         if getattr(self, 'logo_batocera', None):
             f_bato_logo_container = ctk.CTkFrame(f_bato_row, width=175, height=140, fg_color="transparent")
             f_bato_logo_container.pack(side="right", padx=(8, 0), pady=(0, 0))
@@ -2162,9 +1993,7 @@ class SavinOceanicCommand(ctk.CTk):
             lbl_img_bato.bind("<Enter>", lambda e: self.animar_zoom('logo_batocera', 'bato_size', (165, 115), (175, 122), True))
             lbl_img_bato.bind("<Leave>", lambda e: self.animar_zoom('logo_batocera', 'bato_size', (165, 115), (175, 122), False))
 
-        # ---------------------------------------------------------------------
-        # 🟢 PANEL DERECHO: CACHYOS (3- Con zoom que crece al pasar el ratón)
-        # ---------------------------------------------------------------------
+        # PANEL DERECHO: CACHYOS
         self.p_right = ctk.CTkFrame(self.f_panels, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         self.p_right.grid(row=0, column=1, sticky="nsew", padx=(6, 0), pady=0)
 
@@ -2179,7 +2008,6 @@ class SavinOceanicCommand(ctk.CTk):
             lbl_img_cachy = ctk.CTkLabel(f_cachy_logo_container, image=self.logo_cachy, text="", cursor="hand2")
             lbl_img_cachy.place(relx=0.5, rely=0.5, anchor="center")
             lbl_img_cachy.bind("<Button-1>", lambda e: self.abrir_url("https://cachyos.org"))
-            # 3- Zoom correcto: mide 260x72 y crece a 285x79
             lbl_img_cachy.bind("<Enter>", lambda e: self.animar_zoom('logo_cachy', 'cachy_size', (260, 72), (285, 79), True))
             lbl_img_cachy.bind("<Leave>", lambda e: self.animar_zoom('logo_cachy', 'cachy_size', (260, 72), (285, 79), False))
 
@@ -2269,7 +2097,7 @@ class SavinOceanicCommand(ctk.CTk):
             )
             self.btn_plus_iso.place(relx=0.5, rely=0.5, anchor="center")
 
-        # TARJETA 2: PAQUETES
+        # TARJETA 2: PAQUETES (SIN PACK BATOCERA)
         card_content = ctk.CTkFrame(self.f_ht_grid, fg_color=AZUL_CARD, corner_radius=15, border_width=1, border_color="#222")
         card_content.pack(side="left", fill="both", expand=True, padx=4)
 
@@ -2283,9 +2111,6 @@ class SavinOceanicCommand(ctk.CTk):
 
         self.ch_tool_bato = ctk.CTkCheckBox(f_ch_ht, text="Batocera OS (.img)", font=("Segoe UI", 12), variable=self.tool_bato_img)
         self.ch_tool_bato.pack(anchor="w", pady=8, padx=12)
-
-        self.ch_tool_pack_bato = ctk.CTkCheckBox(f_ch_ht, text="Pack ROMs (37.8GB)", font=("Segoe UI", 12), variable=self.tool_pack_bato)
-        self.ch_tool_pack_bato.pack(anchor="w", pady=8, padx=12)
 
         self.ch_tool_pack_hollow = ctk.CTkCheckBox(f_ch_ht, text="Pack HollowDrive (8.06GB)", font=("Segoe UI", 12), variable=self.tool_pack_hollow)
         self.ch_tool_pack_hollow.pack(anchor="w", pady=8, padx=12)
@@ -2338,7 +2163,6 @@ class SavinOceanicCommand(ctk.CTk):
         r_ht_hypr.pack(side="left", padx=5, pady=5)
 
         self.f_slider_sec = ctk.CTkFrame(f_body_cachy, fg_color="#090d12", corner_radius=10, border_width=1, border_color="#1e293b")
-        self.f_slider_sec.pack(fill="x", pady=5)
 
         ctk.CTkLabel(self.f_slider_sec, text="TAMAÑO CACHYOS (DERECHA):", font=("Segoe UI", 10, "bold"), text_color=AZUL_SUAVE).pack(pady=(6, 0))
         self.lbl_ht_right_space = ctk.CTkLabel(self.f_slider_sec, text="Disponible: 0.00 GB", font=("Consolas", 12, "bold"), text_color="white")
@@ -2353,7 +2177,7 @@ class SavinOceanicCommand(ctk.CTk):
         )
         self.btn_ht_ejecutar_cachy.pack(side="bottom", fill="x", pady=(8, 4))
 
-        # COMPARATIVA VISUAL (ANTES / DESPUÉS)
+        # COMPARATIVA VISUAL
         self.f_ht_preview = ctk.CTkFrame(self.hollow_tools_container, fg_color=AZUL_CARD, corner_radius=12, border_width=1, border_color="#222")
 
         f_p1 = ctk.CTkFrame(self.f_ht_preview, fg_color="transparent")
@@ -2376,7 +2200,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.canvas_ht_futuro.pack(fill="x", padx=12, pady=(0, 8))
 
         # =====================================================================
-        # FOOTER / PIE DE PÁGINA CON MULTI-BARRA DINÁMICA
+        # FOOTER
         # =====================================================================
         self.footer = ctk.CTkFrame(self, fg_color="transparent")
 
@@ -2419,11 +2243,9 @@ class SavinOceanicCommand(ctk.CTk):
                 self.main_container.pack(fill="both", expand=True, padx=20, pady=5)
             self.footer.pack(fill="x", side="bottom", padx=20, pady=10)
             
-            # En cambiar_pestana (alrededor de la línea 1025):
             if not self.en_proceso:
                 if hasattr(self, 'btn_start') and self.btn_start.winfo_exists():
                     self.btn_start.pack(side="bottom", pady=(2, 6))
-                self.btn_start.pack(side="top", pady=(2, 4))
                 self.f_progress.pack_forget()
                 self.btn_cancel.pack_forget()
                 
@@ -2544,12 +2366,16 @@ class SavinOceanicCommand(ctk.CTk):
                 self.btn_ht_ejecutar_cachy.configure(state="normal")
                 self.seg_ht_cachy.configure(state="normal")
 
-                if puedes_actualizar and espacio_derecha < 20.0:
+                # Selecciona el modo adecuado según el disco
+                if puedes_actualizar:
                     self.seg_ht_cachy.set("🔄 Actualizar CachyOS")
-                    self.al_cambiar_modo_cachy("🔄 Actualizar CachyOS")
-                elif not puedes_actualizar and espacio_derecha >= 20.0:
+                elif espacio_derecha >= 20.0:
                     self.seg_ht_cachy.set("➕ Instalar CachyOS")
-                    self.al_cambiar_modo_cachy("➕ Instalar CachyOS")
+                else:
+                    self.seg_ht_cachy.set("🔄 Actualizar CachyOS")
+
+                # FORZAR SIEMPRE la sincronización visual del slider
+                self.al_cambiar_modo_cachy(self.seg_ht_cachy.get())
 
                 if espacio_derecha >= 20.0:
                     self.slider_ht_cachy.configure(state="normal", from_=20.0, to=espacio_derecha)
@@ -2569,9 +2395,11 @@ class SavinOceanicCommand(ctk.CTk):
 
     def al_cambiar_modo_cachy(self, value):
         if "Actualizar" in value:
-            self.f_slider_sec.pack_forget()
+            if hasattr(self, 'f_slider_sec') and self.f_slider_sec.winfo_ismapped():
+                self.f_slider_sec.pack_forget()
         else:
-            self.f_slider_sec.pack(fill="x", pady=2, padx=0, after=self.seg_ht_cachy)
+            if hasattr(self, 'f_slider_sec') and not self.f_slider_sec.winfo_ismapped():
+                self.f_slider_sec.pack(fill="x", pady=(2, 6), before=self.btn_ht_ejecutar_cachy)
         self.actualizar_preview_barras_ht()
 
     def ht_ejecutar_accion_cachyos(self):
@@ -2595,7 +2423,6 @@ class SavinOceanicCommand(ctk.CTk):
             self.bloquear_ui(False)
             return
 
-        # BARRA ANTES
         self.canvas_ht_actual.delete("all")
         x = 0
         size_cachy_act = 0.0
@@ -2633,7 +2460,6 @@ class SavinOceanicCommand(ctk.CTk):
         info_act_items.append(f"Libre: {libre_act:.1f}GB")
         self.lbl_ht_bar_actual_info.configure(text=" | ".join(info_act_items))
 
-        # BARRA DESPUÉS
         self.canvas_ht_futuro.delete("all")
         
         if modo_actualizar:
@@ -2891,10 +2717,9 @@ class SavinOceanicCommand(ctk.CTk):
             return
 
         bato_img = self.tool_bato_img.get()
-        pack_bato = self.tool_pack_bato.get()
         pack_hollow = self.tool_pack_hollow.get()
 
-        if not (bato_img or pack_bato or pack_hollow):
+        if not (bato_img or pack_hollow):
             messagebox.showwarning("Selección Vacía", "Por favor, marca al menos un paquete para inyectar.")
             return
 
@@ -2925,15 +2750,6 @@ class SavinOceanicCommand(ctk.CTk):
                         URL_BATOCERA, dest, is_gdrive=is_gdrive,
                         progress_callback=prog_bato,
                         abort_check=lambda: self.abortar_proceso
-                    )
-
-                if pack_bato and not self.abortar_proceso:
-                    def prog_pack_b(pct, msg):
-                        self.actualizar_barra_tarea_dinamica(id_tarea, pct, f"Pack ROMs: {msg}")
-        
-                    self.descargar_y_extraer_batocera_pack(
-                        letra_hollow,
-                        callback_progreso_externo=prog_pack_b
                     )
 
                 if pack_hollow and not self.abortar_proceso:
@@ -3123,6 +2939,9 @@ class SavinOceanicCommand(ctk.CTk):
         for w in self.widgets_interactivos: 
             if hasattr(w, "winfo_exists") and w.winfo_exists(): w.configure(state=st)
         self.btn_modo_tools.configure(state=st)
+        # Refresca la barra para apagar o encender las manetas
+        if hasattr(self, 'actualizar_barra_visual'):
+            self.actualizar_barra_visual()
 
     def creventana_info_base(self, titulo, ancho, alto):
         v = ctk.CTkToplevel(self)
@@ -3155,7 +2974,6 @@ class SavinOceanicCommand(ctk.CTk):
         ctk.CTkLabel(frame_interno, text=t("modals.cachyos_header"), font=("Impact", 30), text_color=COLOR_CACHY).pack(pady=(0, 15))
         ctk.CTkLabel(frame_interno, text=t("modals.cachyos_body"), font=("Segoe UI", 15), justify="center", wraplength=620).pack(pady=5)
         
-        # Mensaje de apoyo para futuros sistemas
         f_apoyo = ctk.CTkFrame(frame_interno, fg_color=AZUL_CARD_INNER, corner_radius=8, border_width=1, border_color="#1e293b")
         f_apoyo.pack(fill="x", pady=(12, 5), padx=10)
         ctk.CTkLabel(
@@ -3386,7 +3204,6 @@ class SavinOceanicCommand(ctk.CTk):
             "preservar_espacio": self.preservar_espacio.get(), 
             "instalar_cachy": self.instalar_cachy.get(),
             "descargar_pack_hollow": self.descargar_pack_hollow.get(),
-            "descargar_pack_bato": self.descargar_pack_bato.get(),
             "instalar_bato": self.instalar_bato.get(),
             "metodo_descarga": self.metodo_descarga.get(),
             "cachy_flavor": getattr(self, 'cachy_flavor', ctk.StringVar(value="kde")).get()
@@ -3509,7 +3326,6 @@ class SavinOceanicCommand(ctk.CTk):
             preservar_espacio = config["preservar_espacio"] 
             instalar_cachy = config["instalar_cachy"]
             descargar_pack_hollow = config["descargar_pack_hollow"]
-            descargar_pack_bato = config["descargar_pack_bato"]
             instalar_bato = config["instalar_bato"]
             metodo_ext = config["metodo_descarga"]
             
@@ -3539,7 +3355,6 @@ class SavinOceanicCommand(ctk.CTk):
                 return None
 
             pasos_activos = ["ventoy"]
-            if descargar_pack_bato: pasos_activos.append("pack_bato")     
             if descargar_pack_hollow: pasos_activos.append("pack_hollow") 
             else: pasos_activos.append("ventoy_base")
                 
@@ -3631,22 +3446,6 @@ class SavinOceanicCommand(ctk.CTk):
                 agregar_exclusion_antivirus(letra_hollow)
             else:
                 raise RuntimeError("No se detectó la letra de unidad física para HOLLOWDRIVE.")
-
-            # PASO PACK ROMS BATOCERA
-            if "pack_bato" in pasos_activos:
-                iniciar_cronometro("Pack Roms Batocera")
-                if self.abortar_proceso: raise InterruptedError()
-                self.after(0, lambda: self.alternar_gif_descarga(True))
-                actualizar_progreso_paso(0.0, "Descargando e inyectando Pack Batocera...")
-                
-                self.descargar_y_extraer_batocera_pack(
-                    letra_hollow, 
-                    callback_progreso_externo=actualizar_progreso_paso
-                )
-
-                self.after(0, lambda: self.alternar_gif_descarga(False))
-                detener_cronometro("Pack Roms Batocera")
-                paso_actual += 1
 
             # PASO PACK UTILS HOLLOWDRIVE
             if "pack_hollow" in pasos_activos:
@@ -3846,34 +3645,31 @@ class SavinOceanicCommand(ctk.CTk):
     # =====================================================================
 
     def _coords_bar(self):
-        """ Delimita la barra horizontal fina de 14px """
         w = self.canvas.winfo_width()
         pad_x = 24
-        y1, y2 = 18, 32  # Barra fina de 14px
+        y1, y2 = 18, 32
         return pad_x, max(pad_x + 30, w - pad_x), y1, y2
 
     def _dibujar_maneta(self, x, hy1, hy2, glow_color):
-        """ Dibuja una maneta vertical ultrafina (5px) con resplandor neón """
         self.canvas.create_line(x, hy1 + 3, x, hy2 - 3, width=8, capstyle="round", fill=glow_color)
         self.canvas.create_line(x, hy1 + 3, x, hy2 - 3, width=6, capstyle="round", fill="#05080a")
         self.canvas.create_line(x, hy1 + 3, x, hy2 - 3, width=4, capstyle="round", fill="#ffffff")
         self.canvas.create_line(x, hy1 + 7, x, hy2 - 7, width=1.5, capstyle="round", fill="#64748b")
 
     def _formato_gb(self, val):
-        """ Omite el .0 si es entero; solo muestra decimales si realmente los hay """
         val_r = round(val, 1)
         if val_r == int(val_r):
             return f"{int(val_r)} GB"
         return f"{val_r:.1f} GB"
 
     def _ajustar_maneta_delta(self, handle_idx, delta_gb):
+        if getattr(self, 'en_proceso', False): return
         total = self.gb_totales
         if total <= 0: return
 
         base_h = 10.0 if self.descargar_pack_hollow.get() else 3.0
-        val_pack = self.tamanos_reales.get("pack_bato", 0.0) if self.descargar_pack_bato.get() else 0.0
         gb_bato = (self.tamanos_reales.get("bato_64", 0.0) if self.bato_64_act.get() else 0.0) if self.instalar_bato.get() else 0.0
-        min_h = base_h + val_pack + gb_bato
+        min_h = base_h + gb_bato
         min_c = 20.0 if self.instalar_cachy.get() else 0.0
         min_libre = 5.0 if self.preservar_espacio.get() else 0.0
 
@@ -3900,6 +3696,7 @@ class SavinOceanicCommand(ctk.CTk):
         self.actualizar_barra_visual()
 
     def _on_bar_wheel(self, event):
+        if getattr(self, 'en_proceso', False): return
         tiene_h1 = (self.instalar_cachy.get() and self.val_cachy_gb > 0) or (self.preservar_espacio.get() and self.val_libre_gb >= 0.1)
         tiene_h2 = self.instalar_cachy.get() and self.preservar_espacio.get() and (self.val_libre_gb >= 0.1)
         if not tiene_h1 and not tiene_h2: return
@@ -3913,6 +3710,7 @@ class SavinOceanicCommand(ctk.CTk):
         self._ajustar_maneta_delta(handle, delta)
 
     def _on_bar_key_left(self, event):
+        if getattr(self, 'en_proceso', False): return
         tiene_h1 = (self.instalar_cachy.get() and self.val_cachy_gb > 0) or (self.preservar_espacio.get() and self.val_libre_gb >= 0.1)
         if not tiene_h1: return
         paso = 0.1 if (event.state & 0x0001) else 1.0
@@ -3920,6 +3718,7 @@ class SavinOceanicCommand(ctk.CTk):
         self._ajustar_maneta_delta(handle, -paso)
 
     def _on_bar_key_right(self, event):
+        if getattr(self, 'en_proceso', False): return
         tiene_h1 = (self.instalar_cachy.get() and self.val_cachy_gb > 0) or (self.preservar_espacio.get() and self.val_libre_gb >= 0.1)
         if not tiene_h1: return
         paso = 0.1 if (event.state & 0x0001) else 1.0
@@ -3927,7 +3726,6 @@ class SavinOceanicCommand(ctk.CTk):
         self._ajustar_maneta_delta(handle, paso)
 
     def actualizar_barra_visual(self, *args):
-        """ Dibuja la barra horizontal ancha con su leyenda siempre visible """
         if not hasattr(self, 'canvas') or not self.canvas.winfo_exists():
             return
         w = self.canvas.winfo_width()
@@ -3944,11 +3742,9 @@ class SavinOceanicCommand(ctk.CTk):
         r_bar = 7
         y_mid = (y1 + y2) // 2
 
-        # 1. Riel base fino
         self.canvas.create_line(x_start + r_bar, y_mid, x_end - r_bar, y_mid, width=16, capstyle="round", fill="#1e293b")
         self.canvas.create_line(x_start + r_bar, y_mid, x_end - r_bar, y_mid, width=14, capstyle="round", fill="#0f172a")
 
-        # 2. Proporciones
         pix_h = max(2, int((self.val_hollow_gb / total) * ancho_util))
         pix_c = int((self.val_cachy_gb / total) * ancho_util) if self.instalar_cachy.get() else 0
 
@@ -3958,11 +3754,9 @@ class SavinOceanicCommand(ctk.CTk):
         tiene_cachy = self.instalar_cachy.get() and pix_c > 0
         tiene_libre = self.preservar_espacio.get() and (x_c_end < x_end)
         
-        # Validación de manetas visibles
         tiene_h1 = tiene_cachy or self.preservar_espacio.get()
         tiene_h2 = tiene_cachy and self.preservar_espacio.get()
 
-        # 3. Segmentos de color
         if not tiene_cachy and not tiene_libre:
             self.canvas.create_line(x_start + r_bar, y_mid, x_end - r_bar, y_mid, width=14, capstyle="round", fill=COLOR_HOLLOW)
         else:
@@ -3981,21 +3775,24 @@ class SavinOceanicCommand(ctk.CTk):
                 self.canvas.create_rectangle(x_l_start, y1, x_end - r_bar, y2, fill=COLOR_LIBRE, outline="")
                 self.canvas.create_oval(x_end - (2 * r_bar), y1, x_end, y2, fill=COLOR_LIBRE, outline="")
 
-        # 4. Manetas: si no existen, su posición se fija en -999 (imposible de tocar)
+        # 4. Manetas: atenuadas a gris si se está instalando
         hy1, hy2 = 10, 40
+        esta_instalando = getattr(self, 'en_proceso', False)
+        glow_h1 = "#475569" if esta_instalando else "#00d4ff"
+        glow_h2 = "#334155" if esta_instalando else "#10b981"
+
         if tiene_h1:
             self._pos_h1 = x_h_end
-            self._dibujar_maneta(self._pos_h1, hy1, hy2, "#00d4ff")
+            self._dibujar_maneta(self._pos_h1, hy1, hy2, glow_h1)
         else:
             self._pos_h1 = -999
 
         if tiene_h2:
             self._pos_h2 = x_c_end
-            self._dibujar_maneta(self._pos_h2, hy1, hy2, "#10b981")
+            self._dibujar_maneta(self._pos_h2, hy1, hy2, glow_h2)
         else:
             self._pos_h2 = -999
 
-        # 5. 1- LEYENDA CENTRADA MATEMÁTICAMENTE (Midiendo el bloque exacto)
         legend_items = [
             ("Hollowdrive", self._formato_gb(self.val_hollow_gb), "#00d4ff", "#0284c7")
         ]
@@ -4011,7 +3808,6 @@ class SavinOceanicCommand(ctk.CTk):
             cx = (w * (i + 1)) / (n_items + 1)
             texto_unificado = f"{nombre}   {gb_str}"
 
-            # 1. Medir el texto para centrar la unidad completa (LED + texto)
             t_id = self.canvas.create_text(cx, y_legend, text=texto_unificado, font=("Segoe UI", 13, "bold"), fill=col_txt, anchor="center")
             bbox = self.canvas.bbox(t_id)
 
@@ -4020,7 +3816,6 @@ class SavinOceanicCommand(ctk.CTk):
                 ancho_total = 20 + t_w
                 inicio_x = cx - (ancho_total / 2)
 
-                # Reposicionar texto y dibujar el LED a su izquierda
                 self.canvas.coords(t_id, inicio_x + 20, y_legend)
                 self.canvas.itemconfig(t_id, anchor="w")
 
@@ -4029,7 +3824,11 @@ class SavinOceanicCommand(ctk.CTk):
                 self.canvas.create_oval(led_x - 2, y_legend - 2, led_x + 2, y_legend + 2, fill=col_txt, outline="")
 
     def _on_bar_hover(self, event):
-        """ Solo activa el cursor de arrastre si una maneta existe físicamente """
+        """ Solo activa el cursor de arrastre si no se está instalando """
+        if getattr(self, 'en_proceso', False):
+            self.canvas.configure(cursor="")
+            return
+
         pos1 = getattr(self, '_pos_h1', -999)
         pos2 = getattr(self, '_pos_h2', -999)
 
@@ -4042,7 +3841,11 @@ class SavinOceanicCommand(ctk.CTk):
             self.canvas.configure(cursor="")
 
     def _on_bar_click(self, event):
-        """ Candado estricto: no permite agarrar manetas invisibles o fuera de rango """
+        """ Candado estricto: ignora clics durante la instalación """
+        if getattr(self, 'en_proceso', False):
+            self._active_handle = None
+            return
+
         self.canvas.focus_set()
         pos1 = getattr(self, '_pos_h1', -999)
         pos2 = getattr(self, '_pos_h2', -999)
@@ -4055,10 +3858,11 @@ class SavinOceanicCommand(ctk.CTk):
         elif pos2 > 0 and d2 <= 12:
             self._active_handle = 2
         else:
-            self._active_handle = None  # Nunca se activa nada si se pulsa fuera o no hay manetas
+            self._active_handle = None
 
     def _on_bar_drag(self, event):
-        if not getattr(self, '_active_handle', None):
+        """ Bloquea el arrastre si se está instalando """
+        if getattr(self, 'en_proceso', False) or not getattr(self, '_active_handle', None):
             return
         total = self.gb_totales
         if total <= 0: return
@@ -4071,9 +3875,8 @@ class SavinOceanicCommand(ctk.CTk):
         gb_cursor = round(gb_raw, 1) if (event.state & 0x0001) else round(gb_raw)
 
         base_h = 10.0 if self.descargar_pack_hollow.get() else 3.0
-        val_pack = self.tamanos_reales.get("pack_bato", 0.0) if self.descargar_pack_bato.get() else 0.0
         gb_bato = (self.tamanos_reales.get("bato_64", 0.0) if self.bato_64_act.get() else 0.0) if self.instalar_bato.get() else 0.0
-        min_h = base_h + val_pack + gb_bato
+        min_h = base_h + gb_bato
         min_c = 20.0 if self.instalar_cachy.get() else 0.0
         min_libre = 5.0 if self.preservar_espacio.get() else 0.0
 
@@ -4109,13 +3912,11 @@ class SavinOceanicCommand(ctk.CTk):
         self._active_handle = None
 
     def toggle_preservar_espacio(self):
-        """ Controla la reserva de espacio libre al conmutar el switch """
         if self.gb_totales <= 0:
             return
         total = self.gb_totales
 
         if self.preservar_espacio.get():
-            # Reserva un ~15% inicial para espacio libre recortándolo de Cachy o Hollow
             margen_libre = max(5.0, round(total * 0.15, 1))
             if self.instalar_cachy.get():
                 if self.val_cachy_gb - margen_libre >= 20.0:
@@ -4126,7 +3927,7 @@ class SavinOceanicCommand(ctk.CTk):
                     self.val_hollow_gb = max(10.0, round(total - self.val_cachy_gb - self.val_libre_gb, 1))
             else:
                 self.val_libre_gb = margen_libre
-                self.val_hollow_gb = max(10.0, round(total - self.val_libre_gb, 1))
+                self.val_hollow_gb = max(10.0, round(total - self.val_cachy_gb - self.val_libre_gb, 1))
         else:
             # Al apagar el switch, llena el disco al 100% (Libre = 0)
             if self.instalar_cachy.get():
@@ -4144,18 +3945,8 @@ class SavinOceanicCommand(ctk.CTk):
         total = self.gb_totales
 
         base_h = 10.0 if self.descargar_pack_hollow.get() else 3.0
-        val_pack = self.tamanos_reales.get("pack_bato", 0.0) if self.descargar_pack_bato.get() else 0.0
         gb_bato = (self.tamanos_reales.get("bato_64", 0.0) if self.bato_64_act.get() else 0.0) if self.instalar_bato.get() else 0.0
-        min_h = base_h + val_pack + gb_bato
-
-        # Bloqueo del pack de Batocera si no cabe en el disco
-        espacio_restante = total - min_h - (20.0 if self.instalar_cachy.get() else 0.0)
-        if self.instalar_bato.get():
-            if espacio_restante >= self.tamanos_reales.get("pack_bato", 37.8):
-                self.ch_pack_bato.configure(state="normal")
-            else:
-                self.descargar_pack_bato.set(False)
-                self.ch_pack_bato.configure(state="disabled")
+        min_h = base_h + gb_bato
 
         # Ajuste de proporciones iniciales
         if self.instalar_cachy.get():
@@ -4172,11 +3963,10 @@ class SavinOceanicCommand(ctk.CTk):
         self.actualizar_barra_visual()
 
     def actualizar_estados_bato(self):
-        """ Despliega las opciones de Batocera 64/32 bits encima de los packs """
+        """ Despliega las opciones de Batocera 64/32 bits encima del Pack HollowDrive """
         activado = self.instalar_bato.get()
         if activado:
             try:
-                # Se empaqueta justo tras el switch de Batocera y antes de los packs
                 self.f_bato_opts.pack(fill="x", pady=(2, 4), after=self.f_bato_h)
             except Exception:
                 try: self.f_bato_opts.pack(fill="x", pady=(2, 4))
@@ -4319,7 +4109,6 @@ class SavinOceanicCommand(ctk.CTk):
             self.p_total.pack(fill="x", padx=5, pady=2)
 
     def mostrar_menu_idioma(self):
-        """ Despliega el menú de idiomas con flechita o lo contrae si ya está abierto """
         now = time.time()
         if (now - getattr(self, "_last_lang_close_time", 0.0)) < 0.35:
             return
@@ -4333,7 +4122,6 @@ class SavinOceanicCommand(ctk.CTk):
             self._last_lang_close_time = time.time()
 
     def al_cambiar_idioma(self, seleccion):
-        """ Callback cuando el usuario selecciona un nuevo idioma en el menú desplegable """
         codigo = seleccion.lower().strip()
         i18n.set_current_language(codigo)
         if hasattr(self, 'btn_idioma'):
@@ -4342,10 +4130,8 @@ class SavinOceanicCommand(ctk.CTk):
         self.actualizar_textos_idioma()
 
     def actualizar_textos_idioma(self):
-        """ Actualiza en tiempo real todos los textos de la interfaz sin reiniciar """
         self.title(t("app.title", version=VERSION_ACTUAL))
 
-        # Pestañas y selector
         if hasattr(self, 'btn_modo_installer'):
             self.btn_modo_installer.configure(text=t("nav.installer"))
         if hasattr(self, 'btn_modo_tools'):
@@ -4357,7 +4143,6 @@ class SavinOceanicCommand(ctk.CTk):
         if hasattr(self, 'tooltip_refresh'):
             self.tooltip_refresh.text = t("tooltips.reload")
 
-        # Combobox selector de discos instalador
         if hasattr(self, 'combo_disk'):
             curr_val = self.combo_disk.get()
             if not getattr(self, 'lista_discos_reales', []):
@@ -4368,7 +4153,6 @@ class SavinOceanicCommand(ctk.CTk):
                 self.combo_disk.configure(values=nombres)
                 self.combo_disk.set(t("selector.select_placeholder"))
 
-        # Batocera & CachyOS
         if hasattr(self, 'sw_bato'):
             self.sw_bato.configure(text=t("batocera.switch"))
         self.actualizar_labels_ui_con_tamanos_reales()
@@ -4379,7 +4163,6 @@ class SavinOceanicCommand(ctk.CTk):
         if hasattr(self, 'r_hypr'):
             self.r_hypr.configure(text=t("cachyos.hyprland"))
 
-        # Motor de extracción
         if hasattr(self, 'lbl_motor'):
             self.lbl_motor.configure(text=t("motor.title"))
         if hasattr(self, 'r_motor_ram'):
@@ -4389,11 +4172,9 @@ class SavinOceanicCommand(ctk.CTk):
         if hasattr(self, 'sw_preservar'):
             self.sw_preservar.configure(text=t("motor.preserve_space"))
 
-        # Botón principal
         if hasattr(self, 'btn_start') and not getattr(self, 'img_instalar', None):
             self.btn_start.configure(text=t("install_btn.text"))
 
-        # HollowTools
         if hasattr(self, 'lbl_ht_title'):
             self.lbl_ht_title.configure(text=t("hollowtools.header_title"))
         if hasattr(self, 'tooltip_ht_refresh'):
@@ -4422,14 +4203,9 @@ class SavinOceanicCommand(ctk.CTk):
                 self.combo_ht_disk.configure(values=nombres_ht)
                 self.combo_ht_disk.set(t("selector.select_placeholder"))
 
-        # Rebalancear para refrescar la barra visual y las leyendas
         self.rebalancear()
 
     def animar_despliegue(self, widget, mostrar, altura_max, before_widget=None, pack_kwargs=None, on_finish=None):
-        """
-        Despliega u oculta suavemente un contenedor interpolando su altura (efecto acordeón fluido)
-        forzando el refresco de idletasks para evitar artefactos visuales o duplicación de elementos.
-        """
         anim_attr = f"_anim_slide_{id(widget)}"
         prev_id = getattr(self, anim_attr, None)
         if prev_id:
