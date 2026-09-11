@@ -156,6 +156,3 @@ SAVIN-HOLLOWDRIVE integra, enlaza o interactúa con proyectos de código abierto
 | **Requests** | Cliente HTTP para descargas y API | [Apache License 2.0](https://github.com/psf/requests/blob/main/LICENSE) | [requests.readthedocs.io](https://requests.readthedocs.io/) |
 | **urllib3** | Cliente HTTP y gestión de conexiones | [MIT License](https://github.com/urllib3/urllib3/blob/main/LICENSE.txt) | [urllib3.readthedocs.io](https://urllib3.readthedocs.io/) |
 | **windnd** | Módulo nativo Win32 Drag and Drop | [MIT License](https://github.com/AuspexLabs/windnd) | [github.com/AuspexLabs/windnd](https://github.com/AuspexLabs/windnd) |
-
-### Reconocimiento de Inspiración Técnica
-El diseño de la partición de utilidades y la estructura de herramientas de diagnóstico de este software reconoce como referente conceptual al proyecto comunitario **MediCat USB**.
