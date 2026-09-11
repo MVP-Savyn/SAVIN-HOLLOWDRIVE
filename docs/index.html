@@ -513,82 +513,137 @@
     }
 
     /* =====================================================================
-       📥 BOTÓN DESCARGA DIRECTA A GITHUB RELEASES
+       📥 BOTÓN DESCARGA EN CASCADA ESCALONADA (TELESCOPIC NEON)
        ===================================================================== */
     .download-widget {
       position: relative;
-      display: inline-block;
-      margin-bottom: 3.5rem;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 4.8rem;
+      z-index: 50;
+    }
+
+    /* Zona invisible segura anti-pérdida de hover */
+    .download-widget::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -15%;
+      width: 130%;
+      height: calc(100% + 115px);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .download-widget:hover::after {
+      pointer-events: auto;
     }
 
     .main-download-btn {
+      position: relative;
+      z-index: 10;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.8rem;
       background: linear-gradient(135deg, var(--blue-electric), #0040b0);
       color: #ffffff;
       font-size: 1.1rem;
       font-weight: 700;
       padding: 0.95rem 2.4rem;
-      border-radius: 14px;
+      border-radius: 50px;
       text-decoration: none;
-      box-shadow: 0 10px 30px rgba(0, 94, 255, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 94, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .main-download-btn:hover {
+    .download-widget:hover .main-download-btn {
       transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(0, 94, 255, 0.5);
+      box-shadow: 0 15px 40px rgba(0, 212, 255, 0.55);
+      border-color: var(--cyan);
     }
 
-    .download-dropdown {
+    /* Base de las cajas que caen en cascada */
+    .cascade-box {
       position: absolute;
-      top: 100%;
       left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 0.6rem;
-      width: 320px;
-      box-shadow: var(--shadow-glow), 0 20px 40px rgba(0, 0, 0, 0.6);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
-      z-index: 50;
+      top: 0;
+      text-decoration: none;
+      box-sizing: border-box;
+      border-radius: 40px;
       backdrop-filter: blur(16px);
-    }
-
-    .download-widget:hover .download-dropdown {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(12px);
-    }
-
-    .dropdown-item {
+      -webkit-backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      margin-bottom: 0.3rem;
-      text-decoration: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      white-space: nowrap;
     }
 
-    .dropdown-item.active {
-      background: rgba(0, 212, 255, 0.1);
-      color: var(--cyan);
-      font-weight: 700;
-      border: 1px solid rgba(0, 212, 255, 0.3);
+    .cascade-os-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
     }
 
-    .dropdown-item.disabled {
-      background: rgba(255, 255, 255, 0.02);
-      color: #64748b;
+    .cascade-os-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.35));
+    }
+
+    /* Nivel 1: Linux (84% de ancho) */
+    .cascade-box-1 {
+      width: 84%;
+      padding: 0.6rem 1.15rem;
+      font-size: 0.86rem;
+      background: rgba(13, 17, 23, 0.94);
+      border: 1px solid rgba(0, 212, 255, 0.35);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      color: #94a3b8;
+      z-index: 5;
+      transform: translateX(-50%) translateY(0) scale(0.9);
       cursor: not-allowed;
-      border: 1px dashed var(--border-color);
-      opacity: 0.75;
+    }
+
+    /* Nivel 2: macOS (70% de ancho) */
+    .cascade-box-2 {
+      width: 70%;
+      padding: 0.5rem 1rem;
+      font-size: 0.78rem;
+      background: rgba(8, 12, 16, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.9);
+      color: #64748b;
+      z-index: 4;
+      transform: translateX(-50%) translateY(0) scale(0.82);
+      cursor: not-allowed;
+    }
+
+    /* Despliegue en hover */
+    .download-widget:hover .cascade-box {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .download-widget:hover .cascade-box-1 {
+      top: calc(100% + 8px);
+      transform: translateX(-50%) translateY(0) scale(1);
+      transition-delay: 0.02s;
+    }
+
+    .download-widget:hover .cascade-box-2 {
+      top: calc(100% + 50px);
+      transform: translateX(-50%) translateY(0) scale(1);
+      transition-delay: 0.07s;
     }
 
     .badge-support {
@@ -1329,14 +1384,13 @@
       user-select: none;
     }
 
-    /* Menú de radios flotante sin contenedores visibles, aparece en hover */
     .floating-radio-menu {
       position: absolute;
       bottom: 100%;
       left: 50%;
       transform: translateX(-50%) translateY(10px);
       width: 260px;
-      padding-bottom: 15px; /* Puente anti-pérdida de cursor */
+      padding-bottom: 15px;
       background: transparent;
       border: none;
       box-shadow: none;
@@ -1349,7 +1403,6 @@
       gap: 0.25rem;
     }
 
-    /* Al colocar el cursor sobre el widget, aparece la lista de radios flotante */
     .floating-audio-widget:hover .floating-radio-menu {
       opacity: 1;
       visibility: visible;
@@ -1375,7 +1428,6 @@
       background: transparent;
     }
 
-    /* Botones de radio: texto puro azul neón flotante con transparencia */
     .radio-opt-btn {
       background: transparent;
       border: none;
@@ -1419,7 +1471,6 @@
       box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
     }
 
-    /* Contenedor del visualizador con fade transparente en ambos lados */
     .floating-wave-wrapper {
       width: 100%;
       height: 44px;
@@ -1438,7 +1489,6 @@
       filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
     }
 
-    /* Título de la pista flotante con brillo azul translúcido */
     .floating-track-info {
       width: 100%;
       text-align: center;
@@ -1472,7 +1522,6 @@
       80%, 100% { transform: translateX(var(--scroll-offset, -50px)); }
     }
 
-    /* Botones compactos y transparentes en azul neón */
     .floating-controls-row {
       display: flex;
       align-items: center;
@@ -1710,27 +1759,29 @@
         <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
       </p>
 
+      <!-- BOTÓN DE DESCARGA PRINCIPAL CON CASCADA ESCALONADA (SIN DUPLICAR WINDOWS) -->
       <div class="download-widget">
         <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
           Descargar para Windows (.exe)
         </a>
 
-        <div class="download-dropdown">
-          <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="dropdown-item active">
-            <span>🪟 Windows (BETA)</span>
-            <span style="font-size: 0.8rem; font-weight: 800;">DISPONIBLE</span>
-          </a>
-
-          <div class="dropdown-item disabled">
-            <span>🐧 Linux</span>
-            <span class="badge-support">Próximamente si me apoyáis ;)</span>
+        <!-- Nivel 1: Linux (84% de ancho) -->
+        <div class="cascade-box cascade-box-1">
+          <div class="cascade-os-left">
+            <img src="media/images/linux.png" alt="Linux" class="cascade-os-icon" onerror="this.src='images/linux.png';" />
+            <span>Linux</span>
           </div>
+          <span class="badge-support">Próximamente ;)</span>
+        </div>
 
-          <div class="dropdown-item disabled">
-            <span>🍎 macOS</span>
-            <span class="badge-support">Próximamente si me apoyáis ;)</span>
+        <!-- Nivel 2: macOS (70% de ancho) -->
+        <div class="cascade-box cascade-box-2">
+          <div class="cascade-os-left">
+            <img src="media/images/macos.png" alt="macOS" class="cascade-os-icon" onerror="this.src='images/macos.png';" />
+            <span>macOS</span>
           </div>
+          <span class="badge-support">Próximamente ;)</span>
         </div>
       </div>
     </section>
@@ -2022,25 +2073,21 @@
 
   <!-- REPRODUCTOR COMPACTO FLOTANTE 100% NEÓN AZUL TRANSPARENTE -->
   <aside class="floating-audio-widget" id="cavaPlayer">
-    <!-- Menú de radios flotante: Aparece automáticamente al pasar el ratón -->
     <div class="floating-radio-menu" id="radioDrawer">
       <div class="menu-header-minimal">SELECCIONAR EMISORA</div>
       <div class="radio-options-list" id="radioOptionsList"></div>
     </div>
 
-    <!-- Visualizador de ondas simétrico con difuminado transparente lateral -->
     <div class="floating-wave-wrapper">
       <canvas id="cavaCanvas" width="250" height="44"></canvas>
     </div>
 
-    <!-- Nombre de la emisora en rotación / marquesina -->
     <div class="floating-track-info">
       <div class="marquee-container" id="marqueeContainer">
         <span class="player-title" id="trackTitle">Conectando señal...</span>
       </div>
     </div>
 
-    <!-- Controles transparentes en azul eléctrico con brillo neón -->
     <div class="floating-controls-row">
       <button class="neon-ctrl-btn" id="btnPrev" title="Emisora Anterior">
         <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
@@ -2162,7 +2209,6 @@
     const volIcon = document.getElementById("volIcon");
     const radioOptionsList = document.getElementById("radioOptionsList");
 
-    // Función que blinda el volumen para que NUNCA suene al 100% al inicio
     function sincronizarVolumen() {
       const vol = parseFloat(volSlider.value);
       audioElement.volume = isNaN(vol) ? 0.75 : vol;
@@ -2172,7 +2218,6 @@
       }
     }
 
-    // Forzar el volumen en el milisegundo exacto en que arranca el stream
     audioElement.addEventListener("play", sincronizarVolumen);
     audioElement.addEventListener("playing", sincronizarVolumen);
     audioElement.addEventListener("canplay", sincronizarVolumen);
@@ -2222,12 +2267,12 @@
 
       if (autoPlay) {
         audioElement.src = radio.url;
-        sincronizarVolumen(); // Fijamos volumen ANTES de reproducir
+        sincronizarVolumen();
         iniciarAudioContext();
         audioElement.play()
           .then(() => {
             setPlayingState(true);
-            sincronizarVolumen(); // Reaseguramos volumen justo tras arrancar
+            sincronizarVolumen();
           })
           .catch(() => setPlayingState(false));
       }
@@ -2236,12 +2281,12 @@
     function togglePlay() {
       if (!isPlaying) {
         audioElement.src = RADIOS[currentRadioIdx].url;
-        sincronizarVolumen(); // Fijamos volumen ANTES de reproducir
+        sincronizarVolumen();
         iniciarAudioContext();
         audioElement.play()
           .then(() => {
             setPlayingState(true);
-            sincronizarVolumen(); // Reaseguramos volumen justo tras arrancar
+            sincronizarVolumen();
           })
           .catch(() => setPlayingState(false));
       } else {
@@ -2304,7 +2349,7 @@
         try {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
           analyser = audioCtx.createAnalyser();
-          gainNode = audioCtx.createGain(); // Control físico de ganancia
+          gainNode = audioCtx.createGain();
 
           analyser.fftSize = 128;
           analyser.smoothingTimeConstant = 0.85;
@@ -2316,9 +2361,7 @@
           
           audioSourceConnected = true;
           dataArray = new Uint8Array(analyser.frequencyBinCount);
-        } catch (e) {
-          // Modo reactivo fluido si CORS no está habilitado
-        }
+        } catch (e) {}
       }
       if (audioCtx && audioCtx.state === "suspended") {
         audioCtx.resume();
@@ -2389,7 +2432,7 @@
 
     dibujarOnda();
     cargarEmisora(0, false);
-    sincronizarVolumen(); // Ejecución inmediata al cargar la web
+    sincronizarVolumen();
     
     // =====================================================================
     // 4. CONTROL INTELIGENTE DE VÍDEOS DE SECCIONES
