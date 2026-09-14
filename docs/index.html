@@ -6,7 +6,7 @@
   <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
   <link rel="icon" type="image/x-icon" href="assets/icon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 
   <style>
@@ -34,7 +34,11 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Optimización GPU: transiciones solo a los elementos que realmente interactúan */
+    a, button, .action-pillar-card, .video-card, .circle-btn, .radio-opt-btn, .tool-category-item {
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     html {
@@ -51,7 +55,7 @@
     }
 
     /* =====================================================================
-       🎥 FONDO DE VÍDEO ANIMADO
+       🎥 FONDO DE VÍDEO ANIMADO (OPTIMIZADO GPU)
        ===================================================================== */
     .bg-video-wrap {
       position: fixed;
@@ -64,7 +68,7 @@
       transition: opacity 0.8s ease-in-out;
       pointer-events: none;
       transform: translateZ(0);
-      will-change: transform, opacity;
+      will-change: opacity;
     }
 
     .bg-video-wrap.active {
@@ -76,7 +80,8 @@
       height: 100%;
       object-fit: cover;
       filter: blur(8px) brightness(0.65);
-      transform: scale(1.05);
+      transform: scale(1.05) translateZ(0);
+      backface-visibility: hidden;
     }
 
     .bg-video-overlay {
@@ -87,18 +92,25 @@
       pointer-events: none;
     }
 
+    /* Optimización: Cambiado blur() pesado por gradiente radial matemático */
     .ambient-light {
       position: fixed;
       width: 450px;
       height: 450px;
       border-radius: 50%;
-      filter: blur(140px);
       pointer-events: none;
       z-index: -2;
-      opacity: 0.35;
     }
-    .light-top-left { top: -100px; left: -100px; background: var(--blue-electric); }
-    .light-mid-right { top: 40%; right: -150px; background: var(--cyan); }
+    .light-top-left { 
+      top: -100px; 
+      left: -100px; 
+      background: radial-gradient(circle, rgba(0, 94, 255, 0.35) 0%, rgba(0, 94, 255, 0) 70%); 
+    }
+    .light-mid-right { 
+      top: 40%; 
+      right: -150px; 
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.25) 0%, rgba(0, 212, 255, 0) 70%); 
+    }
 
     /* =====================================================================
        🧭 NAVEGACIÓN
@@ -110,12 +122,14 @@
       z-index: 100;
       background: var(--nav-bg);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0.75rem 2rem;
       gap: 1rem;
+      transform: translateZ(0);
     }
 
     .nav-brand {
@@ -350,10 +364,6 @@
       color: var(--cyan);
     }
 
-    @media (max-width: 900px) {
-      .side-index-nav { display: none; }
-    }
-
     /* =====================================================================
        🗡️ WIDGET FIJO: EL CABALLERO + BOTÓN MONEDA
        ===================================================================== */
@@ -368,6 +378,7 @@
       user-select: none;
       pointer-events: none;
       transition: transform 0.3s ease, opacity 0.3s ease;
+      transform: translateZ(0);
     }
 
     .coin-btn-interactive {
@@ -418,6 +429,7 @@
       pointer-events: auto;
       cursor: pointer;
       transition: box-shadow 0.25s ease;
+      will-change: transform;
     }
 
     .coin-btn-interactive:hover .coin-speech-bubble {
@@ -446,13 +458,10 @@
     }
 
     @media (max-width: 1400px) {
-      .fixed-knight-container { transform: scale(0.85); transform-origin: bottom left; left: -15px; }
+      .fixed-knight-container { transform: scale(0.85) translateZ(0); transform-origin: bottom left; left: -15px; }
     }
     @media (max-width: 1100px) {
-      .fixed-knight-container { transform: scale(0.68); transform-origin: bottom left; left: -20px; opacity: 0.85; }
-    }
-    @media (max-width: 800px) {
-      .fixed-knight-container { transform: scale(0.5); transform-origin: bottom left; left: -25px; bottom: -20px; }
+      .fixed-knight-container { transform: scale(0.68) translateZ(0); transform-origin: bottom left; left: -20px; opacity: 0.85; }
     }
 
     /* =====================================================================
@@ -524,7 +533,6 @@
       z-index: 50;
     }
 
-    /* Zona invisible segura anti-pérdida de hover */
     .download-widget::after {
       content: '';
       position: absolute;
@@ -565,7 +573,6 @@
       border-color: var(--cyan);
     }
 
-    /* Base de las cajas que caen en cascada */
     .cascade-box {
       position: absolute;
       left: 50%;
@@ -599,7 +606,6 @@
       filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.35));
     }
 
-    /* Nivel 1: Linux (84% de ancho) */
     .cascade-box-1 {
       width: 84%;
       padding: 0.6rem 1.15rem;
@@ -613,7 +619,6 @@
       cursor: not-allowed;
     }
 
-    /* Nivel 2: macOS (70% de ancho) */
     .cascade-box-2 {
       width: 70%;
       padding: 0.5rem 1rem;
@@ -627,7 +632,6 @@
       cursor: not-allowed;
     }
 
-    /* Despliegue en hover */
     .download-widget:hover .cascade-box {
       opacity: 1;
       visibility: visible;
@@ -664,6 +668,7 @@
       inset: 0;
       background: rgba(0, 0, 0, 0.78);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 2000;
       display: flex;
       align-items: center;
@@ -800,6 +805,8 @@
       padding: 1.5rem;
       box-shadow: var(--shadow-glow);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transform: translateZ(0);
     }
 
     .video-header {
@@ -954,7 +961,9 @@
       margin-bottom: 2.5rem;
       box-shadow: var(--shadow-glow);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       position: relative;
+      transform: translateZ(0);
     }
 
     .pillar-header-row {
@@ -1029,7 +1038,6 @@
       display: flex;
       flex-direction: column;
       gap: 0.65rem;
-      transition: transform 0.2s, border-color 0.2s;
       min-width: 0;
     }
 
@@ -1254,6 +1262,7 @@
       border-radius: 18px;
       padding: 2.2rem;
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -1261,6 +1270,7 @@
       text-align: center;
       position: relative;
       overflow: hidden;
+      transform: translateZ(0);
     }
 
     .glow-bg-animated {
@@ -1322,9 +1332,11 @@
       padding: 2rem;
       box-shadow: var(--shadow-glow);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: flex;
       flex-direction: column;
       justify-content: center;
+      transform: translateZ(0);
     }
 
     .tip-header {
@@ -1382,6 +1394,7 @@
       align-items: center;
       gap: 0.45rem;
       user-select: none;
+      transform: translateZ(0);
     }
 
     .floating-radio-menu {
@@ -1625,26 +1638,6 @@
       font-size: 0.8rem;
     }
 
-    @media (max-width: 850px) {
-      .specs-grid { grid-template-columns: 1fr; }
-      .video-player-mockup { height: 260px; }
-      nav { padding: 0.8rem 1rem; }
-      .tools-categories-grid { grid-template-columns: 1fr; }
-      .sub-card-pack { flex-direction: column; }
-    }
-
-    @media (max-width: 768px) {
-      .wallpapers-hint { display: none; }
-    }
-
-    @media (max-width: 500px) {
-      .floating-audio-widget {
-        right: 15px;
-        bottom: 15px;
-        width: 230px;
-      }
-    }
-
     .cachyos-text-link {
       font-weight: 800;
       background: linear-gradient(135deg, var(--cyan), #38bdf8);
@@ -1659,10 +1652,79 @@
     .cachyos-text-link:hover {
       filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.85));
     }
+
+    /* =====================================================================
+       📱 ADAPTACIÓN EXCLUSIVA PARA MÓVILES (NO TOCA EL DISEÑO DE ESCRITORIO)
+       ===================================================================== */
+    @media (max-width: 900px) {
+      .side-index-nav { display: none; }
+    }
+
+    @media (max-width: 850px) {
+      .specs-grid { grid-template-columns: 1fr; }
+      .video-player-mockup { height: 260px; }
+      nav { padding: 0.8rem 1rem; }
+      .tools-categories-grid { grid-template-columns: 1fr; }
+      .sub-card-pack { flex-direction: column; }
+    }
+
+    @media (max-width: 768px) {
+      .wallpapers-hint { display: none; }
+      .circles-tray.open { max-width: 140px; }
+    }
+
+    @media (max-width: 650px) {
+      .hero h1 { font-size: 2.1rem; }
+      .hero p { font-size: 1rem; }
+      .section-header-block h2 { font-size: 2rem; }
+      .action-pillar-card { padding: 1.4rem; }
+
+      /* Botón descarga adaptable */
+      .main-download-btn {
+        width: 100%;
+        max-width: 320px;
+        padding: 0.85rem 1.4rem;
+        font-size: 0.95rem;
+      }
+      .cascade-box-1 { width: 90%; }
+      .cascade-box-2 { width: 80%; }
+
+      /* El caballero se posiciona a la izquierda para no tapar nada */
+      .fixed-knight-container {
+        left: -15px;
+        bottom: 5px;
+        transform: scale(0.42) translateZ(0);
+        transform-origin: bottom left;
+        opacity: 0.9;
+        z-index: 99;
+      }
+      .coin-btn-interactive {
+        transform: translateX(10px);
+      }
+
+      /* Reproductor compacto colocado en la esquina derecha */
+      .floating-audio-widget {
+        right: 12px;
+        bottom: 12px;
+        width: 210px;
+        background: rgba(5, 8, 10, 0.75);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 20px;
+        padding: 0.5rem 0.4rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .floating-vol-wrap {
+        display: none; /* Se oculta slider de volumen en móvil para no saturar */
+      }
+      .floating-radio-menu {
+        width: 220px;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- Fondo animado -->
+  <!-- Fondo animado optimizado -->
   <div class="bg-video-wrap active" id="bgVideoWrap">
     <video id="bgVideo" loop muted playsinline autoplay preload="auto">
       <source id="bgVideoSource" src="media/videos/1.webm" type="video/webm" />
@@ -1759,14 +1821,14 @@
         <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
       </p>
 
-      <!-- BOTÓN DE DESCARGA PRINCIPAL CON CASCADA ESCALONADA (SIN DUPLICAR WINDOWS) -->
+      <!-- BOTÓN DE DESCARGA PRINCIPAL CON CASCADA ESCALONADA -->
       <div class="download-widget">
         <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
           Descargar para Windows (.exe)
         </a>
 
-        <!-- Nivel 1: Linux (84% de ancho) -->
+        <!-- Nivel 1: Linux -->
         <div class="cascade-box cascade-box-1">
           <div class="cascade-os-left">
             <img src="media/images/linux.png" alt="Linux" class="cascade-os-icon" onerror="this.src='images/linux.png';" />
@@ -1775,7 +1837,7 @@
           <span class="badge-support">Próximamente ;)</span>
         </div>
 
-        <!-- Nivel 2: macOS (70% de ancho) -->
+        <!-- Nivel 2: macOS -->
         <div class="cascade-box cascade-box-2">
           <div class="cascade-os-left">
             <img src="media/images/macos.png" alt="macOS" class="cascade-os-icon" onerror="this.src='images/macos.png';" />
