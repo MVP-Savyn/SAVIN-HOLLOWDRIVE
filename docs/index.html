@@ -58,17 +58,18 @@
        ===================================================================== */
     .bg-video-wrap {
       position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: -2;
       overflow: hidden;
       opacity: 0;
-      transition: opacity 0.6s ease-in-out;
+      transition: opacity 0.5s ease-in-out;
       pointer-events: none;
-      /* Aisla el fondo entero en la GPU para que el scroll no lo vuelva a procesar */
-      contain: strict;
+      /* ESTO OBLIGA A ZEN/FIREFOX A USAR UN BUFFER SEPARADO */
       transform: translate3d(0, 0, 0);
+      isolation: isolate;
       will-change: opacity;
     }
 
@@ -77,17 +78,13 @@
     }
 
     #bgVideo {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 105vw;
-      height: 105vh;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      /* Tu blur y oscuridad originales intactos */
       filter: blur(8px) brightness(0.65);
-      transform: translate(-50%, -50%) translate3d(0, 0, 0);
+      transform: scale(1.08) translate3d(0, 0, 0);
       backface-visibility: hidden;
-      will-change: transform;
+      perspective: 1000px;
     }
 
     .bg-video-overlay {
