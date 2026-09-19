@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAVIN-HOLLOWDRIVE // El Kit Más Potente del Mundo</title>
+  <link rel="icon" type="image/x-icon" href="assets/icon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+<body>
+  <!-- Fondo de vídeo animado (se oculta suavemente al desactivar dejando ver el degradado) -->
+  <div class="bg-video-wrap active" id="bgVideoWrap">
+    <video id="bgVideo" loop muted playsinline autoplay preload="auto">
+      <source id="bgVideoSource" src="media/videos/1.mp4" type="video/mp4" />
+      <source src="media/videos/1.webm" type="video/webm" />
+    </video>
+    <div class="bg-video-overlay"></div>
+  </div>
+
+  <div class="ambient-light light-top-left"></div>
+  <div class="ambient-light light-mid-right"></div>
+
+  <!-- PANTALLA INICIAL DE INTRO CON DESENFOQUE COMPLETO -->
+  <div class="intro-overlay active" id="introOverlay"></div>
+
+  <!-- NAVEGACIÓN -->
+  <nav>
+    <div class="nav-left">
+      <a href="https://github.com/MVP-Savyn" target="_blank" rel="noopener" class="github-pill" title="Visitar perfil de GitHub">
+        <img src="https://github.com/MVP-Savyn.png" alt="MVP-Savyn" class="avatar-img" onerror="this.src='https://avatars.githubusercontent.com/u/9919?v=4'" />
+        <span>MVP-Savyn</span>
+      </a>
+    </div>
+
+    <!-- Espacio central despejado para el visualizador en la barra -->
+    <div class="nav-center-slot"></div>
+
+    <div class="nav-right">
+      <div class="anim-widget">
+        <button class="btn-animar active" id="btnAnimar" title="Activar / Desactivar fondo animado">
+          <span>Wallpapers</span>
+        </button>
+        <div class="circles-tray open" id="circlesTray">
+          <button class="circle-btn active" data-index="1" title="Fondo 1"></button>
+          <button class="circle-btn" data-index="2" title="Fondo 2"></button>
+          <button class="circle-btn" data-index="3" title="Fondo 3"></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ÍNDICE LATERAL FLOTANTE -->
+  <aside class="side-index-nav" id="sideIndexNav" aria-label="Índice de secciones">
+    <a href="#sec-hero" class="side-index-dot active">
+      <span class="side-dot-label">Inicio</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-video" class="side-index-dot">
+      <span class="side-dot-label">Vídeo Tutorial</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-kit" class="side-index-dot">
+      <span class="side-dot-label">Kit de Herramientas</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-batocera" class="side-index-dot">
+      <span class="side-dot-label">Batocera Retrogaming</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-sistema" class="side-index-dot">
+      <span class="side-dot-label">Sistema Portátil</span>
+      <span class="side-dot-bar"></span>
+    </a>
+    <a href="#sec-requisitos" class="side-index-dot">
+      <span class="side-dot-label">Requisitos Mínimos</span>
+      <span class="side-dot-bar"></span>
+    </a>
+  </aside>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="container">
+    <!-- HERO SECTION -->
+    <section class="hero" id="sec-hero">
+      <div class="hero-brand-block">
+        <img src="assets/icon.ico" alt="Icono" class="hero-brand-icon" width="34" height="34" />
+        <img src="images/hollowdrive.png" alt="SAVIN-HOLLOWDRIVE" class="hero-brand-logo" onerror="this.src='media/images/hollowdrive.png';" />
+        <span class="brand-badge">BETA</span>
+      </div>
+      <h1>El Kit Más Potente del Mundo <span class="gradient-text">en tu Bolsillo</span></h1>
+      <p>
+        Convierte cualquier USB o disco externo en una bestia de rescate y sistemas portátiles con <strong>Batocera</strong> y <strong>CachyOS</strong>, con total libertad para añadir tus propias <strong>ISOs</strong>.<br />
+        <span class="highlight-safe">Todo funciona de manera completamente autónoma y aislada, sin tocar ni afectar al ordenador al que se conecta.</span>
+      </p>
+
+      <!-- BOTÓN DE DESCARGA ADAPTADO -->
+      <div class="download-widget">
+        <a href="https://github.com/MVP-Savyn/SAVIN-HOLLOWDRIVE/releases/latest/download/HollowDriveBETA.exe" class="main-download-btn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.798"/></svg>
+          Descargar para Windows (.exe)
+        </a>
+
+        <!-- Nivel 1: Linux -->
+        <div class="cascade-box cascade-box-1">
+          <div class="cascade-os-left">
+            <img src="media/images/linux.png" alt="Linux" class="cascade-os-icon" onerror="this.src='images/linux.png';" />
+            <span>Linux</span>
+          </div>
+          <span class="badge-support">Próximamente ;)</span>
+        </div>
+
+        <!-- Nivel 2: macOS -->
+        <div class="cascade-box cascade-box-2">
+          <div class="cascade-os-left">
+            <img src="media/images/macos.png" alt="macOS" class="cascade-os-icon" onerror="this.src='images/macos.png';" />
+            <span>macOS</span>
+          </div>
+          <span class="badge-support">Próximamente ;)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREVISUALIZACIÓN VÍDEO YOUTUBE -->
+    <section class="video-section" id="sec-video">
+      <div class="video-card">
+        <div class="video-header">
+          <div class="video-title">
+            <span>📺</span>
+            <span>Mira el vídeo para saber cómo funciona!</span>
+          </div>
+          <span class="badge-upcoming">Próximamente en YouTube</span>
+        </div>
+
+        <a href="https://www.youtube.com/@T0xicAre4" target="_blank" rel="noopener" class="video-player-mockup" title="Ir a mi canal de YouTube @T0xicAre4">
+          <div class="play-btn-circle">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </div>
+          <div class="video-caption">◈ ¡MIRA ESTE VÍDEO PARA SABER CÓMO FUNCIONA! ◈</div>
+          <div class="video-subcaption">Haz clic para visitar mi canal oficial de YouTube (@T0xicAre4)</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ¿QUÉ HACE HOLLOWDRIVE? -->
+    <section style="margin-bottom: 5rem;">
+      <div class="section-header-block">
+        <div class="section-badge-tag">CAPACIDADES & POTENCIA</div>
+        <h2>¿Qué hace <span class="highlight">Hollowdrive</span>?</h2>
+        <div class="section-title-line"></div>
+        <p class="section-intro-text">
+          Hollowdrive convierte cualquier memoria USB o disco duro en un kit personalizado con:
+        </p>
+      </div>
+
+      <!-- 1. KIT DE HERRAMIENTAS -->
+      <article class="action-pillar-card" id="sec-kit">
+        <div class="pillar-header-row">
+          <div class="pillar-title-wrap">
+            <span class="pillar-num-badge">01</span>
+            <h3>Kit de Herramientas</h3>
+          </div>
+        </div>
+
+        <div class="section-video-slot">
+          <video class="section-preview-video" loop muted playsinline preload="metadata">
+            <source src="media/videos/kit.webm" type="video/webm" />
+            <source src="media/videos/kit.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        <p class="pillar-body-text">
+          He creado un kit de herramientas booteables que funciona con Ventoy, con un menú personalizado para rescatar ordenadores, gestionar particiones... etc, esto es lo que incluye:
+        </p>
+
+        <div class="tools-categories-grid">
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/antivirus.png" alt="Antivirus" class="tool-cat-icon" onerror="this.src='media/images/liveos.png';" />
+              <span class="tool-cat-title">Antivirus</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.malwarebytes.com/" target="_blank" rel="noopener" class="tool-file-link" title="Malwarebytes Oficial">
+                <span class="tool-file-name">Malwarebytes.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/backup.png" alt="Backups" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Backups y Clonación de Discos/Sistemas</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.ubackup.com/" target="_blank" rel="noopener" class="tool-file-link" title="AOMEI Backupper Oficial">
+                <span class="tool-file-name">AOMEI_Backupper_Technician_Plus_8.4.0.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://clonezilla.org/" target="_blank" rel="noopener" class="tool-file-link" title="Clonezilla Oficial">
+                <span class="tool-file-name">clonezilla-live-3.3.1-35-amd64.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://rescuezilla.com/" target="_blank" rel="noopener" class="tool-file-link" title="Rescuezilla Oficial">
+                <span class="tool-file-name">rescuezilla-2.6.2-64bit.resolute.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/liveos.png" alt="Sistema Live" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Sistema Live lleno de Herramientas</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.hirensbootcd.org/" target="_blank" rel="noopener" class="tool-file-link" title="Hiren's BootCD PE Oficial">
+                <span class="tool-file-name">HBCD_PE_x64.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/osimages.png" alt="Tus ISOs" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Carpeta para dejar tus propias ISOs</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.ventoy.net/" target="_blank" rel="noopener" class="tool-file-link" title="Documentación Ventoy">
+                <span class="tool-file-name">Directorio nativo Ventoy (Copia y pega cualquier ISO)</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/partition.png" alt="Particiones" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Herramientas de Particiones</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://gparted.org/" target="_blank" rel="noopener" class="tool-file-link" title="GParted Oficial">
+                <span class="tool-file-name">gparted-live-1.8.1-2-amd64.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://www.diskpart.com/" target="_blank" rel="noopener" class="tool-file-link" title="AOMEI Partition Assistant Oficial">
+                <span class="tool-file-name">PartAssist_WinPE_Technician_10.11.0.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="tool-category-item">
+            <div class="tool-cat-head">
+              <img src="media/images/supergrub.png" alt="Arranque" class="tool-cat-icon" onerror="this.src='assets/icon.ico';" />
+              <span class="tool-cat-title">Rescate de Arranque</span>
+            </div>
+            <div class="tool-files-list">
+              <a href="https://www.supergrubdisk.org/super-grub2-disk/" target="_blank" rel="noopener" class="tool-file-link" title="Super GRUB2 Disk Oficial">
+                <span class="tool-file-name">Super_GRUB2_Disk.efi</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+              <a href="https://www.supergrubdisk.org/super-grub2-disk/" target="_blank" rel="noopener" class="tool-file-link" title="Super GRUB2 Disk Oficial">
+                <span class="tool-file-name">Super_GRUB2_Disk.iso</span>
+                <span class="arrow-icon">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. BATOCERA -->
+      <article class="action-pillar-card" id="sec-batocera">
+        <div class="pillar-header-row">
+          <div class="pillar-title-wrap">
+            <span class="pillar-num-badge">02</span>
+            <h3>BATOCERA</h3>
+          </div>
+        </div>
+
+        <div class="section-video-slot">
+          <video class="section-preview-video" loop muted playsinline preload="metadata">
+            <source src="media/videos/batocera.webm" type="video/webm" />
+            <source src="media/videos/batocera.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        <div class="batocera-hero-row">
+          <a href="https://batocera.org" target="_blank" rel="noopener" class="btn-batocera-link" title="Visitar la web oficial de Batocera">
+            <img src="media/images/batocera.png" alt="Batocera Linux" class="batocera-logo-btn" onerror="this.src='assets/icon.ico';" />
+            <span class="batocera-tag-hint">Página oficial ↗</span>
+          </a>
+          <div style="flex: 1; min-width: 260px;">
+            <p class="pillar-body-text" style="margin-bottom: 0;">
+              He optimizado al máximo la gestión del pincho para que puedas usar Batocera sin malgastar ni un megabyte de espacio, te lo explico:<br /><br />
+              Hollowdrive usa una imagen que he modificado personalmente para que ocupe lo menos posible y, al ejecutarla desde Ventoy, detecte la carpeta del sistema <strong>"batocera/"</strong> de la partición HOLLOWDRIVE con todos sus juegos y personalización. Si no existe, la crea de cero, pero siempre puedes gestionar las roms, partidas y el sistema entero con total libertad, ya que podrás ver los archivos desde el explorador de archivos de tu ordenador, o incluso desde CachyOS.<br /><br />
+              <strong>De esta manera puedes usar Batocera sin siquiera tenerlo instalado en el USB!!</strong> Así no devora todo tu pincho, es un dolor de cabeza intentar hacer que batocera conviva con otros sistemas y particiones.
+            </p>
+          </div>
+        </div>
+
+        <div class="sub-card-pack">
+          <img src="media/images/gamepad.png" alt="Mando" class="pack-gamepad-icon" onerror="this.src='assets/icon.ico';" />
+          <div class="pack-content">
+            <h4>
+              <span>ADDONS</span>
+            </h4>
+            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+              Desde el apartado de Addons podréis añadir cualquier tipo de descarga como packs de batocera (bajo vuestro propio riesgo) siempre y cuando dispongáis de un .json con dicho contenido. <strong>Mira mi vídeo de yt para saber más ;)</strong>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3. SISTEMA PORTÁTIL -->
+      <article class="action-pillar-card" id="sec-sistema">
+        <div class="pillar-header-row">
+          <div class="pillar-title-wrap">
+            <span class="pillar-num-badge">03</span>
+            <h3>Sistema Portátil</h3>
+          </div>
+        </div>
+
+        <div class="section-video-slot">
+          <video class="section-preview-video" loop muted playsinline preload="metadata">
+            <source src="media/videos/sistema.webm" type="video/webm" />
+            <source src="media/videos/sistema.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        <div class="cachyos-tags-row">
+          <span class="cachy-tag">Arch Linux Optimizado</span>
+          <span class="cachy-tag">Entorno Hyprland</span>
+          <span class="cachy-tag">Steam Gaming</span>
+          <span class="cachy-tag">Máquinas Virtuales</span>
+          <span class="cachy-tag">Conexión Remota</span>
+        </div>
+
+        <p class="pillar-body-text">
+          Lleva un sistema preparado para que se pueda ejecutar desde casi cualquier ordenador para poder llevarte tu trabajo como máquinas virtuales encima o <strong>saltarte las restricciones de los ordenadores de clase (guiño guiño)</strong>, y todas las funciones que tú elijas.<br /><br />
+          Personalmente lo he usado para máquinas virtuales, para llevarme mis videojuegos encima (ya que puedes instalar steam dentro de cachyos y dejar tus juegos en Hollowdrive), para conectarme remotamente al ordenador de mi casa desde clase y más. Por ahora la única opción es <a href="https://cachyos.org" target="_blank" rel="noopener" class="cachyos-text-link">CachyOS</a> pero si este proyecto recibe apoyo traeré más sistemas como <strong>zorinos, debian, ubuntu</strong> o los que queráis.
+        </p>
+
+        <div class="one-click-banner">
+          <h3>¡Todo esto puedes generarlo en un click!</h3>
+        </div>
+      </article>
+    </section>
+
+    <!-- REQUISITOS Y CONSEJO -->
+    <section class="specs-grid" id="sec-requisitos">
+      <div class="requirements-box">
+        <div class="glow-bg-animated"></div>
+        <div class="req-hero-content">
+          <span class="req-mini-tag">Requisito Mínimo</span>
+          <div class="giant-3gb">3 GB</div>
+          <p class="req-desc-text">
+            Lo único que necesitas es un <strong>USB de al menos 3 GB</strong>! Eso sí, si quieres sacarle el máximo partido, lee mis recomendaciones a la derecha ;)
+          </p>
+        </div>
+      </div>
+
+      <div class="savyn-tip-box">
+        <div>
+          <div class="tip-header">
+            <img src="https://github.com/MVP-Savyn.png" alt="Savyn" class="tip-author-avatar" onerror="this.src='https://avatars.githubusercontent.com/u/9919?v=4'" />
+            <div>
+              <h4>Consejo y Recomendación de Savyn</h4>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Recomendación para el mejor rendimiento</span>
+            </div>
+          </div>
+          <p class="tip-body">
+            «Mi recomendación es que uses un <strong>disco duro externo o SSD</strong>, aunque sea barato. Los de <strong>64GB o 128GB</strong> se consiguen muy fácilmente y tirados de precio por <span class="wallapop-badge">Wallapop</span> o de segunda mano.<br /><br />
+            Con una carcasa USB barata tienes el pincho perfecto: los discos están infinitamente mejor diseñados para aguantar <strong>lecturas y escrituras constantes</strong> sin calentarse ni degradarse como le pasa a los pendrives normales.»
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- REPRODUCTOR EN EL MENÚ SUPERIOR (EN REPOSO SOLO MUESTRA LAS ONDAS) -->
+  <aside class="floating-audio-widget intro-mode" id="cavaPlayer">
+    <div class="floating-wave-wrapper" id="waveTrigger" title="Haz hover o toca para ver controles y emisoras">
+      <canvas id="cavaCanvas" width="180" height="28"></canvas>
+    </div>
+
+    <div class="audio-expand-panel" id="audioExpandPanel">
+      <div class="floating-track-info">
+        <div class="marquee-container" id="marqueeContainer">
+          <span class="player-title" id="trackTitle">Conectando señal...</span>
+        </div>
+      </div>
+
+      <div class="floating-controls-row">
+        <button class="neon-ctrl-btn" id="btnPrev" title="Emisora Anterior">
+          <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+
+        <button class="neon-ctrl-btn neon-play-main" id="btnPlay" title="Reproducir / Pausar">
+          <svg width="13" height="13" id="playIcon" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+
+        <button class="neon-ctrl-btn" id="btnNext" title="Emisora Siguiente">
+          <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+
+        <div class="floating-vol-wrap">
+          <button class="neon-ctrl-btn vol-mute-btn" id="btnMute" title="Silenciar">
+            <svg id="volIcon" width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          </button>
+          <input type="range" class="neon-vol-slider" id="volSlider" min="0" max="1" step="0.02" value="0.2" />
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="floating-radio-menu" id="radioDrawer">
+        <div class="menu-header-minimal">SELECCIONAR EMISORA</div>
+        <div class="radio-options-list" id="radioOptionsList"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MODAL DE DONACIÓN -->
+  <div class="modal-backdrop" id="donateModalBackdrop">
+    <div class="donate-modal">
+      <button class="modal-close-btn" id="btnCloseDonate">&times;</button>
+      <div class="modal-header-gif-wrap">
+        <img src="assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+      </div>
+      <h3>¿Me echas una monedilla?</h3>
+      <p>
+        Desarrollar y mantener <strong>HollowDrive</strong> requiere muchas noches sin dormir. Si el kit te ha sido útil o te gusta la idea, cualquier aportación ayuda un montón a seguir mejorándolo.
+      </p>
+
+      <div class="donate-buttons-list">
+        <a href="https://ko-fi.com/t0xic4rea" target="_blank" rel="noopener" class="btn-kofi-direct">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.047 3.974-4.047 3.974s-2.8-2.521-4.047-3.974c-1.332-1.556-.838-3.877 1.007-4.432 1.845-.555 3.04 1.137 3.04 1.137s1.195-1.692 3.04-1.137c1.845.555 2.339 2.876 1.007 4.432zm7.14-1.277c-.439 2.327-2.736 2.344-2.736 2.344v-4.688s2.297.017 2.736 2.344z"/></svg>
+          <span>Invítame a un café (Ko-fi)</span>
+        </a>
+
+        <a href="https://paypal.me/T0xicArea" target="_blank" rel="noopener" class="btn-paypal-direct">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.586c3.084 0 5.378.694 6.438 2.059.984 1.268 1.168 3.064.551 5.341-1.026 3.782-3.843 5.76-7.857 5.76H8.736a.785.785 0 0 0-.773.654l-.887 4.457z"/></svg>
+          <span>Donar con PayPal</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audioElement" preload="none" crossorigin="anonymous"></audio>
+
+  <!-- PIE DE PÁGINA (CON EL CABALLERO ASENTADO SOBRE LA LÍNEA A LA IZQUIERDA) -->
+  <footer>
+    <div class="footer-knight-container" id="fixedKnightWidget">
+      <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar el proyecto)">
+        <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
+        <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="90" height="90" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+      </button>
+
+      <div class="knight-wrapper">
+        <img src="assets/knight-cuenco.png" alt="Hollow Knight con cuenco" class="knight-large-img" id="knightPngImg" onerror="this.style.display='none';" />
+      </div>
+    </div>
+
+    <p>Desarrollado por <strong>MVP-Savyn</strong> // Proyecto de código abierto</p>
+    <p class="footer-credits">
+      Agradecimiento especial a <strong>MediCat USB</strong> por la inspiración técnica para este kit.
+    </p>
+    <p class="footer-disclaimer">
+      HollowDrive es un proyecto comunitario independiente, gratuito y sin fines de lucro. Hollow Knight y sus personajes son propiedad intelectual y marca registrada de Team Cherry.
+    </p>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // =====================================================================
+    // 1. GESTIÓN DEL FONDO ANIMADO Y CAMBIO DE WALLPAPERS
+    // =====================================================================
+    let modoAnimadoActivo = true;
+
+    const btnAnimar = document.getElementById("btnAnimar");
+    const circlesTray = document.getElementById("circlesTray");
+    const circleBtns = document.querySelectorAll(".circle-btn");
+    const bgVideoWrap = document.getElementById("bgVideoWrap");
+    const bgVideo = document.getElementById("bgVideo");
+    const bgVideoSource = document.getElementById("bgVideoSource");
+
+    btnAnimar.addEventListener("click", () => {
+      modoAnimadoActivo = !modoAnimadoActivo;
+      if (modoAnimadoActivo) {
+        btnAnimar.classList.add("active");
+        circlesTray.classList.add("open");
+        bgVideoWrap.classList.add("active");
+        bgVideo.play().catch(() => {});
+      } else {
+        btnAnimar.classList.remove("active");
+        circlesTray.classList.remove("open");
+        bgVideoWrap.classList.remove("active");
+        bgVideo.pause();
+      }
+    });
+
+    circleBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const num = btn.getAttribute("data-index");
+        circleBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      
+        bgVideoSource.src = `media/videos/${num}.mp4`;
+        bgVideo.load();
+        bgVideo.play().catch(() => {});
+      });
+    });
+
+    // =====================================================================
+    // 2. MODAL DE DONACIÓN
+    // =====================================================================
+    const btnCoinDonate = document.getElementById("btnCoinDonate");
+    const knightPngImg = document.getElementById("knightPngImg");
+    const btnCloseDonate = document.getElementById("btnCloseDonate");
+    const donateModalBackdrop = document.getElementById("donateModalBackdrop");
+
+    if (btnCoinDonate) {
+      btnCoinDonate.addEventListener("click", () => donateModalBackdrop.classList.add("open"));
+    }
+    if (knightPngImg) {
+      knightPngImg.addEventListener("click", () => donateModalBackdrop.classList.add("open"));
+    }
+
+    btnCloseDonate.addEventListener("click", () => donateModalBackdrop.classList.remove("open"));
+    donateModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === donateModalBackdrop) donateModalBackdrop.classList.remove("open");
+    });
+
+    // =====================================================================
+    // 3. REPRODUCTOR COMPACTO Y MOTOR DE AUDIO
+    // =====================================================================
+    const RADIOS = [
+      { name: "Chillsynth FM", genre: "Lofi Retro", url: "https://stream.nightride.fm/chillsynth.mp3" },
+      { name: "Nightride FM", genre: "Synthwave", url: "https://stream.nightride.fm/nightride.mp3" },
+      { name: "Nightwave Plaza", genre: "Vaporwave", url: "https://radio.plaza.one/mp3" },
+      { name: "Darksynth Radio", genre: "Cyberpunk", url: "https://stream.nightride.fm/darksynth.mp3" },
+      { name: "Lofi Cafe Beat", genre: "Chill Lofi", url: "https://streams.ilovemusic.de/iloveradio17.mp3" }
+    ];
+
+    let currentRadioIdx = 0;
+    let isPlaying = false;
+
+    const audioElement = document.getElementById("audioElement");
+    const trackTitle = document.getElementById("trackTitle");
+    const marqueeContainer = document.getElementById("marqueeContainer");
+    const btnPlay = document.getElementById("btnPlay");
+    const playIcon = document.getElementById("playIcon");
+    const btnPrev = document.getElementById("btnPrev");
+    const btnNext = document.getElementById("btnNext");
+    const volSlider = document.getElementById("volSlider");
+    const btnMute = document.getElementById("btnMute");
+    const volIcon = document.getElementById("volIcon");
+    const radioOptionsList = document.getElementById("radioOptionsList");
+    const cavaPlayer = document.getElementById("cavaPlayer");
+    const waveTrigger = document.getElementById("waveTrigger");
+    const introOverlay = document.getElementById("introOverlay");
+
+    if (volSlider) volSlider.value = 0.2;
+    audioElement.volume = 0.2;
+    let prevVol = 0.2;
+
+    function sincronizarVolumen() {
+      const vol = parseFloat(volSlider.value);
+      const safeVol = isNaN(vol) ? 0.2 : vol;
+      actualizarIconoVol(safeVol);
+
+      if (gainNode && audioCtx && audioSourceConnected) {
+        gainNode.gain.setValueAtTime(safeVol, audioCtx.currentTime);
+        audioElement.volume = 1.0;
+      } else {
+        audioElement.volume = safeVol;
+      }
+    }
+
+    audioElement.addEventListener("play", sincronizarVolumen);
+    audioElement.addEventListener("playing", sincronizarVolumen);
+    audioElement.addEventListener("canplay", sincronizarVolumen);
+
+    function renderizarOpcionesRadio() {
+      radioOptionsList.innerHTML = "";
+      RADIOS.forEach((r, idx) => {
+        const btn = document.createElement("button");
+        btn.className = `radio-opt-btn ${idx === currentRadioIdx ? "active" : ""}`;
+        btn.innerHTML = `
+          <span>${r.name}</span>
+          <span class="radio-genre-tag">${r.genre}</span>
+        `;
+        btn.addEventListener("click", () => {
+          cargarEmisora(idx, true);
+        });
+        radioOptionsList.appendChild(btn);
+      });
+    }
+
+    function actualizarMarquesina() {
+      trackTitle.classList.remove("marquee-active");
+      trackTitle.style.removeProperty("--scroll-offset");
+      trackTitle.style.transform = "translateX(0)";
+
+      setTimeout(() => {
+        const anchoContenedor = marqueeContainer.clientWidth;
+        const anchoTexto = trackTitle.scrollWidth;
+
+        if (anchoTexto > anchoContenedor) {
+          const desfase = anchoContenedor - anchoTexto - 8;
+          trackTitle.style.setProperty("--scroll-offset", `${desfase}px`);
+          trackTitle.classList.add("marquee-active");
+        }
+      }, 50);
+    }
+
+    function cargarEmisora(index, autoPlay = false) {
+      if (index < 0) index = RADIOS.length - 1;
+      if (index >= RADIOS.length) index = 0;
+      currentRadioIdx = index;
+
+      const radio = RADIOS[currentRadioIdx];
+      trackTitle.textContent = `${radio.name} // ${radio.genre}`;
+      actualizarMarquesina();
+      renderizarOpcionesRadio();
+
+      if (autoPlay) {
+        audioElement.src = radio.url;
+        sincronizarVolumen();
+        iniciarAudioContext();
+        audioElement.play()
+          .then(() => {
+            setPlayingState(true);
+            sincronizarVolumen();
+          })
+          .catch(() => setPlayingState(false));
+      }
+    }
+
+    function togglePlay() {
+      // 1. Clic en intro: reproduce y viaja inmediatamente a la barra contraído (sin delay ni teaser)
+      if (cavaPlayer.classList.contains("intro-mode")) {
+        iniciarAudioContext();
+        audioElement.src = RADIOS[currentRadioIdx].url;
+        sincronizarVolumen();
+        audioElement.play().then(() => {
+          setPlayingState(true);
+        }).catch(() => setPlayingState(false));
+
+        cavaPlayer.classList.remove("intro-mode");
+        if (introOverlay) {
+          introOverlay.classList.remove("active");
+        }
+        return;
+      }
+
+      // 2. Modo normal
+      if (!isPlaying) {
+        audioElement.src = RADIOS[currentRadioIdx].url;
+        sincronizarVolumen();
+        if (!audioCtx) iniciarAudioContext();
+        audioElement.play()
+          .then(() => setPlayingState(true))
+          .catch(() => setPlayingState(false));
+      } else {
+        audioElement.pause();
+        audioElement.src = "";
+        setPlayingState(false);
+      }
+    }
+
+    // Toggle táctil al tocar el visualizador para abrir/cerrar controles
+    if (waveTrigger) {
+      waveTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!cavaPlayer.classList.contains("intro-mode")) {
+          cavaPlayer.classList.toggle("menu-open");
+        }
+      });
+    }
+
+    // Cerrar al pulsar fuera
+    document.addEventListener("click", (e) => {
+      if (cavaPlayer && !cavaPlayer.contains(e.target)) {
+        cavaPlayer.classList.remove("menu-open");
+      }
+    });
+
+    function setPlayingState(playing) {
+      isPlaying = playing;
+      if (playing) {
+        playIcon.innerHTML = `<rect x="5" y="4" width="4" height="16"></rect><rect x="15" y="4" width="4" height="16"></rect>`;
+        arrancarVisualizador();
+      } else {
+        playIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+      }
+    }
+
+    btnPlay.addEventListener("click", togglePlay);
+    btnNext.addEventListener("click", () => cargarEmisora(currentRadioIdx + 1, isPlaying));
+    btnPrev.addEventListener("click", () => cargarEmisora(currentRadioIdx - 1, isPlaying));
+
+    volSlider.addEventListener("input", () => {
+      sincronizarVolumen();
+    });
+
+    btnMute.addEventListener("click", () => {
+      if (audioElement.volume > 0) {
+        prevVol = audioElement.volume;
+        audioElement.volume = 0;
+        volSlider.value = 0;
+        sincronizarVolumen();
+      } else {
+        volSlider.value = prevVol || 0.2;
+        sincronizarVolumen();
+      }
+    });
+
+    function actualizarIconoVol(vol) {
+      if (vol === 0) {
+        volIcon.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
+      } else {
+        volIcon.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
+      }
+    }
+
+    // =====================================================================
+    // CANVAS: ESPECTRO SIMÉTRICO DINÁMICO
+    // =====================================================================
+    const canvas = document.getElementById("cavaCanvas");
+    const ctx = canvas.getContext("2d");
+    let audioCtx = null;
+    let analyser = null;
+    let gainNode = null;
+    let dataArray = null;
+    let audioSourceConnected = false;
+
+    function iniciarAudioContext() {
+      if (!audioCtx) {
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioCtx.createAnalyser();
+          gainNode = audioCtx.createGain();
+
+          analyser.fftSize = 128;
+          analyser.smoothingTimeConstant = 0.85;
+
+          const source = audioCtx.createMediaElementSource(audioElement);
+          source.connect(analyser);
+          analyser.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          
+          audioSourceConnected = true;
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
+        } catch (e) {}
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      sincronizarVolumen();
+    }
+
+    const TOTAL_BARS = 22;
+    let currentHeights = new Array(TOTAL_BARS).fill(2);
+
+    const barWidth = 3.2;
+    const gap = 3.6;
+    const totalWidth = TOTAL_BARS * (barWidth + gap) - gap;
+    const startX = (canvas.width - totalWidth) / 2;
+    const centerY = canvas.height / 2;
+
+    const cachedGradient = ctx.createLinearGradient(startX, 0, startX + totalWidth, 0);
+    cachedGradient.addColorStop(0.0, "rgba(0, 94, 255, 0.4)");
+    cachedGradient.addColorStop(0.2, "rgba(0, 212, 255, 0.8)");
+    cachedGradient.addColorStop(0.5, "rgba(200, 245, 255, 1.0)");
+    cachedGradient.addColorStop(0.8, "rgba(0, 212, 255, 0.8)");
+    cachedGradient.addColorStop(1.0, "rgba(0, 94, 255, 0.4)");
+
+    let animFrameOnda = null;
+
+    function arrancarVisualizador() {
+      if (!animFrameOnda) {
+        animFrameOnda = requestAnimationFrame(dibujarOnda);
+      }
+    }
+
+    function dibujarOnda() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = cachedGradient;
+
+      let realData = false;
+      if (analyser && isPlaying && audioSourceConnected) {
+        analyser.getByteFrequencyData(dataArray);
+        realData = dataArray.some(v => v > 0);
+      }
+
+      let todoEnReposo = true;
+      const currentVol = (volSlider && !isNaN(parseFloat(volSlider.value))) ? parseFloat(volSlider.value) : 0.2;
+      const volFactor = 0.25 + 0.75 * Math.pow(currentVol, 0.75);
+      const movimientoExtra = 1.10;
+
+      for (let i = 0; i < TOTAL_BARS; i++) {
+        let targetH = 2;
+        const normalizedIdx = i / (TOTAL_BARS - 1);
+        const curve = 0.35 + 0.65 * Math.sin(normalizedIdx * Math.PI);
+
+        if (isPlaying) {
+          if (realData) {
+            const fIdx = Math.floor((i / TOTAL_BARS) * (dataArray.length * 0.7));
+            const val = dataArray[fIdx] || 0;
+            const norm = val / 255;
+            targetH = Math.max(2.2, Math.min(centerY - 1, norm * (centerY - 1) * curve * 1.6 * volFactor * movimientoExtra));
+          } else {
+            const time = performance.now() * 0.007;
+            const w1 = Math.sin(time + i * 0.35);
+            const w2 = Math.cos(time * 0.8 + i * 0.22);
+            const w3 = Math.sin(time * 1.3 + i * 0.5);
+            const combined = Math.abs(w1 * 0.5 + w2 * 0.35 + w3 * 0.25);
+            targetH = Math.max(2.2, combined * (centerY - 1) * curve * 1.4 * volFactor * movimientoExtra);
+          }
+        }
+
+        currentHeights[i] += (targetH - currentHeights[i]) * 0.28;
+        const h = currentHeights[i];
+        const x = startX + i * (barWidth + gap);
+        const radius = barWidth / 2;
+
+        if (Math.abs(h - 2) > 0.1) {
+          todoEnReposo = false;
+        }
+
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x, centerY - h, barWidth, h * 2, [radius]);
+        } else {
+          ctx.rect(x, centerY - h, barWidth, h * 2);
+        }
+        ctx.fill();
+      }
+
+      if (!isPlaying && todoEnReposo) {
+        animFrameOnda = null;
+        return;
+      }
+
+      animFrameOnda = requestAnimationFrame(dibujarOnda);
+    }
+
+    dibujarOnda();
+    cargarEmisora(0, false);
+    sincronizarVolumen();
+
+    // =====================================================================
+    // 4. CONTROL DE VÍDEOS DE SECCIÓN
+    // =====================================================================
+    const videoSlots = document.querySelectorAll('.section-video-slot');
+
+    videoSlots.forEach((slot) => {
+      const video = slot.querySelector('.section-preview-video');
+      if (!video) return;
+
+      if (!slot.querySelector('.video-hover-overlay')) {
+        const overlay = document.createElement('div');
+        overlay.className = 'video-hover-overlay';
+        overlay.innerHTML = `
+          <button class="video-toggle-btn" title="Pausar / Reproducir">
+            <svg class="icon-pause" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+            <svg class="icon-play" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+              <polygon points="6,4 20,12 6,20"></polygon>
+            </svg>
+          </button>
+          <input type="range" class="video-seek-bar" min="0" max="100" step="0.1" value="0" title="Línea de tiempo">
+        `;
+        slot.appendChild(overlay);
+
+        const btn = overlay.querySelector('.video-toggle-btn');
+        const iconPause = btn.querySelector('.icon-pause');
+        const iconPlay = btn.querySelector('.icon-play');
+        const seekBar = overlay.querySelector('.video-seek-bar');
+
+        function alternarVideo() {
+          if (video.paused) {
+            video.play().catch(() => {});
+            video.dataset.manualPause = "false";
+            iconPause.style.display = "block";
+            iconPlay.style.display = "none";
+          } else {
+            video.pause();
+            video.dataset.manualPause = "true";
+            iconPause.style.display = "none";
+            iconPlay.style.display = "block";
+          }
+        }
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          alternarVideo();
+        });
+
+        video.addEventListener('click', alternarVideo);
+
+        let isSeeking = false;
+        function actualizarFondoBarra(pct) {
+          seekBar.style.background = `linear-gradient(to right, var(--cyan) ${pct}%, rgba(255, 255, 255, 0.2) ${pct}%)`;
+        }
+
+        video.addEventListener('timeupdate', () => {
+          if (!isSeeking && video.duration) {
+            const pct = (video.currentTime / video.duration) * 100;
+            seekBar.value = pct;
+            actualizarFondoBarra(pct);
+          }
+        });
+
+        seekBar.addEventListener('input', (e) => {
+          isSeeking = true;
+          const pct = parseFloat(e.target.value);
+          actualizarFondoBarra(pct);
+          if (video.duration) {
+            video.currentTime = (pct / 100) * video.duration;
+          }
+        });
+
+        seekBar.addEventListener('change', () => { isSeeking = false; });
+        seekBar.addEventListener('click', (e) => e.stopPropagation());
+      }
+    });
+
+    if ('IntersectionObserver' in window) {
+      const videoObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+          const slot = video.closest('.section-video-slot');
+          const iconPause = slot?.querySelector('.icon-pause');
+          const iconPlay = slot?.querySelector('.icon-play');
+
+          if (entry.isIntersecting) {
+            if (video.dataset.manualPause !== "true") {
+              video.play().catch(() => {});
+              if (iconPause && iconPlay) {
+                iconPause.style.display = "block";
+                iconPlay.style.display = "none";
+              }
+            }
+          } else {
+            video.pause();
+            if (iconPause && iconPlay) {
+              iconPause.style.display = "none";
+              iconPlay.style.display = "block";
+            }
+          }
+        });
+      }, { 
+        rootMargin: '0px',
+        threshold: 0.15
+      });
+
+      document.querySelectorAll('.section-preview-video').forEach((v) => {
+        v.addEventListener('loadeddata', () => {
+          if (v.paused && v.currentTime === 0) {
+            v.currentTime = 0.001;
+          }
+        }, { once: true });
+
+        videoObserver.observe(v);
+      });
+    }
+
+    // =====================================================================
+    // 4.1 CONTROL DE FOCO Y VISIBILIDAD DE PESTAÑA
+    // =====================================================================
+    function pausarPorPerdidaDeFoco() {
+      if (bgVideo && !bgVideo.paused) {
+        bgVideo.pause();
+      }
+
+      document.querySelectorAll('.section-preview-video').forEach((v) => {
+        const slot = v.closest('.section-video-slot');
+        const iconPause = slot?.querySelector('.icon-pause');
+        const iconPlay = slot?.querySelector('.icon-play');
+
+        if (!v.paused) {
+          v.pause();
+          v.dataset.pausedByFocus = "true";
+          if (iconPause && iconPlay) {
+            iconPause.style.display = "none";
+            iconPlay.style.display = "block";
+          }
+        }
+      });
+    }
+
+    function reanudarPorRecuperacionDeFoco() {
+      if (modoAnimadoActivo && bgVideo && bgVideo.paused) {
+        bgVideo.play().catch(() => {});
+      }
+
+      document.querySelectorAll('.section-preview-video').forEach((v) => {
+        const slot = v.closest('.section-video-slot');
+        const iconPause = slot?.querySelector('.icon-pause');
+        const iconPlay = slot?.querySelector('.icon-play');
+
+        if (v.dataset.pausedByFocus === "true") {
+          v.dataset.pausedByFocus = "false";
+
+          const rect = v.getBoundingClientRect();
+          const enPantalla = rect.top < window.innerHeight && rect.bottom > 0;
+
+          if (enPantalla && v.dataset.manualPause !== "true") {
+            v.play().catch(() => {});
+            if (iconPause && iconPlay) {
+              iconPause.style.display = "block";
+              iconPlay.style.display = "none";
+            }
+          }
+        }
+      });
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        pausarPorPerdidaDeFoco();
+      } else {
+        reanudarPorRecuperacionDeFoco();
+      }
+    });
+
+    window.addEventListener("blur", pausarPorPerdidaDeFoco);
+    window.addEventListener("focus", reanudarPorRecuperacionDeFoco);
+
+    // =====================================================================
+    // 5. SCROLLSPY
+    // =====================================================================
+    const sideDots = document.querySelectorAll('.side-index-dot');
+    const trackedSections = [
+      document.getElementById('sec-hero'),
+      document.getElementById('sec-video'),
+      document.getElementById('sec-kit'),
+      document.getElementById('sec-batocera'),
+      document.getElementById('sec-sistema'),
+      document.getElementById('sec-requisitos')
+    ].filter(Boolean);
+
+    let scrollTicking = false;
+
+    function actualizarIndiceScroll() {
+      let currentId = '';
+      const alFondo = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 80);
+
+      if (alFondo && trackedSections.length > 0) {
+        currentId = trackedSections[trackedSections.length - 1].getAttribute('id');
+      } else {
+        const scrollPos = window.scrollY + (window.innerHeight / 2.5);
+        for (let i = 0; i < trackedSections.length; i++) {
+          if (scrollPos >= trackedSections[i].offsetTop) {
+            currentId = trackedSections[i].getAttribute('id');
+          }
+        }
+      }
+
+      sideDots.forEach(dot => {
+        dot.classList.toggle('active', dot.getAttribute('href') === `#${currentId}`);
+      });
+      scrollTicking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!scrollTicking) {
+        requestAnimationFrame(actualizarIndiceScroll);
+        scrollTicking = true;
+      }
+    }, { passive: true });
+
+    actualizarIndiceScroll();
+
+    // =====================================================================
+    // 6. ESTRATEGIA DE RENDIMIENTO: MONITOR AUTOMÁTICO DE FPS
+    // =====================================================================
+    let fpsMonitoringActive = true;
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let consecutiveLagSeconds = 0;
+
+    // Se inicia tras 3 segundos para que la carga inicial no dé falsos positivos
+    setTimeout(() => {
+      if (!fpsMonitoringActive) return;
+
+      function medirFPS(ahora) {
+        if (!fpsMonitoringActive) return;
+
+        frameCount++;
+        const delta = ahora - lastTime;
+
+        if (delta >= 1000) {
+          const fps = (frameCount * 1000) / delta;
+          frameCount = 0;
+          lastTime = ahora;
+
+          // Si la pestaña está visible y el vídeo activo
+          if (!document.hidden && modoAnimadoActivo) {
+            // Se considera lag si baja de 50 FPS de forma sostenida
+            if (fps < 50) {
+              consecutiveLagSeconds++;
+              if (consecutiveLagSeconds >= 2) {
+                desactivarWallpapersPorRendimiento();
+                return;
+              }
+            } else {
+              consecutiveLagSeconds = 0;
+            }
+          }
+        }
+
+        requestAnimationFrame(medirFPS);
+      }
+
+      requestAnimationFrame(medirFPS);
+    }, 3000);
+
+    function desactivarWallpapersPorRendimiento() {
+      if (!modoAnimadoActivo) return;
+      modoAnimadoActivo = false;
+      btnAnimar.classList.remove("active");
+      circlesTray.classList.remove("open");
+      bgVideoWrap.classList.remove("active");
+      bgVideo.pause();
+      fpsMonitoringActive = false; // Detiene el bucle para ahorrar 100% de CPU
+      console.warn("⚡ HollowDrive: Rendimiento inferior a 60 FPS detectado. Wallpapers desactivados para optimizar fluidez.");
+    }
+  </script>
+</body>
+</html>

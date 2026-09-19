@@ -1,0 +1,17 @@
+venv/
+.venv/
+__pycache__
+engine/tools/
+build/
+requeriments.txt
+Savin_GUI.spec
+Savin_GUI.build/
+Savin_GUI.onefile-build/
+.DS_Store
+jolowcoras (2).png
+Savin_GUI.dist/
+HollowDrive.exe
+installer/installer.build
+installer/installer.onefile-build
+installer/installer.dist
+engine\__pycache__"

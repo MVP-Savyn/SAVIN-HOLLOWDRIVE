@@ -1,0 +1,12 @@
+certifi==2026.4.22
+charset-normalizer==3.4.7
+customtkinter==5.2.2
+darkdetect==0.8.0
+idna==3.13
+Nuitka==4.1.3
+ordered-set==4.1.0
+packaging==26.2
+pillow==12.2.0
+requests==2.33.1
+urllib3==2.7.0
+windnd==1.0.7
