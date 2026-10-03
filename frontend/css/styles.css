@@ -45,6 +45,22 @@
   
   --transition-fast: 0.18s ease;
   --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Escala compensatoria del caballerito según escalado de Windows (JS la ajusta con precisión) */
+  --knight-dpr-scale: 1;
+}
+
+/* Fallback CSS por si el JS aún no ha calculado la escala exacta */
+@media (-webkit-min-device-pixel-ratio: 1.15), (min-resolution: 110dpi) {
+  :root {
+    --knight-dpr-scale: 0.80;
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 1.4), (min-resolution: 135dpi) {
+  :root {
+    --knight-dpr-scale: 0.67;
+  }
 }
 
 /* Reset y Base */
@@ -1675,7 +1691,8 @@ input[type="range"]:focus-visible {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px) scale(0.95);
+  transform: translateY(10px) scale(calc(var(--knight-dpr-scale, 1) * 0.95));
+  transform-origin: bottom left;
   transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1), visibility 1s ease;
 }
 
@@ -1684,14 +1701,14 @@ input[type="range"]:focus-visible {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transform: translateY(0) scale(1);
+  transform: translateY(0) scale(var(--knight-dpr-scale, 1));
 }
 
 #screen-hub:not(.active) ~ .hub-knight-widget {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transform: translateY(10px) scale(0.95);
+  transform: translateY(10px) scale(calc(var(--knight-dpr-scale, 1) * 0.95));
 }
 
 .knight-wrapper {

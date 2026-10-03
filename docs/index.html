@@ -460,7 +460,7 @@
     <div class="footer-knight-container" id="fixedKnightWidget" role="button" tabindex="0" title="¿Me echas una monedilla? (Apoyar el proyecto)">
       <button class="coin-btn-interactive" id="btnCoinDonate" type="button" tabindex="-1">
         <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
-        <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="52" height="52" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+        <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="68" height="68" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
       </button>
 
       <div class="knight-wrapper">
@@ -587,6 +587,25 @@
         closeDonateModal(e);
       }
     });
+
+    // =====================================================================
+    // 2.1 ADAPTACIÓN DINÁMICA DE TAMAÑO SEGÚN ZOOM / ESCALADO DPI (100%, 125%, 150%, etc.)
+    // =====================================================================
+    let knightDprMq = null;
+    function autoAjustarEscalaCaballero() {
+      const dpr = window.devicePixelRatio || 1;
+      // Inversa proporcional para contrarrestar el escalado del navegador y mantener idéntica presencia física
+      const factor = Math.max(0.55, Math.min(1.25, 1 / dpr));
+      document.documentElement.style.setProperty('--knight-dpr-scale', factor.toFixed(3));
+      // Re-suscribir al nuevo DPR para detectar cambios sucesivos de zoom / monitor
+      if (window.matchMedia) {
+        if (knightDprMq) knightDprMq.removeEventListener('change', autoAjustarEscalaCaballero);
+        knightDprMq = window.matchMedia(`(resolution: ${dpr}dppx)`);
+        knightDprMq.addEventListener('change', autoAjustarEscalaCaballero);
+      }
+    }
+
+    autoAjustarEscalaCaballero();
 
     // =====================================================================
     // 3. REPRODUCTOR COMPACTO Y MOTOR DE AUDIO

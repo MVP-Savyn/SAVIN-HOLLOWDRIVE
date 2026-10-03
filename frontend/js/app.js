@@ -4002,6 +4002,24 @@ function initApp() {
   });
 }
 
+// =====================================================================
+// Escala del caballerito independiente del escalado de Windows (100%, 125%, 150%...)
+// Se contrarresta el devicePixelRatio para que mantenga siempre el mismo tamaño físico.
+// =====================================================================
+(function initKnightDprScale() {
+  let mq = null;
+  const apply = () => {
+    const dpr = window.devicePixelRatio || 1;
+    const factor = Math.max(0.5, Math.min(1.25, 1 / dpr));
+    document.documentElement.style.setProperty('--knight-dpr-scale', factor.toFixed(3));
+    // Re-suscribir al nuevo DPR (p. ej. al arrastrar la ventana a otro monitor)
+    if (mq) mq.removeEventListener('change', apply);
+    mq = window.matchMedia(`(resolution: ${dpr}dppx)`);
+    mq.addEventListener('change', apply);
+  };
+  apply();
+})();
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
