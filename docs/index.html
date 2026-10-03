@@ -457,10 +457,10 @@
 
   <!-- PIE DE PÁGINA (CON EL CABALLERO ASENTADO SOBRE LA LÍNEA A LA IZQUIERDA) -->
   <footer>
-    <div class="footer-knight-container" id="fixedKnightWidget">
-      <button class="coin-btn-interactive" id="btnCoinDonate" title="¿Me echas una monedilla? (Apoyar el proyecto)">
+    <div class="footer-knight-container" id="fixedKnightWidget" role="button" tabindex="0" title="¿Me echas una monedilla? (Apoyar el proyecto)">
+      <button class="coin-btn-interactive" id="btnCoinDonate" type="button" tabindex="-1">
         <div class="coin-speech-bubble">¿Me echas una monedilla?</div>
-        <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="90" height="90" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
+        <img src="assets/coin.gif" alt="Moneda" class="coin-gif-img" width="52" height="52" onerror="this.src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png';" />
       </button>
 
       <div class="knight-wrapper">
@@ -521,21 +521,71 @@
     // =====================================================================
     // 2. MODAL DE DONACIÓN
     // =====================================================================
+    const fixedKnightWidget = document.getElementById("fixedKnightWidget");
     const btnCoinDonate = document.getElementById("btnCoinDonate");
     const knightPngImg = document.getElementById("knightPngImg");
     const btnCloseDonate = document.getElementById("btnCloseDonate");
     const donateModalBackdrop = document.getElementById("donateModalBackdrop");
 
-    if (btnCoinDonate) {
-      btnCoinDonate.addEventListener("click", () => donateModalBackdrop.classList.add("open"));
-    }
-    if (knightPngImg) {
-      knightPngImg.addEventListener("click", () => donateModalBackdrop.classList.add("open"));
+    function openDonateModal(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (donateModalBackdrop) {
+        donateModalBackdrop.classList.add("open");
+        donateModalBackdrop.style.display = "flex";
+        donateModalBackdrop.style.visibility = "visible";
+        donateModalBackdrop.style.opacity = "1";
+        donateModalBackdrop.style.pointerEvents = "auto";
+      }
     }
 
-    btnCloseDonate.addEventListener("click", () => donateModalBackdrop.classList.remove("open"));
-    donateModalBackdrop.addEventListener("click", (e) => {
-      if (e.target === donateModalBackdrop) donateModalBackdrop.classList.remove("open");
+    function closeDonateModal(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (donateModalBackdrop) {
+        donateModalBackdrop.classList.remove("open");
+        donateModalBackdrop.style.opacity = "0";
+        donateModalBackdrop.style.visibility = "hidden";
+        donateModalBackdrop.style.pointerEvents = "none";
+        setTimeout(() => {
+          if (!donateModalBackdrop.classList.contains("open")) {
+            donateModalBackdrop.style.display = "none";
+          }
+        }, 250);
+      }
+    }
+
+    if (fixedKnightWidget) {
+      fixedKnightWidget.addEventListener("click", openDonateModal);
+      fixedKnightWidget.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          openDonateModal(e);
+        }
+      });
+    }
+    if (btnCoinDonate) {
+      btnCoinDonate.addEventListener("click", openDonateModal);
+    }
+    if (knightPngImg) {
+      knightPngImg.addEventListener("click", openDonateModal);
+    }
+
+    if (btnCloseDonate) {
+      btnCloseDonate.addEventListener("click", closeDonateModal);
+    }
+    if (donateModalBackdrop) {
+      donateModalBackdrop.addEventListener("click", (e) => {
+        if (e.target === donateModalBackdrop) closeDonateModal(e);
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && donateModalBackdrop && donateModalBackdrop.classList.contains("open")) {
+        closeDonateModal(e);
+      }
     });
 
     // =====================================================================
