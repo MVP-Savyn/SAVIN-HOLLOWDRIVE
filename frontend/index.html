@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOLLOWDRIVE</title>
+  <link rel="icon" type="image/x-icon" href="/media/hollowdrive.ico" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <!-- Fondo animado: Lumélulas (Lumaflies) de Hollow Knight flotando por el fondo y alrededor del cursor -->
+  <canvas id="lumaflyCanvas" class="lumafly-canvas"></canvas>
+
+  <!-- =====================================================================
+       ✨ ANIMACIÓN INICIAL DE INTRODUCCIÓN (INTRO SPLASH)
+       Icono girando 360° en el centro, desplazamiento a la izquierda, título emergiendo,
+       rompimiento en cachitos (shatter particles) y apertura de la pantalla de información
+       ===================================================================== -->
+  <div class="intro-splash" id="introSplash">
+    <div class="splash-background">
+      <div class="splash-ambient-glow"></div>
+      <div class="splash-dust" id="splashDust"></div>
+    </div>
+    
+    <div class="splash-stage" id="splashStage">
+      <!-- Icono grande de HollowDrive -->
+      <div class="splash-icon-wrap" id="splashIconWrap">
+        <img src="/media/hollowdrive-logo.png" alt="HollowDrive Icon" class="splash-icon-img" id="splashIconImg" />
+        <div class="splash-icon-halo"></div>
+      </div>
+
+      <!-- Título cursivo que emerge desde el icono hacia la derecha -->
+      <div class="splash-title-wrap" id="splashTitleWrap">
+        <img src="/media/hollowdrive-title.png" alt="HollowDrive" class="splash-title-img" id="splashTitleImg" />
+        <div class="splash-title-glow"></div>
+      </div>
+    </div>
+
+    <!-- Canvas para el efecto de rompimiento en cachitos y chispas -->
+    <canvas class="splash-shatter-canvas" id="splashShatterCanvas"></canvas>
+
+    <!-- Indicador discreto para saltar -->
+    <div class="splash-skip-hint" id="splashSkipHint">Pulsa cualquier tecla o haz clic para omitir</div>
+  </div>
+
+  <!-- =====================================================================
+       🖥️ CONTROLES DE VENTANA DESLIZABLES (FRAMELESS UI)
+       Se deslizan desde el borde superior al acercar el puntero del ratón
+       ===================================================================== -->
+  <!-- =====================================================================
+       🖥️ BARRA SUPERIOR DESLIZABLE DE VENTANA (FRAMELESS TRANSLUCENT TOP BAR)
+       Barra con poca opacidad que cubre toda la parte superior con símbolos de neón sin bloques ni bordes
+       ===================================================================== -->
+  <div class="window-top-bar" id="windowTopBar">
+    <div class="window-top-bar-drag-spacer" id="windowTopBarDragSpacer"></div>
+    <div class="window-controls-slider window-neon-controls" id="windowControlsSlider">
+      <button class="win-btn neon-win-btn neon-btn-min" id="winBtnMinimize" title="Minimizar" aria-label="Minimizar">
+        <svg viewBox="0 0 14 14"><line x1="2.5" y1="7" x2="11.5" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="win-btn neon-win-btn neon-btn-max" id="winBtnMaximize" title="Maximizar / Restaurar" aria-label="Maximizar">
+        <svg viewBox="0 0 14 14"><rect x="2.5" y="2.5" width="9" height="9" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+      <button class="win-btn neon-win-btn neon-btn-close" id="winBtnClose" title="Cerrar" aria-label="Cerrar">
+        <svg viewBox="0 0 14 14"><line x1="3" y1="3" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="3" x2="3" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       HEADER UNIVERSAL (DRAGGABLE REGION):
+       Izquierda: Idiomas | Centro: Título PNG Grande | Derecha: Botón Info
+       ===================================================================== -->
+  <header class="app-header">
+    <div class="header-left">
+      <!-- Perfil de GitHub a la izquierda -->
+      <a href="https://github.com/MVP-Savyn" target="_blank" rel="noopener" class="github-pill" title="GitHub: MVP-Savyn">
+        <img src="https://github.com/MVP-Savyn.png" class="avatar-img" alt="MVP-Savyn" onerror="this.src='/media/hollowdrive.ico';" />
+        <span>MVP-Savyn</span>
+      </a>
+    </div>
+
+    <div class="header-center">
+      <!-- Título grande en medio arriba con icono de hollowdrive -->
+      <div class="brand-title-wrap" id="headerLogoWrap">
+        <img src="/media/hollowdrive.ico" class="title-ico-large" alt="HollowDrive" />
+        <img src="/media/HollowDrive-2.png" alt="HOLLOWDRIVE" class="brand-logo-img brand-logo-center-huge" id="headerLogo" />
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Botón de Información Principal [ ℹ ] -->
+      <button class="btn-info-header" id="btnHeaderInfo" title="Información del Proyecto y Tutorial" onclick="window.openOverlayInfo && window.openOverlayInfo()">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+      </button>
+
+      <!-- Selector de Idiomas reactivo a la derecha del todo -->
+      <div class="lang-select-wrap">
+        <button class="lang-select-btn" id="langBtn" title="Cambiar Idioma">
+          <span id="langCurrentText">🌐 Español</span> ▾
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+          <button type="button" class="lang-option" data-lang="es">🌐 Español</button>
+          <button type="button" class="lang-option" data-lang="en">🌐 English</button>
+          <button type="button" class="lang-option" data-lang="zh">🌐 简体中文</button>
+          <button type="button" class="lang-option" data-lang="ja">🌐 日本語</button>
+          <button type="button" class="lang-option" data-lang="ru">🌐 Русский</button>
+          <button type="button" class="lang-option" data-lang="pt">🌐 Português</button>
+          <button type="button" class="lang-option" data-lang="de">🌐 Deutsch</button>
+          <button type="button" class="lang-option" data-lang="fr">🌐 Français</button>
+          <button type="button" class="lang-option" data-lang="it">🌐 Italiano</button>
+          <button type="button" class="lang-option" data-lang="ko">🌐 한국어</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       CONTENIDO PRINCIPAL (SPA SCREENS)
+       ===================================================================== -->
+  <main class="app-content">
+
+    <!-- -------------------------------------------------------------------
+         PANTALLA 0: HUB PRINCIPAL (BOTONES SIMPLES Y LIMPIOS)
+         ------------------------------------------------------------------- -->
+    <section class="screen active instant" id="screen-hub">
+      <div class="hub-container">
+        <div class="hub-hero">
+          <h1 id="hubHeroTitle">El Kit Más Potente del Mundo <span id="hubHeroHighlight">en tu Bolsillo</span></h1>
+          <p id="hubHeroSub">Sistemas portátiles y herramientas autónomas sin tocar el ordenador al que se conecta.</p>
+        </div>
+
+        <div class="hub-cards-grid">
+          <!-- Tarjeta 1: HollowDrive (Crear USB) -->
+          <div class="hub-card card-hollow" id="hubCardHollow" onclick="window.enterHollowdrive && window.enterHollowdrive(event)">
+            <div class="hub-card-icon-wrap">
+              <svg viewBox="0 0 24 24"><path d="M15 7v4h1v2h-3V5h2l-3-4-3 4h2v8H8v-2.07c.6-.36 1-.99 1-1.73 0-1.1-.9-2-2-2s-2 .9-2 2c0 .74.4 1.37 1 1.73V15c0 1.1.9 2 2 2h3v4.27c-.6.36-1 .99-1 1.73 0 1.1.9 2 2 2s2-.9 2-2c0-.74-.4-1.37-1-1.73V17h3c1.1 0 2-.9 2-2v-2h1c1.1 0 2-.9 2-2V7h-4zm-7 3c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1zm6 11c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
+            </div>
+            <span class="hub-card-tag" id="hubTagHollow">CREAR USB</span>
+            <h2 class="hub-card-title">HOLLOWDRIVE</h2>
+            <div class="hub-card-btn" onclick="window.enterHollowdrive && window.enterHollowdrive(event)">
+              <span id="hubBtnHollow">Comenzar Asistente ➜</span>
+            </div>
+          </div>
+
+          <!-- Tarjeta 2: HollowTools -->
+          <div class="hub-card card-tools" id="hubCardTools" onclick="window.enterTools && window.enterTools(event)">
+            <div class="hub-card-icon-wrap">
+              <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+            </div>
+            <span class="hub-card-tag" id="hubTagTools">MANTENIMIENTO</span>
+            <h2 class="hub-card-title">HOLLOWTOOLS</h2>
+            <div class="hub-card-btn" onclick="window.enterTools && window.enterTools(event)">
+              <span id="hubBtnTools">Herramientas ➜</span>
+            </div>
+          </div>
+
+          <!-- Tarjeta 3: Addons (Próximamente) -->
+          <div class="hub-card card-addons disabled" id="hubCardAddons">
+            <div class="hub-card-icon-wrap">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+            <span class="hub-card-tag" id="hubTagAddons">CATÁLOGO DINÁMICO</span>
+            <h2 class="hub-card-title">ADDONS</h2>
+            <div class="hub-card-btn">
+              <span id="hubBtnAddons">Próximamente</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Caballero con cuenco y moneda giratoria en la esquina inferior izquierda -->
+    <div class="hub-knight-widget" id="hubKnightWidget">
+      <div class="knight-wrapper" id="knightClickWrapper" role="button" tabindex="0" title="Apoyar el proyecto" onclick="window.openModalDonate && window.openModalDonate(event)">
+        <div class="knight-coin-container">
+          <div class="knight-coin-aura"></div>
+          <img src="/media/coin.gif" alt="Moneda girando" class="knight-floating-coin" id="knightFloatingCoin" draggable="false" onerror="if(this.src.indexOf('assets')===-1)this.src='/assets/coin.gif';" />
+        </div>
+        <img src="/media/knight-cuenco.png" alt="Hollow Knight con cuenco" class="knight-large-img" id="knightPngImg" draggable="false" onerror="if(this.src.indexOf('assets')===-1)this.src='/assets/knight-cuenco.png';" />
+      </div>
+    </div>
+
+    <!-- Indicadores de ayuda en la esquina inferior derecha: Mover y Redimensionar ventana -->
+    <div class="hub-hints-widget" id="hubHintsWidget">
+      <div class="hub-hint-pill" id="hintDragMovePill" title="Mantén pulsado el botón izquierdo y arrastra para mover la ventana">
+        <svg class="mouse-hint-ico" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1.5" y="1.5" width="17" height="23" rx="8.5" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.6"/>
+          <line x1="1.5" y1="11" x2="18.5" y2="11" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.2"/>
+          <line x1="10" y1="1.5" x2="10" y2="11" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.2"/>
+          <!-- Botón izquierdo resaltado en cian neón -->
+          <path d="M 10 2.2 A 7.8 7.8 0 0 0 2.2 10 L 10 10 Z" fill="#00d4ff"/>
+        </svg>
+        <span class="hub-hint-text" id="hintDragMoveText">Mover ventana al arrastrar</span>
+      </div>
+
+      <div class="hub-hint-pill" id="hintDragResizePill" title="Mantén pulsado el botón derecho y arrastra para redimensionar la ventana">
+        <svg class="mouse-hint-ico" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1.5" y="1.5" width="17" height="23" rx="8.5" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.6"/>
+          <line x1="1.5" y1="11" x2="18.5" y2="11" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.2"/>
+          <line x1="10" y1="1.5" x2="10" y2="11" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.2"/>
+          <!-- Botón derecho resaltado en cian neón -->
+          <path d="M 10 2.2 A 7.8 7.8 0 0 1 17.8 10 L 10 10 Z" fill="#00d4ff"/>
+        </svg>
+        <span class="hub-hint-text" id="hintDragResizeText">Redimensionar al arrastrar</span>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------------------------
+         PANTALLA 1: WIZARD HOLLOWDRIVE (5 PASOS)
+         ------------------------------------------------------------------- -->
+    <section class="screen" id="screen-wizard">
+      <div class="wizard-container">
+        
+        <!-- Stepper Bar -->
+        <div class="stepper-wrap" id="stepperWrap">
+          <div class="step-item active" data-step="1">
+            <span class="step-num">1</span>
+            <span id="stepLabel1">Unidad USB</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-item" data-step="2">
+            <span class="step-num">2</span>
+            <span id="stepLabel2">Kit de Herramientas</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-item" data-step="3">
+            <span class="step-num">3</span>
+            <span id="stepLabel3">Batocera</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-item" data-step="4">
+            <span class="step-num">4</span>
+            <span id="stepLabel4">Sistema Portable</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-item" data-step="5">
+            <span class="step-num">5</span>
+            <span id="stepLabel5">Método de Descarga</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-item" data-step="6">
+            <span class="step-num">6</span>
+            <span id="stepLabel6">Particionado</span>
+          </div>
+        </div>
+
+        <!-- Cuerpo del Asistente -->
+        <div class="wizard-body">
+
+          <!-- PASO 1: SELECCIÓN DE USB -->
+          <div class="wizard-step-pane active" data-step="1">
+            <div class="usb-select-center">
+              <h2 style="font-size: 1.6rem; text-align: center;" id="usbStepTitle">Selecciona una unidad</h2>
+
+              <div class="usb-dropdown-row">
+                <button class="btn-refresh-icon" id="btnRefreshUsb" title="Actualizar lista de unidades">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                  </svg>
+                </button>
+                <select class="usb-select" id="usbSelect">
+                  <option value="">Buscando unidades disponibles...</option>
+                </select>
+                <!-- Toggle Discos Internos (Limpio, a la derecha del selector) -->
+                <label class="internal-disks-toggle-row">
+                  <input type="checkbox" id="chkShowInternal" />
+                  <span id="lblShowInternal">Mostrar discos internos</span>
+                </label>
+              </div>
+
+              <div class="usb-warning-box">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;">
+                  <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                </svg>
+                <span>
+                  <strong id="usbWarningTitle">ADVERTENCIA:</strong> <span id="usbWarningText">Esta acción formateará por completo la unidad seleccionada. Asegúrate de respaldar cualquier archivo antes de continuar.</span>
+                </span>
+              </div>
+
+              <label class="usb-lock-row">
+                <input type="checkbox" id="usbLockCheckbox" />
+                <span id="usbLockLabel">Entiendo los riesgos y confirmo el formateo del dispositivo</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- PASO 2: PACK DE HERRAMIENTAS -->
+          <div class="wizard-step-pane" data-step="2">
+            <div class="pane-header-row">
+              <div class="pane-title-group">
+                <img src="/media/hollowdrive.ico" alt="HollowDrive" class="pane-title-ico" />
+                <h2 class="pane-title" id="paneTitleKit">Pack de Herramientas (8.7 GB)</h2>
+                <!-- Botón de información independiente [ ℹ ] -->
+                <button class="btn-mini-info" id="btnKitInfo" title="Ver desglose de herramientas del Pack" onclick="window.openModal && window.openModal(document.getElementById('modalKitTools'))">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </button>
+              </div>
+              <div class="pane-actions-right">
+                <div class="switch-control active" id="switchKit">
+                  <span class="switch-label switch-text-install">¿Instalar?</span>
+                  <div class="switch-track"><div class="switch-thumb"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview en vídeo -->
+            <div class="video-preview-wrap">
+              <div class="video-preview-box" data-video="videoKit">
+                <video id="videoKit" loop muted playsinline preload="metadata">
+                  <source src="/media/kit.mp4" type="video/mp4" />
+                </video>
+                <div class="video-hover-bar">
+                  <button class="video-play-btn" type="button" title="Reproducir / Pausar">
+                    <svg class="icon-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/></svg>
+                    <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
+                  </button>
+                  <div class="video-scrub-track" title="Deslizar para avanzar o retroceder">
+                    <div class="video-scrub-fill"></div>
+                    <div class="video-scrub-thumb"></div>
+                  </div>
+                  <span class="video-time-chip">0:00 / 0:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASO 3: BATOCERA RETROGAMING -->
+          <div class="wizard-step-pane" data-step="3">
+            <div class="pane-header-row">
+              <div class="pane-title-group">
+                <img src="/media/batocera.png" alt="Batocera" class="pane-title-gamepad" />
+                <h2 class="pane-title" id="paneTitleBatocera">¿Instalar Batocera?</h2>
+                <!-- Botón de información independiente [ ℹ ] -->
+                <button class="btn-mini-info" id="btnBatoInfo" title="Información sobre Batocera" onclick="window.openModal && window.openModal(document.getElementById('modalBatocera'))">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </button>
+              </div>
+              <div class="pane-actions-right">
+                <div class="segmented-selector">
+                  <button class="segment-btn active" id="btnBato64">Batocera 64bits (4.6 GB)</button>
+                  <button class="segment-btn" id="btnBato32" disabled style="opacity:0.45; cursor:not-allowed;">Batocera 32bits (Próximamente)</button>
+                </div>
+                <div class="switch-control active" id="switchBatocera">
+                  <span class="switch-label switch-text-install">¿Instalar?</span>
+                  <div class="switch-track"><div class="switch-thumb"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview Batocera en bucle -->
+            <div class="video-preview-wrap">
+              <div class="video-preview-box" data-video="videoBatocera">
+                <video id="videoBatocera" loop muted playsinline preload="metadata">
+                  <source src="/media/batocera.mp4" type="video/mp4" />
+                </video>
+                <div class="video-hover-bar">
+                  <button class="video-play-btn" type="button" title="Reproducir / Pausar">
+                    <svg class="icon-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/></svg>
+                    <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
+                  </button>
+                  <div class="video-scrub-track" title="Deslizar para avanzar o retroceder">
+                    <div class="video-scrub-fill"></div>
+                    <div class="video-scrub-thumb"></div>
+                  </div>
+                  <span class="video-time-chip">0:00 / 0:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASO 4: SISTEMA PORTABLE (SIN CACHY, SIN EMOJIS) -->
+          <div class="wizard-step-pane" data-step="4">
+            <div class="pane-header-row">
+              <div class="pane-title-group">
+                <img src="/media/sistemas.png" alt="Sistemas" class="pane-title-gamepad" />
+                <h2 class="pane-title" id="paneTitleSystem">¿Instalar Sistema Portable?</h2>
+                <!-- Botón de información independiente [ ℹ ] -->
+                <button class="btn-mini-info" id="btnCachyInfo" title="Información sobre Sistemas Portables" onclick="window.openModal && window.openModal(document.getElementById('modalCachy'))">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </button>
+              </div>
+              <!-- Selector de Sistemas Portables a la derecha -->
+              <div class="pane-actions-right">
+                <select class="portable-os-select" id="selectPortableOs">
+                  <option value="cachyos" selected id="optOsCachy">CachyOS (Arch Linux Optimizado)</option>
+                  <option value="none" id="optOsNone">Ninguno (No instalar sistema)</option>
+                  <option value="zorin" disabled id="optOsZorin">Zorin OS (Próximamente)</option>
+                  <option value="deepin" disabled id="optOsDeepin">Deepin OS (Próximamente)</option>
+                  <option value="ubuntu" disabled id="optOsUbuntu">Ubuntu (Próximamente)</option>
+                  <option value="debian" disabled id="optOsDebian">Debian (Próximamente)</option>
+                </select>
+                <!-- Selector de Entornos (Hyprland / KDE) -->
+                <div class="segmented-selector" id="cachyFlavorWrap">
+                  <button class="segment-btn active" id="btnCachyHypr">Hyprland</button>
+                  <button class="segment-btn" id="btnCachyKde" disabled style="opacity:0.45; cursor:not-allowed;">KDE Plasma (Próximamente)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview Sistema Portable en bucle -->
+            <div class="video-preview-wrap">
+              <div class="video-preview-box" data-video="videoCachy">
+                <video id="videoCachy" loop muted playsinline preload="metadata">
+                  <source src="/media/sistema.mp4" type="video/mp4" />
+                </video>
+                <div class="video-hover-bar">
+                  <button class="video-play-btn" type="button" title="Reproducir / Pausar">
+                    <svg class="icon-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/></svg>
+                    <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
+                  </button>
+                  <div class="video-scrub-track" title="Deslizar para avanzar o retroceder">
+                    <div class="video-scrub-fill"></div>
+                    <div class="video-scrub-thumb"></div>
+                  </div>
+                  <span class="video-time-chip">0:00 / 0:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASO 5: MÉTODO DE DESCARGA (ASÍNCRONA VS CLÁSICA) -->
+          <div class="wizard-step-pane" data-step="5">
+            <div class="download-mode-container">
+              <div class="download-mode-header">
+                <h2 class="download-mode-title" id="downloadModeTitle">¿Cómo deseas descargar los paquetes?</h2>
+                <p class="download-mode-sub" id="downloadModeSub">Selecciona la estrategia de transferencia óptima para tu equipo y conexión.</p>
+              </div>
+
+              <div class="download-mode-grid">
+                <!-- Opción 1: Asíncrona (Recomendada / En RAM) -->
+                <div class="download-mode-card active" id="cardModeAsync" onclick="window.selectDownloadMode && window.selectDownloadMode('ram')">
+                  <div class="dl-card-badge-wrap">
+                    <span class="dl-badge-badge recommended" id="badgeDlAsync">Recomendado</span>
+                  </div>
+                  <div class="dl-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </div>
+                  <h3 class="dl-card-title" id="titleDlAsync">Descarga Asíncrona</h3>
+                  <p class="dl-card-desc" id="descDlAsync">
+                    Descarga y descomprime los paquetes al vuelo directamente en memoria RAM hacia el USB.
+                  </p>
+                  <ul class="dl-card-features">
+                    <li><span class="feat-check">✔</span> <span id="featAsync1">Sin archivos temporales gigantes en disco</span></li>
+                    <li><span class="feat-check">✔</span> <span id="featAsync2">Cero desgaste para tu disco SSD</span></li>
+                    <li><span class="feat-check">✔</span> <span id="featAsync3">Velocidad máxima de instalación</span></li>
+                  </ul>
+                  <div class="dl-card-selector">
+                    <div class="dl-radio-dot"></div>
+                    <span class="dl-radio-label" id="radioLblAsync">Seleccionado</span>
+                  </div>
+                </div>
+
+                <!-- Opción 2: Clásica (Secuencial a Disco) -->
+                <div class="download-mode-card" id="cardModeClassic" onclick="window.selectDownloadMode && window.selectDownloadMode('disco')">
+                  <div class="dl-card-badge-wrap"></div>
+                  <div class="dl-card-icon classic-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                      <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                      <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                      <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                    </svg>
+                  </div>
+                  <h3 class="dl-card-title" id="titleDlClassic">Descarga Clásica</h3>
+                  <p class="dl-card-desc" id="descDlClassic">
+                    Descarga primero las partes completas en una carpeta temporal y luego las extrae al USB.
+                  </p>
+                  <ul class="dl-card-features">
+                    <li><span class="feat-check">✔</span> <span id="featClassic1">Reanudación resiliente por partes</span></li>
+                    <li><span class="feat-check">✔</span> <span id="featClassic2">Mínimo consumo de memoria RAM</span></li>
+                    <li><span class="feat-warn">ℹ</span> <span id="featClassic3">Requiere espacio libre temporal en disco</span></li>
+                  </ul>
+                  <div class="dl-card-selector">
+                    <div class="dl-radio-dot"></div>
+                    <span class="dl-radio-label" id="radioLblClassic">Seleccionar</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASO 6: PARTICIONADO REAL Y BOTÓN INSTALAR -->
+          <div class="wizard-step-pane" data-step="6">
+            <div class="partition-visual-card" id="partitionSetupCard">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 1.2rem; font-weight: 800;" id="partitionHeading">Distribución del Espacio en el Disco</h3>
+                <span id="diskTotalLabel" style="font-family: var(--font-mono); font-weight: 700; color: var(--cyan);">Total: -- GB</span>
+              </div>
+              
+              <!-- Barra de particiones reactiva -->
+              <div class="partition-bar" id="partitionBar"></div>
+
+              <!-- Leyenda unificada con tamaños en tiempo real -->
+              <div class="partition-legend">
+                <div class="legend-item">
+                  <span class="legend-dot" style="background:var(--cyan);"></span>
+                  <span id="legendHollow">Hollowdrive: -- GB</span>
+                </div>
+                <div class="legend-item" id="legendCachyItem">
+                  <span class="legend-dot" style="background:var(--emerald);"></span>
+                  <span id="legendCachy">Sistema: -- GB</span>
+                </div>
+                <div class="legend-item" id="legendLibreItem" style="display: none;">
+                  <span class="legend-dot" style="background:#94a3b8;"></span>
+                  <span id="legendLibre">Libre: -- GB</span>
+                </div>
+              </div>
+
+              <!-- Ajustes de Particionado con Sliders Reactivos -->
+              <div class="partition-sliders-grid" id="partitionSlidersGrid">
+                <div class="slider-group" id="hollowSliderGroup">
+                  <div class="slider-header">
+                    <span id="sliderHollowLabel">Tamaño Hollowdrive (Ventoy + ISOs):</span>
+                  </div>
+                  <input type="range" id="hollowSlider" min="10" max="64" step="0.5" value="20" />
+                </div>
+
+                <div class="slider-group" id="cachySliderGroup">
+                  <div class="slider-header">
+                    <span id="sliderSystemLabel">Tamaño Sistema (Ext4):</span>
+                  </div>
+                  <input type="range" id="cachySlider" min="20" max="64" step="0.5" value="20" />
+                </div>
+              </div>
+
+              <!-- Switch Preservar Espacio Libre en USB (desactivado por defecto) -->
+              <div class="preserve-space-row">
+                <div class="switch-control" id="switchPreserveSpace">
+                  <span class="switch-label" id="lblPreserveSpace">Preservar espacio libre en USB</span>
+                  <div class="switch-track"><div class="switch-thumb"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Monitor de Instalación en Vivo -->
+            <div class="install-monitor-card" id="installMonitorCard" style="display: none;">
+              <!-- Barra Superior del Monitor: Interruptor sutil de Vista Simple vs Detallada -->
+              <div class="install-monitor-top-bar">
+                <div class="install-mode-toggle-group" id="installModeToggle">
+                  <button type="button" class="install-mode-btn active" id="btnModeSimple" data-mode="simple" title="Vista Simple">
+                    <span class="mode-icon">⚡</span>
+                    <span id="lblModeSimple">Modo Simple</span>
+                  </button>
+                  <button type="button" class="install-mode-btn" id="btnModeDetailed" data-mode="detailed" title="Vista Detallada">
+                    <span class="mode-icon">📊</span>
+                    <span id="lblModeDetailed">Modo Detallado</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- =================================================================
+                   VISTA SIMPLE (POR DEFECTO)
+                   Aros concéntricos (general + subproceso), Hollow linterna y tiempo abajo
+                   ================================================================= -->
+              <div class="install-view-simple" id="installViewSimple">
+                <div class="simple-monitor-card" id="simpleMonitorCard">
+                  <!-- Aros circulares concéntricos SVG: Aro exterior (general) y aro interior (subprocesos) -->
+                  <div class="simple-progress-ring-wrap" id="simpleRingWrap">
+                    <svg class="simple-progress-ring" viewBox="0 0 260 260">
+                      <!-- Aro Exterior: Progreso General -->
+                      <circle class="ring-track ring-track-outer" cx="130" cy="130" r="110" fill="none"
+                        stroke="rgba(0, 212, 255, 0.14)" stroke-width="10" />
+                      <circle class="ring-fill ring-fill-outer" id="simpleRingFillOuter" cx="130" cy="130" r="110" fill="none"
+                        stroke="url(#cyanEmeraldGradient)" stroke-width="10" stroke-linecap="round"
+                        stroke-dasharray="691.15" stroke-dashoffset="691.15" />
+
+                      <!-- Aro Interior: Subprocesos / Procesos por separado (sin porcentaje dedicado) -->
+                      <circle class="ring-track ring-track-inner" cx="130" cy="130" r="92" fill="none"
+                        stroke="rgba(16, 185, 129, 0.12)" stroke-width="7" />
+                      <circle class="ring-fill ring-fill-inner" id="simpleRingFillInner" cx="130" cy="130" r="92" fill="none"
+                        stroke="url(#emeraldMintGradient)" stroke-width="7" stroke-linecap="round"
+                        stroke-dasharray="578.05" stroke-dashoffset="578.05" />
+
+                      <defs>
+                        <!-- Gradiente Cian / Neón para el Aro Exterior (General) -->
+                        <linearGradient id="cyanEmeraldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#00f0ff" />
+                          <stop offset="60%" stop-color="#38bdf8" />
+                          <stop offset="100%" stop-color="#00d4ff" />
+                        </linearGradient>
+
+                        <!-- Gradiente Esmeralda / Menta para el Aro Interior (Fase / Subproceso) -->
+                        <linearGradient id="emeraldMintGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#10b981" />
+                          <stop offset="50%" stop-color="#34d399" />
+                          <stop offset="100%" stop-color="#059669" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+
+                    <!-- Centro del Aro: Porcentaje Central / Checkmark de éxito (Sin texto 'Progreso General') -->
+                    <div class="simple-center-avatar" id="simpleCenterAvatar">
+                      <div class="simple-center-pct-wrap" id="simpleCenterPctWrap">
+                        <span class="simple-center-pct" id="simpleCenterPct">0%</span>
+                      </div>
+                      
+                      <!-- Tick / Checkmark SVG animado de confirmación final -->
+                      <div class="simple-success-tick" id="simpleSuccessTick" style="display: none;">
+                        <svg class="tick-svg" viewBox="0 0 52 52">
+                          <circle class="tick-circle" cx="26" cy="26" r="24" fill="none"/>
+                          <path class="tick-check" fill="none" d="M14 27l8 8 16-16"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Indicadores de Estado, Hollow linterna y Tiempo Restante Abajo -->
+                  <div class="simple-status-info" id="simpleStatusInfo">
+                    <!-- Hollow linterna abajo del aro circular (espejado) -->
+                    <div class="simple-hollow-bottom-wrap" id="simpleHollowBottomWrap">
+                      <img src="/media/hollow-linterna.webp" alt="Hollow Linterna" class="simple-hollow-gif mirror-mode" id="simpleHollowGif" onerror="this.src='/media/hollow-linterna.gif';" />
+                    </div>
+
+                    <!-- Proceso actual en verde esmeralda con su porcentaje justo al lado -->
+                    <div class="simple-phase-row" id="simplePhaseRow">
+                      <span class="simple-phase-title" id="simplePhaseTitle">Iniciando preparación...</span>
+                      <span class="simple-phase-pct" id="simplePhasePct">0%</span>
+                    </div>
+
+                    <!-- Tiempo Restante Abajo (Diseño luminoso y transparente conservando el glow) -->
+                    <div class="simple-bottom-timer-card" id="simpleBottomTimerCard">
+                      <div class="timer-card-wrap">
+                        <span class="timer-card-icon">⏱</span>
+                        <span class="timer-card-digits" id="simpleTimerDigits">--:--</span>
+                      </div>
+                      <div class="timer-card-sub" id="simpleTimerSub">Calculando<span class="dots-animation"></span></div>
+                    </div>
+                  </div>
+
+                  <!-- Bloque de la Fase Final: Transparencia con efecto vidrio sobre las lumélulas,
+                       marcas de tiempo de cada proceso a la izquierda y tiempo total en grande a la derecha -->
+                  <div class="simple-completion-zone" id="simpleCompletionZone" style="display: none;">
+                    <!-- Columna Izquierda: Marcas de tiempo de cada proceso -->
+                    <div class="completion-col-left">
+                      <div class="completion-col-header">
+                        <span class="completion-header-icon">📋</span>
+                        <span class="completion-header-title" id="lblSimpleBreakdownTitle">DESGLOSE POR PROCESOS</span>
+                      </div>
+                      <div class="completion-process-list" id="simpleProcessTimesList">
+                        <!-- Generado dinámicamente con los tiempos registrados de cada paso -->
+                      </div>
+                    </div>
+
+                    <!-- Columna Derecha: Tiempo total en grande y botón siguiente -->
+                    <div class="completion-col-right">
+                      <div class="completion-hero-card">
+                        <div class="completion-badge-pill">
+                          <span class="completion-tick-mini">✔</span>
+                          <span class="total-time-title" id="lblSimpleTotalTimeTitle">TIEMPO TOTAL</span>
+                        </div>
+                        <div class="completion-hero-digits" id="simpleTotalTimeValue">00m 00s</div>
+                      </div>
+                      
+                      <button class="btn-simple-next" id="btnSimpleNext" type="button">
+                        <span id="lblSimpleNext">Siguiente ➜</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tarjeta Final de Agradecimiento: Caballero con Cuenco y Moneda -->
+                <div class="simple-gratitude-card" id="simpleGratitudeCard" style="display: none;">
+                  <div class="gratitude-knight-wrap">
+                    <div class="knight-coin-wrapper">
+                      <img src="/media/knight-cuenco.png" class="gratitude-knight-img" alt="Hollow Knight" />
+                      <img src="/media/coin.gif" class="gratitude-coin-gif" alt="Moneda" />
+                    </div>
+                    <h3 class="gratitude-title" id="lblGratitudeTitle">¡Tu HollowDrive está listo para la aventura!</h3>
+                    <p class="gratitude-sub" id="lblGratitudeSub">Ya puedes retirar de forma segura la memoria USB e iniciarla en cualquier ordenador.</p>
+                  </div>
+                  
+                  <div class="gratitude-actions">
+                    <button class="btn-nav btn-prev btn-gratitude-menu" id="btnGratitudeBackMenu" type="button">
+                      <span id="lblGratitudeBackMenu">⬅ Volver al Menú</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- =================================================================
+                   VISTA DETALLADA
+                   Métricas avanzadas, barras desglosadas y terminal en vivo
+                   ================================================================= -->
+              <div class="install-view-detailed" id="installViewDetailed" style="display: none;">
+                <div class="progress-metrics-row">
+                  <div class="metric-box">
+                    <div class="metric-title" id="metricTitleStep">Fase Actual</div>
+                    <div class="metric-value" id="metricStep">Iniciando...</div>
+                    <div class="metric-sub" id="metricStepSub">Paso 1 de 1</div>
+                  </div>
+                  <div class="metric-box">
+                    <div class="metric-title" id="metricTitleSpeed">Velocidad</div>
+                    <div class="metric-value" id="metricSpeed">-- MB/s</div>
+                    <div class="metric-sub" id="metricSpeedSub">Transferencia</div>
+                  </div>
+                  <div class="metric-box task-metric">
+                    <div class="metric-title" id="metricTitleTaskTime">Tiempo Proceso</div>
+                    <div class="metric-value text-glow-cyan" id="metricTaskTime">00:00</div>
+                    <div class="metric-sub" id="metricTaskTimeEst">Est: --:--</div>
+                  </div>
+                  <div class="metric-box highlight-metric">
+                    <div class="metric-title" id="metricTitleEta">Total Restante</div>
+                    <div class="metric-value text-glow-emerald" id="metricEta">--:--</div>
+                    <div class="metric-sub" id="metricTotalElapsed">Transcurrido: 00:00</div>
+                  </div>
+                  <!-- Bloque de Estado con GIF interactivo (espejado) en lugar de texto -->
+                  <div class="metric-box metric-box-status">
+                    <div class="metric-title" id="metricTitleStatus">Estado</div>
+                    <div class="status-gif-container" id="statusGifContainer">
+                      <img src="/media/hollow-linterna.webp" alt="Estado" class="metric-status-gif mirror-mode" id="metricStatusGif" onerror="this.src='/media/hollow-linterna.gif';" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Barras de Progreso (se ocultan tras terminar para dar espacio) -->
+                <div class="progress-bar-wrap" id="taskProgressBarWrap">
+                  <div class="progress-bar-label task-label-inline-row">
+                    <div class="task-process-inline-group">
+                      <span id="lblTaskProgress" class="task-process-text">Iniciando preparación...</span>
+                      <span id="taskProgressPct" class="task-process-pct">0%</span>
+                    </div>
+                  </div>
+                  <div class="progress-bar-outer">
+                    <div class="progress-bar-inner task-bar-emerald" id="taskProgressBar"></div>
+                  </div>
+                </div>
+
+                <div class="progress-bar-wrap" id="totalProgressBarWrap">
+                  <div class="progress-bar-label">
+                    <span id="lblTotalProgress">Progreso Global de la Instalación</span>
+                    <span id="totalProgressPct">0%</span>
+                  </div>
+                  <div class="progress-bar-outer">
+                    <div class="progress-bar-inner" id="totalProgressBar" style="background: linear-gradient(90deg, var(--emerald) 0%, var(--cyan) 100%);"></div>
+                  </div>
+                </div>
+
+                <!-- Bloque Resumen de Finalización y Marcas de Tiempo -->
+                <div class="completion-summary-card" id="completionSummaryCard" style="display: none;">
+                  <div class="completion-header">
+                    <div class="completion-badge">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                      <span id="lblInstallSuccessTitle">¡Instalación Finalizada con Éxito!</span>
+                    </div>
+                  </div>
+
+                  <!-- Marcas de tiempo de cada proceso -->
+                  <div class="completion-times-grid" id="completionTimesGrid"></div>
+
+                  <!-- Botón de Nueva Instalación justo debajo de las marcas de tiempo -->
+                  <div class="completion-actions-row">
+                    <button class="btn-new-install" id="btnNewInstall" type="button" title="Comenzar una nueva instalación de HollowDrive">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                      </svg>
+                      <span id="lblNewInstallBtn">Nueva Instalación</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Terminal Monospace en Vivo con Cabecera Plegable -->
+                <div class="terminal-toggle-row" id="terminalToggleRow">
+                  <span class="terminal-title">Registro en Vivo</span>
+                  <button class="btn-toggle-terminal" id="btnToggleTerminal" type="button">
+                    <span id="terminalToggleIcon">▼</span> <span id="terminalToggleText">Ocultar registro</span>
+                  </button>
+                </div>
+                <div class="terminal-console" id="terminalConsole"></div>
+              </div>
+            </div>
+
+            <!-- Botón Instalar grande con PNG original debajo del bloque -->
+            <div class="btn-instalar-row" id="btnInstalarRow" onclick="window.startInstallClick && window.startInstallClick(event)">
+              <img src="/media/instalar.png" class="btn-instalar-img" id="btnStartInstallImg" alt="Comenzar Instalación" title="Comenzar Instalación Real" onclick="window.startInstallClick && window.startInstallClick(event)" />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Barra Inferior de Navegación del Asistente -->
+        <footer class="wizard-footer">
+          <button class="btn-nav btn-prev" id="btnPrev">⬅ Volver al Menú</button>
+          <button class="btn-nav btn-next" id="btnNext" disabled>Siguiente ➡</button>
+          <button class="btn-nav btn-cancel-install" id="btnCancelInstallProcess" style="display: none;">❌ Cancelar instalación</button>
+        </footer>
+
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------------------
+         PANTALLA 2: HOLLOWTOOLS
+         ------------------------------------------------------------------- -->
+    <!-- -------------------------------------------------------------------
+         PANTALLA 2: HOLLOWTOOLS (MANTENIMIENTO Y GESTIÓN)
+         ------------------------------------------------------------------- -->
+    <section class="screen" id="screen-tools">
+      <div class="tools-container">
+        
+        <!-- Header superior de HollowTools: Título + Selector de disco + Botón volver (Sin emoticonos) -->
+        <div class="tools-top-bar">
+          <div class="tools-title-wrap">
+            <h2 class="tools-title" id="toolsTitle">MANTENIMIENTO Y GESTIÓN HOLLOWDRIVE</h2>
+          </div>
+          
+          <div class="tools-disk-selector-row">
+            <select class="tools-disk-select" id="toolsUsbSelect">
+              <option value="">Buscando unidades HOLLOWDRIVE...</option>
+            </select>
+            <button class="btn-refresh-icon" id="btnRefreshToolsUsb" title="Recargar unidades">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Rejilla de las 3 Tarjetas Principales (Sin emoticonos) -->
+        <div class="tools-cards-grid" id="toolsCardsGrid">
+          
+          <!-- TARJETA 1: GESTOR DE ISOs -->
+          <div class="tools-module-card card-gestor-iso">
+            <div class="tools-card-head">
+              <div class="tools-card-title-group">
+                <span class="tools-card-heading" id="toolsCardIsoTitle">GESTOR DE ISOs</span>
+              </div>
+              <button class="tools-card-diamond-btn" id="btnInfoToolsIso" title="Información">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              </button>
+            </div>
+            
+            <div class="tools-drop-zone" id="toolsDropZone">
+              <p class="tools-drop-msg" id="toolsDropMsg">Arrastra tus .ISO a este recuadro o haz clic abajo</p>
+              <div class="tools-plus-container">
+                <button class="tools-plus-btn" id="btnPlusIso" title="Añadir archivos ISO">+</button>
+              </div>
+              <input type="file" id="fileInputIsos" accept=".iso" multiple style="display:none;" />
+            </div>
+            <div class="tools-card-foot">
+              <span class="tools-foot-hint" id="toolsIsoHint">Destino: HOLLOWDRIVE\OSimages</span>
+            </div>
+          </div>
+
+          <!-- TARJETA 2: PAQUETES -->
+          <div class="tools-module-card card-paquetes">
+            <div class="tools-card-head">
+              <div class="tools-card-title-group">
+                <span class="tools-card-heading" id="toolsCardPacksTitle">PAQUETES</span>
+              </div>
+              <button class="tools-card-diamond-btn" id="btnInfoToolsPacks" title="Información">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              </button>
+            </div>
+            
+            <div class="tools-card-body-packs">
+              <div class="tools-checkbox-group">
+                <label class="tools-custom-check">
+                  <input type="checkbox" id="chkToolsBato" checked />
+                  <span class="check-box-indicator"></span>
+                  <span class="check-box-text">Batocera OS (.img)</span>
+                </label>
+                <label class="tools-custom-check">
+                  <input type="checkbox" id="chkToolsPack" checked />
+                  <span class="check-box-indicator"></span>
+                  <span class="check-box-text">Pack HollowDrive (8.06GB)</span>
+                </label>
+              </div>
+              
+              <div class="tools-card-action-wrap">
+                <button class="tools-action-btn btn-inject-packs" id="btnInjectPacks">
+                  Inyectar Seleccionados
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TARJETA 3: SISTEMA PORTABLE -->
+          <div class="tools-module-card card-portable">
+            <div class="tools-card-head">
+              <div class="tools-card-title-group">
+                <span class="tools-card-heading cachy-green" id="toolsCardPortableTitle">SISTEMA PORTABLE</span>
+              </div>
+              <button class="tools-card-diamond-btn" id="btnInfoToolsCachy" title="Información">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              </button>
+            </div>
+            
+              <!-- Info de espacio libre oculta según solicitud del usuario -->
+              <div class="tools-portable-status-box" id="toolsPortableStatusBox" style="display: none;">
+                <div class="portable-system-badge" id="toolsPortableBadge">CachyOS</div>
+                <div class="portable-system-desc" id="toolsPortableStatusText">Consultando estado...</div>
+              </div>
+              
+              <div class="tools-portable-gear-wrap">
+                <button class="tools-gear-btn" id="btnOpenPortableOptions" type="button" title="Configurar opciones">
+                  <svg class="gear-icon" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  <span id="toolsGearLabel">Opciones</span>
+                </button>
+              </div>
+
+              <div class="tools-card-action-wrap">
+                <button class="tools-action-btn btn-apply-cachy" id="btnApplyCachy" type="button">
+                  <span id="toolsBtnApplyText">Aplicar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.tools-cards-grid -->
+
+        <!-- Monitor de Progreso en Vivo para Operaciones de HollowTools (Sin emoticonos) -->
+        <div class="tools-monitor-card" id="toolsMonitorCard" style="display: none;">
+          <div class="tools-monitor-header">
+            <span class="tools-monitor-msg" id="toolsMonitorMsg">Preparando operación...</span>
+            <span class="tools-monitor-pct" id="toolsMonitorPct">0%</span>
+          </div>
+          <div class="tools-progress-track">
+            <div class="tools-progress-fill" id="toolsProgressFill" style="width: 0%;"></div>
+          </div>
+          <div class="tools-monitor-actions">
+            <button class="btn-cancel-tools-op" id="btnCancelToolsOp">Cancelar Operación</button>
+          </div>
+        </div>
+
+        <!-- Barra Inferior de Navegación de HollowTools (Atrás abajo a la izquierda) -->
+        <div class="tools-bottom-nav">
+          <button class="btn-nav btn-prev" id="btnBackFromTools" onclick="window.setScreen && window.setScreen('hub', true)">⬅ Atrás</button>
+        </div>
+
+      </div><!-- /.tools-container -->
+    </section>
+
+  </main>
+
+  <!-- =====================================================================
+       PANTALLA INICIAL DE INFORMACIÓN & TUTORIAL (FULL SCREEN REPARTIDA)
+       Sin rebordes neón toscos, con avatar de Savin grande, redes arriba y botón Siguiente fijo
+       ===================================================================== -->
+  <div class="overlay-info-view open" id="overlayInfo">
+    <div class="overlay-info-window">
+      <!-- Barra superior con selector de idioma en la pantalla de info -->
+      <div class="overlay-info-top-bar">
+        <div class="lang-select-wrap">
+          <button class="lang-select-btn" id="langBtnInfo" title="Cambiar Idioma">
+            <span id="langCurrentTextInfo">🌐 Español</span> ▾
+          </button>
+          <div class="lang-dropdown" id="langDropdownInfo">
+            <button type="button" class="lang-option" data-lang="es">🌐 Español</button>
+            <button type="button" class="lang-option" data-lang="en">🌐 English</button>
+            <button type="button" class="lang-option" data-lang="zh">🌐 简体中文</button>
+            <button type="button" class="lang-option" data-lang="ja">🌐 日本語</button>
+            <button type="button" class="lang-option" data-lang="ru">🌐 Русский</button>
+            <button type="button" class="lang-option" data-lang="pt">🌐 Português</button>
+            <button type="button" class="lang-option" data-lang="de">🌐 Deutsch</button>
+            <button type="button" class="lang-option" data-lang="fr">🌐 Français</button>
+            <button type="button" class="lang-option" data-lang="it">🌐 Italiano</button>
+            <button type="button" class="lang-option" data-lang="ko">🌐 한국어</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay-info-scroll">
+        <!-- Foto de perfil de Savin bien en grande arriba -->
+        <div class="overlay-avatar-wrap">
+          <img src="/media/Savin.png" class="overlay-avatar-img" alt="Savin" onerror="this.src='/media/hollowdrive.ico';" />
+        </div>
+        
+        <!-- Mensaje de bienvenida de Savin en bloque estilizado, blanco y legible -->
+        <div class="overlay-welcome-card">
+          <p class="overlay-welcome-text" id="infoWelcomeText">
+            ¡Hola! soy Savin, te presento mi proyecto HOLLOWDRIVE, en el que he trabajado mucho mUCho para que puedas tener el USB más potente del mundo en unos pocos clicks :D. Disfrutalo mientras arreglo mi horario de sueño.
+          </p>
+        </div>
+
+        <!-- Botones de redes sociales arriba con los iconos de la carpeta media -->
+        <div class="overlay-social-icons-row">
+          <button class="btn-social-icon" onclick="window.hollowdrive.openUrl('https://discord.gg/HJvgmCRpGm');" title="Discord">
+            <img src="/media/discord.png" alt="Discord" />
+          </button>
+          <button class="btn-social-icon" onclick="window.hollowdrive.openUrl('https://github.com/MVP-Savyn');" title="GitHub">
+            <img src="/media/github.png" alt="GitHub" />
+          </button>
+          <button class="btn-social-icon" onclick="window.hollowdrive.openUrl('https://youtube.com/@T0xicArea');" title="YouTube">
+            <img src="/media/youtube.png" alt="YouTube" />
+          </button>
+        </div>
+
+        <!-- Widget del vídeo estilizado y responsive -->
+        <div class="overlay-video-widget-wrap">
+          <div class="overlay-section-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <span id="infoVideoPrompt">¡MIRA ESTE VÍDEO PARA SABER CÓMO FUNCIONA!</span>
+          </div>
+
+          <div class="overlay-video-container" id="videoTutorialTrigger">
+            <div class="overlay-video-thumb" style="background-image: url('/media/miniatura.jpg');"></div>
+            <div class="overlay-play-glow-wrap">
+              <img src="/media/play.png" alt="Play" class="overlay-play-btn" onerror="this.style.display='none';" />
+            </div>
+            <div class="overlay-video-bottom-bar">
+              <span>Ver Tutorial Oficial (YouTube) ↗</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección Licencias con badge estilizado -->
+        <div class="overlay-section-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          <span id="infoLicensesPrompt">HERRAMIENTAS CORE Y LICENCIAS</span>
+        </div>
+
+        <!-- Tarjeta de Licencias y Códigos Fuente -->
+        <div class="credits-card-table">
+          <div class="credit-row">
+            <span class="credit-name">• VENTOY CORE (GNU GPLv3)</span>
+            <button class="btn-credit-link" onclick="window.hollowdrive.openUrl('https://github.com/ventoy/Ventoy');">Código / Web</button>
+          </div>
+          <div class="credit-row">
+            <span class="credit-name">• 7-ZIP ENGINE (GNU LGPL)</span>
+            <button class="btn-credit-link" onclick="window.hollowdrive.openUrl('https://www.7-zip.org');">Código / Web</button>
+          </div>
+          <div class="credit-row">
+            <span class="credit-name">• CACHY OS (GNU GPLv3)</span>
+            <button class="btn-credit-link" onclick="window.hollowdrive.openUrl('https://cachyos.org');">Código / Web</button>
+          </div>
+          <div class="credit-row">
+            <span class="credit-name">• BATOCERA LINUX (GPLv2)</span>
+            <button class="btn-credit-link" onclick="window.hollowdrive.openUrl('https://batocera.org');">Código / Web</button>
+          </div>
+          <div class="credits-legal-notice" id="infoLegalNotice">
+            * Las herramientas de terceros se ejecutan de forma independiente (mera agregación) bajo sus respectivas licencias libres.
+          </div>
+        </div>
+
+        <!-- Cuadro de agradecimiento a MediCat (sin emoticonos) -->
+        <div class="thanks-medicat-box" id="infoThanksText">
+          Gracias a MediCat USB, que me inspiró a crear un USB cercano a la perfección.
+        </div>
+      </div><!-- /.overlay-info-scroll -->
+    </div><!-- /.overlay-info-window -->
+
+    <!-- Botón Siguiente fijado permanentemente en la pantalla sin verse afectado por el scroll -->
+    <button class="btn-info-fixed-next" id="btnEnterApp" title="Entrar a HollowDrive" onclick="window.closeOverlayInfo && window.closeOverlayInfo()">
+      <span id="btnEnterAppText">Siguiente ➡</span>
+    </button>
+  </div><!-- /#overlayInfo -->
+
+  <!-- =====================================================================
+       MODAL 2: CATÁLOGO DE HERRAMIENTAS DEL PACK (PASO 2 [ ℹ ])
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalKitTools">
+    <div class="custom-modal-card tools-modal-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title">
+          <span class="badge-blue-pill">
+            <img src="/media/hollowdrive.ico" alt="Kit" />
+            <span id="modalKitHeader">PACK DE HERRAMIENTAS HOLLOWDRIVE</span>
+          </span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalKitTools">&times;</button>
+      </div>
+
+      <div class="tools-catalog-grid">
+        <!-- 1. Antivirus -->
+        <div class="tool-cat-card">
+          <div class="tool-cat-header">
+            <img src="/docs/media/images/antivirus.png" class="tool-cat-ico" onerror="this.style.display='none'" alt="Antivirus" />
+            <span id="toolCatAntivirus">ANTIVIRUS</span>
+          </div>
+          <div class="tool-cat-list">
+            <div class="tool-item"><span>Malwarebytes.iso</span><span class="tool-arr">↗</span></div>
+          </div>
+        </div>
+
+        <!-- 2. Backups -->
+        <div class="tool-cat-card">
+          <div class="tool-cat-header">
+            <img src="/docs/media/images/backup.png" class="tool-cat-ico" onerror="this.style.display='none'" alt="Backups" />
+            <span id="toolCatBackups">BACKUPS Y CLONACIÓN DE DISCOS/SISTEMAS</span>
+          </div>
+          <div class="tool-cat-list">
+            <div class="tool-item"><span>AOMEI_Backupper_Technician_Plus_8.4.0.iso</span><span class="tool-arr">↗</span></div>
+            <div class="tool-item"><span>clonezilla-live-3.3.1-35-amd64.iso</span><span class="tool-arr">↗</span></div>
+            <div class="tool-item"><span>rescuezilla-2.6.2-64bit.resolute.iso</span><span class="tool-arr">↗</span></div>
+          </div>
+        </div>
+
+        <!-- 3. Live OS -->
+        <div class="tool-cat-card">
+          <div class="tool-cat-header">
+            <img src="/docs/media/images/liveos.png" class="tool-cat-ico" onerror="this.style.display='none'" alt="Live OS" />
+            <span id="toolCatLiveOs">SISTEMA LIVE LLENO DE HERRAMIENTAS</span>
+          </div>
+          <div class="tool-cat-list">
+            <div class="tool-item"><span>HBCD_PE_x64.iso</span><span class="tool-arr">↗</span></div>
+          </div>
+        </div>
+
+        <!-- 4. Propias ISOs -->
+        <div class="tool-cat-card">
+          <div class="tool-cat-header">
+            <img src="/docs/media/images/osimages.png" class="tool-cat-ico" onerror="this.style.display='none'" alt="ISOs" />
+            <span id="toolCatIsos">CARPETA PARA DEJAR TUS PROPIAS ISOS</span>
+          </div>
+          <div class="tool-cat-list">
+            <div class="tool-item"><span id="toolCatVentoyDesc">Directorio nativo Ventoy (Copia y pega cualquier ISO)</span><span class="tool-arr">↗</span></div>
+          </div>
+        </div>
+
+        <!-- 5. Particiones -->
+        <div class="tool-cat-card">
+          <div class="tool-cat-header">
+            <img src="/docs/media/images/partition.png" class="tool-cat-ico" onerror="this.style.display='none'" alt="Particiones" />
+            <span id="toolCatPartitions">HERRAMIENTAS DE PARTICIONES</span>
+          </div>
+          <div class="tool-cat-list">
+            <div class="tool-item"><span>gparted-live-1.8.1-2-amd64.iso</span><span class="tool-arr">↗</span></div>
+            <div class="tool-item"><span>PartAssist_WinPE_Technician_10.11.0.iso</span><span class="tool-arr">↗</span></div>
+          </div>
+        </div>
+
+        <!-- 6. Rescate de Arranque -->
+        <div class="tool-cat-card">
+          <div class="tool-cat-header">
+            <img src="/docs/media/images/supergrub.png" class="tool-cat-ico" onerror="this.style.display='none'" alt="Arranque" />
+            <span id="toolCatRescue">RESCATE DE ARRANQUE</span>
+          </div>
+          <div class="tool-cat-list">
+            <div class="tool-item"><span>Super_GRUB2_Disk.efi</span><span class="tool-arr">↗</span></div>
+            <div class="tool-item"><span>Super_GRUB2_Disk.iso</span><span class="tool-arr">↗</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:center; margin-top:10px;">
+        <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalKitTools" style="padding:8px 30px;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 3: BATOCERA INFO (SIN EMOTICONOS, CENTRADO)
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalBatocera">
+    <div class="custom-modal-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title">
+          <span class="badge-blue-pill">
+            <img src="/media/batocera.png" alt="Batocera" />
+            <span id="modalBatoceraTitle">SOBRE BATOCERA</span>
+          </span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalBatocera">&times;</button>
+      </div>
+      <div class="custom-modal-body" id="modalBatoceraBody">
+        <p style="margin-bottom: 8px;">
+          Batocera es un sistema de emulación que puede convertir cualquier ordenador en una consola de videojuegos retro y moderna.
+        </p>
+        <div class="badge-green-pill-wrap">
+          <span class="badge-green-pill">Seguridad de datos</span>
+        </div>
+        <p style="margin-bottom: 8px; color: #cbd5e1;">
+          Aunque inicies Batocera desde el USB, <strong>NUNCA perderás ni modificarás</strong> los datos del disco duro del ordenador anfitrión.
+        </p>
+        <div style="font-size: 0.88rem; color: var(--text-muted); display:flex; flex-direction:column; gap:4px;">
+          <span>• No requiere instalación en el ordenador</span>
+          <span>• Incluye drivers para mandos Bluetooth y USB</span>
+          <span>• Guarda tus partidas directamente en el almacenamiento de HollowDrive</span>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:8px;">
+        <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalBatocera" style="padding:7px 28px;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 4: SISTEMA PORTABLE INFO (SIN CACHY, SIN EMOTICONOS)
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalCachy">
+    <div class="custom-modal-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title">
+          <span class="badge-blue-pill">
+            <img src="/media/sistemas.png" alt="Sistemas" />
+            <span id="modalSystemTitle">SISTEMA PORTABLE OPTIMIZADO</span>
+          </span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalCachy">&times;</button>
+      </div>
+      <div class="custom-modal-body" id="modalSystemBody" style="white-space: pre-line;">He preparado un sistema para que sea fluido y fácil de usar dentro del USB.
+
+CARACTERÍSTICAS PRINCIPALES:
+. Universal: Funciona en casi cualquier PC (x86_64).
+. Portable: Llevas tu sistema operativo, archivos y aplicaciones siempre contigo en el USB.</div>
+      <div class="system-modal-note" id="modalSystemNote">
+        Cada sistema tiene sus ventajas, por ahora sólo está disponible CachyOS con Hyprland, si este proyecto recibe apoyo añadiré más opciones ;&gt;
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:14px;">
+        <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalCachy" style="padding:8px 30px;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 5: AVISO VISUAL DE DISCOS INTERNOS (MODO PELIGRO)
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalInternalDanger">
+    <div class="custom-modal-card" style="border-color: var(--rose); box-shadow: 0 0 35px var(--rose-glow);">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title" style="color: var(--rose); font-size:1.15rem; display:flex; align-items:center; gap:8px;">
+          <span id="modalInternalDangerTitle">AVISO: DISCOS INTERNOS</span>
+        </div>
+        <button class="btn-modal-close" id="btnCancelInternalModalX">&times;</button>
+      </div>
+      <div class="custom-modal-body" id="modalInternalDangerBody" style="color: #fecdd3; font-size:0.92rem; line-height:1.6;">
+        Vas a habilitar la visualización de <strong>DISCOS INTERNOS</strong>.<br/><br/>
+        Instalar HollowDrive en un disco interno <strong>BORRARÁ TODO</strong> su contenido.
+      </div>
+      <div style="display:flex; justify-content:center; gap:14px; margin-top:12px;">
+        <button class="btn-nav btn-prev" id="btnCancelInternalModal">Cancelar</button>
+        <button class="btn-nav btn-next" id="btnConfirmInternalModal" style="background:var(--rose); color:#fff; box-shadow:0 0 15px var(--rose-glow);">Activar de todos modos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 6: CONFIRMACIÓN VISUAL ANTES DE INSTALAR EN USB
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalConfirmInstall">
+    <div class="custom-modal-card confirm-modal-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title" style="color: var(--cyan);">
+          <span id="modalConfirmInstallTitle">CONFIRMACIÓN DE INSTALACIÓN</span>
+        </div>
+        <button class="btn-modal-close" id="btnCancelInstallModalX">&times;</button>
+      </div>
+      <div class="custom-modal-body" id="confirmInstallMsg" style="padding: 10px 14px 4px 14px;">
+        ¿Deseas iniciar la instalación real de HollowDrive?
+      </div>
+      <div class="confirm-modal-actions">
+        <button class="btn-nav btn-prev" id="btnCancelInstallModal">Cancelar</button>
+        <button class="btn-nav btn-next" id="btnExecuteInstallConfirmed">¡Comenzar Instalación!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL: CONFIRMACIÓN CANCELAR INSTALACIÓN EN CURSO
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalConfirmCancel">
+    <div class="custom-modal-card" style="border-color: #ef4444; box-shadow: 0 0 35px rgba(239, 68, 68, 0.4); max-width: 480px; text-align: center;">
+      <div class="custom-modal-header" style="background: rgba(239, 68, 68, 0.1); border-bottom: 1px solid rgba(239, 68, 68, 0.3); padding: 12px 18px; justify-content: center; position: relative;">
+        <div class="custom-modal-title" style="color: #ef4444; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.5px;">
+          <span>CANCELAR INSTALACIÓN</span>
+        </div>
+        <button class="btn-modal-close" id="btnCancelAbortModalX" style="position: absolute; right: 14px; top: 12px;">&times;</button>
+      </div>
+      <div class="custom-modal-body" style="font-size:0.92rem; line-height:1.6; padding: 16px 20px;">
+        <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; color: #fecdd3;">
+          <strong style="color: #ef4444; font-size: 1.05rem; display: block; margin-bottom: 6px;">¡LOS DATOS DEL USB YA SE HAN BORRADO!</strong>
+          El formateo inicial ya ha comenzado. Si cancelas ahora, la unidad quedará incompleta o inaccesible hasta que la vuelvas a instalar.
+        </div>
+        <p style="color: var(--text-main); font-weight: 600;">¿Estás seguro de que deseas cancelar la instalación y detener el proceso?</p>
+      </div>
+      <div style="display:flex; justify-content:center; gap:14px; padding: 0 20px 18px 20px;">
+        <button class="btn-nav btn-prev" id="btnStayInInstall" style="padding:10px 22px;">Continuar Instalando</button>
+        <button class="btn-nav btn-cancel-install" id="btnExecuteAbortConfirmed" style="padding:10px 22px;">Sí, Cancelar Instalación</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 7: ALERTA DOBLE CANDADO PARA DISCOS INTERNOS (ESCRIBIR 'BORRAR')
+       Con overlay fixed para que NUNCA aparezca en el flujo normal
+       ===================================================================== -->
+  <div class="custom-modal-overlay lock-dialog-overlay" id="lockDialogOverlay">
+    <div class="lock-dialog-card">
+      <h3 style="color: var(--rose); font-size: 1.3rem; font-weight: 800;" id="modalLockTitle">ATENCIÓN: DISCO INTERNO SELECCIONADO</h3>
+      <p style="font-size: 0.9rem; color: #fda4af;" id="modalLockBody">
+        Estás a punto de formatear un disco interno del sistema. Todos sus datos se perderán de forma irreversible.<br/><br/>
+        Para desbloquear el proceso, escribe <strong>BORRAR</strong> en mayúsculas:
+      </p>
+      <input type="text" id="lockInputText" class="lock-input" placeholder="BORRAR" autocomplete="off" />
+      <div style="display:flex; justify-content:center; gap:12px; margin-top:12px;">
+        <button class="btn-nav btn-prev" id="btnCancelLock">Cancelar</button>
+        <button class="btn-nav btn-next" id="btnConfirmLock" style="background:var(--rose); color:#fff; box-shadow:0 0 15px var(--rose-glow);">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 8: DONACIONES (APOYAR EL PROYECTO / CABALLERO)
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalDonate">
+    <div class="custom-modal-card donate-modal-card">
+      <button class="btn-modal-close" data-modal-close="modalDonate" title="Cerrar">&times;</button>
+      <div class="donate-modal-body">
+        <div class="modal-coin-gif-wrap">
+          <img src="/assets/coin.gif" alt="Moneda" class="modal-coin-gif" onerror="this.src='/media/hollowdrive.ico';" />
+        </div>
+        <p id="donateModalText" class="donate-modal-desc">
+          Desarrollar y mantener <strong>HollowDrive</strong> requiere muchas noches sin dormir. Si el kit te ha sido útil o te gusta la idea, cualquier aportación ayuda un montón a seguir mejorándolo.
+        </p>
+        <div class="donate-buttons-list">
+          <button class="btn-donate-link btn-kofi" onclick="window.hollowdrive.openUrl('https://ko-fi.com/t0xic4rea');">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.047 3.974-4.047 3.974s-2.8-2.521-4.047-3.974c-1.332-1.556-.838-3.877 1.007-4.432 1.845-.555 3.04 1.137 3.04 1.137s1.195-1.692 3.04-1.137c1.845.555 2.339 2.876 1.007 4.432zm7.14-1.277c-.439 2.327-2.736 2.344-2.736 2.344v-4.688s2.297.017 2.736 2.344z"/></svg>
+            <div class="kofi-btn-text">
+              <span id="donateKofiMain">Invítame a un café</span>
+              <span id="donateKofiSub" class="kofi-sub">(Ko-fi)</span>
+            </div>
+          </button>
+          <button class="btn-donate-link btn-paypal" onclick="window.hollowdrive.openUrl('https://paypal.me/T0xicArea');">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.586c3.084 0 5.378.694 6.438 2.059.984 1.268 1.168 3.064.551 5.341-1.026 3.782-3.843 5.76-7.857 5.76H8.736a.785.785 0 0 0-.773.654l-.887 4.457z"/></svg>
+            <span id="donatePaypalText">Donar con PayPal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 9: AVISO SIN CONEXIÓN A INTERNET
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalNoInternet">
+    <div class="custom-modal-card" style="border-color: #f59e0b; box-shadow: 0 0 30px rgba(245, 158, 11, 0.35);">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title" style="color: #fbbf24; display:flex; align-items:center; gap:8px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          <span id="modalNoInternetTitle">AVISO: SIN CONEXIÓN A INTERNET</span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalNoInternet">&times;</button>
+      </div>
+      <div class="custom-modal-body" id="modalNoInternetBody" style="color: #fef3c7; font-size: 0.95rem; line-height: 1.6;">
+        No se ha detectado conexión a Internet activa.<br/><br/>
+        Todas las opciones que requieran conectarse a la red (como descargar sistemas portables o paquetes remotos) no funcionarán mientras no tengas conexión.
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:16px;">
+        <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalNoInternet" style="padding:8px 32px; background: #d97706; border-color: #f59e0b; color: #fff;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL HOLLOWTOOLS: GESTOR DE ISOs (Sin emoticonos) -->
+  <div class="custom-modal-overlay" id="modalToolsIso">
+    <div class="custom-modal-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title">
+          <span class="badge-blue-pill">
+            <span id="modalToolsIsoTitle">GESTOR DE IMÁGENES ISO</span>
+          </span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalToolsIso">&times;</button>
+      </div>
+      <div class="custom-modal-body" style="font-size: 0.93rem; line-height: 1.6; color: #cbd5e1;">
+        Arrastra o selecciona cualquier imagen <strong>.ISO</strong> oficial (Windows, Ubuntu, Kali, Arch Linux, herramientas de rescate, etc.) para volcarla directamente en la carpeta <strong>HOLLOWDRIVE\OSimages</strong> de tu unidad.<br/><br/>
+        Ventoy la detectará de inmediato al arrancar el ordenador sin necesidad de reinstalar ni formatear.
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:14px;">
+        <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalToolsIso" style="padding:8px 30px;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL HOLLOWTOOLS: PAQUETES (Sin emoticonos) -->
+  <div class="custom-modal-overlay" id="modalToolsPacks">
+    <div class="custom-modal-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title">
+          <span class="badge-blue-pill">
+            <span id="modalToolsPacksTitle">INYECCIÓN DE PAQUETES</span>
+          </span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalToolsPacks">&times;</button>
+      </div>
+      <div class="custom-modal-body" style="font-size: 0.93rem; line-height: 1.6; color: #cbd5e1;">
+        Permite instalar o actualizar individualmente los módulos principales de HollowDrive en tu pendrive existente:<br/><br/>
+        • <strong>Batocera OS (.img)</strong>: Sistema retro de emulación listo para arrancar en cualquier PC.<br/>
+        • <strong>Pack HollowDrive</strong>: Más de 8 GB de herramientas portables, antivirus, diagnóstico y clonación.
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:14px;">
+        <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalToolsPacks" style="padding:8px 30px;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL HOLLOWTOOLS: CACHYOS INFO (Sin emoticonos) -->
+  <div class="custom-modal-overlay" id="modalToolsCachy">
+    <div class="custom-modal-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title">
+          <span class="badge-blue-pill">
+            <span id="modalToolsCachyTitle">SISTEMA PORTABLE EN HOLLOWDRIVE</span>
+          </span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalToolsCachy">&times;</button>
+      </div>
+      <div class="custom-modal-body" style="font-size: 0.93rem; line-height: 1.6; color: #cbd5e1;">
+        • <strong>Actualizar CachyOS</strong>: Reescribe los archivos del sistema y el gestor de arranque GRUB conservando el tamaño y particiones de tu unidad.<br/><br/>
+        • <strong>Instalar CachyOS</strong>: Si tu unidad tiene espacio no asignado (libre) a la derecha de la partición de HollowDrive, creará las particiones de arranque y sistema con el tamaño que elijas en el slider.
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:14px;">
+        <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalToolsCachy" style="padding:8px 30px;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL HOLLOWTOOLS: OPCIONES Y MINI-GRÁFICA DEL SISTEMA PORTABLE -->
+  <div class="custom-modal-overlay" id="modalPortableOptions">
+    <div class="custom-modal-card portable-options-card">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title">
+          <span class="badge-blue-pill">
+            <span id="modalPortableOptionsTitle">OPCIONES DEL SISTEMA PORTABLE</span>
+          </span>
+        </div>
+        <button class="btn-modal-close" data-modal-close="modalPortableOptions">&times;</button>
+      </div>
+
+      <div class="custom-modal-body portable-modal-body">
+        <!-- Selector Segmentado Actualizar / Instalar -->
+        <div class="tools-segmented-bar">
+          <button class="tools-segment active" id="btnToolsCachyUpdate" data-mode="actualizar">Actualizar CachyOS</button>
+          <button class="tools-segment" id="btnToolsCachyInstall" data-mode="instalar">Instalar CachyOS</button>
+        </div>
+
+        <!-- Selector de Entorno (Radio) -->
+        <div class="tools-flavor-box">
+          <span class="tools-flavor-label">Entorno:</span>
+          <label class="tools-radio disabled" title="Próximamente disponible">
+            <input type="radio" name="toolsFlavor" value="kde" disabled />
+            <span class="radio-indicator"></span>
+            <span class="radio-text">KDE Plasma (Próximamente)</span>
+          </label>
+          <label class="tools-radio">
+            <input type="radio" name="toolsFlavor" value="hyprland" checked />
+            <span class="radio-indicator"></span>
+            <span class="radio-text">Hyprland</span>
+          </label>
+        </div>
+
+        <!-- Slider dinámico para Tamaño CachyOS (visible en modo Instalar) -->
+        <div class="tools-cachy-slider-wrap" id="toolsCachySliderWrap" style="display: none;">
+          <div class="slider-title-sub">TAMAÑO CACHYOS (DERECHA):</div>
+          <div class="slider-space-sub" id="toolsCachySpaceText">Disponible: 0.00 GB</div>
+          <input type="range" class="tools-range-slider" id="toolsSliderCachy" min="20" max="100" step="0.5" value="20" />
+        </div>
+
+        <!-- Mini-Gráfica de Particiones Intuitiva (ANTES y DESPUÉS) -->
+        <div class="portable-mini-preview">
+          <div class="mini-preview-block">
+            <div class="mini-preview-head">
+              <span class="mini-badge-antes">ESTRUCTURA ACTUAL (ANTES)</span>
+              <span class="mini-info-text" id="toolsBarActualInfo">Libre: 0.0GB</span>
+            </div>
+            <div class="tools-bar-visual mini-bar" id="toolsBarActual">
+              <div class="tools-slice slice-hollow" style="width: 100%;">Hollow: 0.0GB</div>
+            </div>
+          </div>
+
+          <div class="mini-preview-block">
+            <div class="mini-preview-head">
+              <span class="mini-badge-despues">ESTRUCTURA RESULTANTE (DESPUÉS)</span>
+              <span class="mini-info-text" id="toolsBarFuturoInfo">Libre: 0.0GB</span>
+            </div>
+            <div class="tools-bar-visual mini-bar" id="toolsBarFuturo">
+              <div class="tools-slice slice-hollow" style="width: 100%;">Hollow: 0.0GB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portable-options-footer" style="justify-content: center;">
+        <button class="btn-nav btn-next btn-modal-close-portable" data-modal-close="modalPortableOptions" id="btnModalClosePortable" style="padding: 9px 36px;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL DE CONFIRMACIÓN ELEGANTE (SIN NATIVE BROWSER POPUPS)
+       ===================================================================== -->
+  <div class="custom-modal-overlay" id="modalConfirmToolsAction">
+    <div class="custom-modal-card" style="border-color: rgba(0, 212, 255, 0.45); box-shadow: 0 0 35px rgba(0, 212, 255, 0.25); max-width: 520px;">
+      <div class="custom-modal-header">
+        <div class="custom-modal-title" style="color: var(--cyan);">
+          <span id="modalConfirmToolsTitle">CONFIRMAR ACCIÓN</span>
+        </div>
+        <button class="btn-modal-close" id="btnConfirmToolsClose" data-modal-close="modalConfirmToolsAction">&times;</button>
+      </div>
+      <div class="custom-modal-body" id="modalConfirmToolsBody" style="font-size: 0.94rem; line-height: 1.6; color: #cbd5e1; text-align: center; white-space: normal;">
+        <!-- Mensaje de confirmación -->
+      </div>
+      <div style="display:flex; justify-content:center; gap: 14px; margin-top: 20px;">
+        <button class="btn-nav btn-prev" id="btnConfirmToolsCancel" style="padding: 8px 24px;">Cancelar</button>
+        <button class="btn-nav btn-next" id="btnConfirmToolsOk" style="padding: 8px 28px;">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Despachadores globales tempranos e inmediatos -->
+  <script>
+    window.setScreen = function(screenName) {
+      if (window._setScreenReal) { window._setScreenReal(screenName); return; }
+      document.querySelectorAll('.screen').forEach(function(s) {
+        var isActive = (s.id === 'screen-' + screenName);
+        s.classList.toggle('active', isActive);
+      });
+    };
+
+    window.setWizardStep = function(step) {
+      if (window._setWizardStepReal) { window._setWizardStepReal(step); return; }
+      if (step < 1) { window.setScreen('hub'); return; }
+      document.querySelectorAll('.wizard-step-pane').forEach(function(p) {
+        var isActive = (p.dataset.step == step);
+        p.classList.toggle('active', isActive);
+      });
+      document.querySelectorAll('.step-item').forEach(function(item) {
+        var s = parseInt(item.dataset.step);
+        item.classList.toggle('active', s === step);
+        item.classList.toggle('completed', s < step);
+      });
+    };
+
+    window.enterHollowdrive = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      if (window._enterHollowdriveReal) { window._enterHollowdriveReal(e); return; }
+      window.setScreen('wizard');
+      window.setWizardStep(1);
+    };
+
+    window.enterTools = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      if (window._enterToolsReal) { window._enterToolsReal(e); return; }
+      window.setScreen('tools');
+    };
+
+    window.openModal = function(modalEl) {
+      if (window._openModalReal) { window._openModalReal(modalEl); return; }
+      if (!modalEl) return;
+      if (modalEl.id !== 'overlayInfo') {
+        var overlay = document.getElementById('overlayInfo');
+        if (overlay) { overlay.classList.remove('open'); }
+      }
+      modalEl.classList.add('open');
+    };
+
+    window.closeModal = function(modalEl) {
+      if (!modalEl) return;
+      modalEl.classList.remove('open');
+    };
+
+    window.closeOverlayInfo = function() {
+      if (window._closeOverlayInfoReal) { window._closeOverlayInfoReal(); return; }
+      var el = document.getElementById('overlayInfo');
+      if (el) {
+        el.classList.remove('open');
+        el.style.display = 'none';
+      }
+      window.setScreen('hub');
+    };
+
+    window.openOverlayInfo = function() {
+      var el = document.getElementById('overlayInfo');
+      if (el) { el.classList.add('open'); }
+    };
+
+    window.openModalDonate = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      var el = document.getElementById('modalDonate');
+      if (el) { el.classList.add('open'); el.style.display = 'flex'; }
+    };
+
+    window.startInstallClick = function(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      if (window._handleStartInstallClickReal) { window._handleStartInstallClickReal(); }
+    };
+
+    window.wizardNext = function() {
+      if (window._wizardNextReal) { window._wizardNextReal(); return; }
+      if (window.State && window.State.wizardStep < 5) window.setWizardStep(window.State.wizardStep + 1);
+    };
+
+    window.wizardPrev = function() {
+      if (window._wizardPrevReal) { window._wizardPrevReal(); return; }
+      if (window.State && window.State.wizardStep === 1) window.setScreen('hub');
+      else if (window.State) window.setWizardStep(window.State.wizardStep - 1);
+    };
+  </script>
+
+  <!-- Scripts -->
+  <script src="/js/translations.js"></script>
+  <script src="/js/bridge.js"></script>
+  <script src="/js/splash.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/lumafly.js"></script>
+</body>
+</html>

@@ -17,16 +17,20 @@ def ejecutar_powershell_seguro(cmd):
         si.wShowWindow = subprocess.SW_HIDE
         with _disk_query_lock:
             process = subprocess.Popen(
-                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", cmd],
+                ["powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", cmd],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
                 startupinfo=si,
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
-            stdout = process.stdout.read()
-            process.stdout.close()
-            process.wait()
-            return stdout.decode('utf-8', errors='ignore').strip()
+            try:
+                stdout_data, _ = process.communicate(timeout=25)
+                return stdout_data.decode('utf-8', errors='ignore').strip()
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.communicate()
+                logging.warning("[POWERSHELL] Tiempo de espera agotado al consultar discos.")
+                return ""
     except Exception as e:
         logging.error(f"Error ejecutando PowerShell seguro: {e}")
         return ""
@@ -37,30 +41,55 @@ def obtener_unidades_usb(incluir_internos=False):
         # 1. Identificar letra de sistema (C:) para el bloqueo absoluto
         drive_sistema = os.environ.get('SystemDrive', 'C:').replace(':', '').upper()
 
-        # 2. SCRIPT DE POWERSHELL (Una sola consulta para discos, particiones y etiquetas de volumen)
-        ps_script = (
-            '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; '
-            '$resultado = Get-Disk | ForEach-Object { '
-                '$disk = $_; '
-                '$volumenes = ($disk | Get-Partition | Get-Volume -ErrorAction SilentlyContinue); '
-                '$letras = ($volumenes.DriveLetter | Where-Object { $_ }) -join ","; '
-                '$labels = ($volumenes.FileSystemLabel | Where-Object { $_ }) -join ","; '
-                '$nombre = $disk.FriendlyName; '
-                'if (!$nombre) { $nombre = $disk.Model } '
-                '[PSCustomObject]@{ '
-                    'Index = $disk.Number; '
-                    'Model = $nombre; '
-                    'Size  = $disk.Size; '
-                    'Bus   = $disk.BusType; '
-                    'Letras = $letras; '
-                    'Labels = $labels; '
-                    'IsUSB = ($disk.BusType -eq "USB" -or $disk.BusType -eq "SD"); '
-                '} '
-            '}; '
-            '$resultado | ConvertTo-Json'
+        # 2. SCRIPT DE POWERSHELL ULTRA-RÁPIDO VÍA CIM (0.8s) CON FALLBACK A GET-DISK
+        filter_clause = "" if incluir_internos else " -Filter \\\"InterfaceType='USB'\\\""
+        ps_cim = (
+            f"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; "
+            f"Get-CimInstance Win32_DiskDrive{filter_clause} | ForEach-Object {{ "
+            f"  $d = $_; "
+            f"  $parts = Get-CimAssociatedInstance -InputObject $d -ResultClassName Win32_DiskPartition; "
+            f"  $vols = $parts | ForEach-Object {{ Get-CimAssociatedInstance -InputObject $_ -ResultClassName Win32_LogicalDisk }}; "
+            f"  $letras = ($vols.DeviceID | Where-Object {{ $_ }}) -join ','; "
+            f"  $labels = ($vols.VolumeName | Where-Object {{ $_ }}) -join ','; "
+            f"  $isUsb = ($d.InterfaceType -eq 'USB' -or $d.MediaType -like '*removable*' -or $d.Model -like '*USB*'); "
+            f"  [PSCustomObject]@{{ "
+            f"    Index = $d.Index; "
+            f"    Model = $d.Model; "
+            f"    Size  = $d.Size; "
+            f"    Bus   = $d.InterfaceType; "
+            f"    Letras = $letras; "
+            f"    Labels = $labels; "
+            f"    IsUSB = $isUsb; "
+            f"  }} "
+            f"}} | ConvertTo-Json"
         )
-        
-        resultado_raw = ejecutar_powershell_seguro(ps_script)
+
+        resultado_raw = ejecutar_powershell_seguro(ps_cim)
+        if not resultado_raw or resultado_raw == "null":
+            # Fallback tradicional con Get-Disk si CIM no arrojó resultados
+            ps_script = (
+                '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; '
+                '$resultado = Get-Disk | ForEach-Object { '
+                    '$disk = $_; '
+                    '$volumenes = ($disk | Get-Partition | Get-Volume -ErrorAction SilentlyContinue); '
+                    '$letras = ($volumenes.DriveLetter | Where-Object { $_ }) -join ","; '
+                    '$labels = ($volumenes.FileSystemLabel | Where-Object { $_ }) -join ","; '
+                    '$nombre = $disk.FriendlyName; '
+                    'if (!$nombre) { $nombre = $disk.Model } '
+                    '[PSCustomObject]@{ '
+                        'Index = $disk.Number; '
+                        'Model = $nombre; '
+                        'Size  = $disk.Size; '
+                        'Bus   = $disk.BusType; '
+                        'Letras = $letras; '
+                        'Labels = $labels; '
+                        'IsUSB = ($disk.BusType -eq "USB" -or $disk.BusType -eq "SD"); '
+                    '} '
+                '}; '
+                '$resultado | ConvertTo-Json'
+            )
+            resultado_raw = ejecutar_powershell_seguro(ps_script)
+
         if not resultado_raw or resultado_raw == "null": 
             return []
             
@@ -235,7 +264,7 @@ def obtener_letras_de_disco(disk_index):
             "Get-Volume -ErrorAction SilentlyContinue | "
             "ForEach-Object { $_.DriveLetter }"
         )
-        cmd = ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ps_script]
+        cmd = ['powershell', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', ps_script]
         
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -261,24 +290,35 @@ def obtener_letras_de_disco(disk_index):
         print(f"Error detectando letras para disco {disk_index}: {e}")
         return set()
 
-def crear_particion_adicional(disk_index, size_gb, label, fs="fat32"):
+def crear_particion_adicional(disk_index, size_gb=None, label="PARTITION", fs="fat32", **kwargs):
     """
     Crea una partición primaria en el espacio no asignado (reservado) 
     utilizando diskpart en segundo plano de manera silenciosa.
     Si fs es None o "raw", crea la partición pero no la formatea (RAW).
     Retorna la letra de unidad que Windows le ha asignado dinámicamente.
+    Soporta argumentos estándar (size_gb, fs) y alias flexibles (size_mb, format_fs).
     """
     letras_antes = obtener_letras_de_disco(disk_index)
 
-    size_mb = int(size_gb * 1024)
+    # Determinar sistema de archivos (soporta format_fs como alias de fs)
+    fs_final = kwargs.get("format_fs", fs)
+
+    # Determinar tamaño en MB (soporta tanto size_gb como size_mb)
+    if size_gb is not None:
+        size_mb = int(float(size_gb) * 1024)
+    elif "size_mb" in kwargs:
+        size_mb = int(kwargs["size_mb"])
+    else:
+        size_mb = 0
+
     commands = [f"select disk {disk_index}"]
     if size_mb > 0:
         commands.append(f"create partition primary size={size_mb}")
     else:
         commands.append("create partition primary")
         
-    if fs and fs.lower() not in ["raw", "none"]:
-        commands.append(f"format fs={fs} quick label=\"{label}\"")
+    if fs_final and fs_final.lower() not in ["raw", "none"]:
+        commands.append(f"format fs={fs_final} quick label=\"{label}\"")
     
     commands.append("assign")
 
@@ -301,8 +341,55 @@ def crear_particion_adicional(disk_index, size_gb, label, fs="fat32"):
             creationflags=subprocess.CREATE_NO_WINDOW
         )
         
-        if res.returncode != 0:
-            raise RuntimeError(f"Diskpart falló al crear partición {label}:\n{res.stderr}\n{res.stdout}")
+        output_combined = (res.stdout or "") + "\n" + (res.stderr or "")
+        has_error = (res.returncode != 0) or any(
+            err_term in output_combined.lower()
+            for err_term in [
+                "error del servicio de disco virtual",
+                "virtual disk service error",
+                "no se encontró ninguna extensión",
+                "no usable free extent",
+                "el tamaño del argumento no es válido",
+                "the arguments specified for this command are not valid"
+            ]
+        )
+        
+        if has_error:
+            # Si falló con un tamaño explícito (ej: desajuste de alineación de sectores), reintentar con el espacio libre disponible
+            if size_mb > 0:
+                logging.warning(f"[DISKPART] Creación con size={size_mb}MB no completada. Reintentando con el espacio no asignado restante...")
+                commands_retry = [
+                    f"select disk {disk_index}",
+                    "create partition primary"
+                ]
+                if fs_final and fs_final.lower() not in ["raw", "none"]:
+                    commands_retry.append(f"format fs={fs_final} quick label=\"{label}\"")
+                commands_retry.append("assign")
+
+                with open(temp_script, "w") as f_retry:
+                    f_retry.write("\n".join(commands_retry))
+
+                res_retry = subprocess.run(
+                    ["diskpart", "/s", temp_script],
+                    capture_output=True,
+                    text=True,
+                    startupinfo=startupinfo,
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
+                output_retry = (res_retry.stdout or "") + "\n" + (res_retry.stderr or "")
+                retry_failed = (res_retry.returncode != 0) or any(
+                    err_term in output_retry.lower()
+                    for err_term in [
+                        "error del servicio de disco virtual",
+                        "virtual disk service error",
+                        "no se encontró ninguna extensión",
+                        "no usable free extent"
+                    ]
+                )
+                if retry_failed:
+                    raise RuntimeError(f"Diskpart falló al crear partición {label}:\n{output_retry}")
+            else:
+                raise RuntimeError(f"Diskpart falló al crear partición {label}:\n{output_combined}")
         
         time.sleep(2)
         

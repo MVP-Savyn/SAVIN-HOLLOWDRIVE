@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentación Oficial // SAVIN-HOLLOWDRIVE</title>
+  <link rel="icon" type="image/x-icon" href="../assets/icon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-body: #05080a;
+      --bg-card: rgba(13, 17, 23, 0.88);
+      --bg-card-inner: rgba(18, 24, 38, 0.95);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(0, 212, 255, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan: #00d4ff;
+      --cyan-glow: rgba(0, 212, 255, 0.4);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --purple: #a855f7;
+      --blue: #3b82f6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-body);
+      background-image:
+        radial-gradient(circle at 10% 10%, rgba(0, 94, 255, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 90% 40%, rgba(0, 212, 255, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
+        linear-gradient(180deg, #05080a 0%, #080d14 40%, #05080a 100%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BARRA SUPERIOR DE NAVEGACIÓN */
+    .doc-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5, 8, 10, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-left-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-mobile-sidebar-toggle {
+      display: none;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.45rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-mobile-sidebar-toggle:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .nav-brand img {
+      width: 28px;
+      height: 28px;
+    }
+
+    .nav-brand span.badge {
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 212, 255, 0.4);
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    .btn-back-home {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      color: var(--text-main) !important;
+    }
+
+    .btn-back-home:hover {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: var(--cyan);
+    }
+
+    /* CONTENEDOR GENERAL DE DOCUMENTACIÓN CON SIDEBAR */
+    .doc-layout {
+      max-width: 1540px;
+      margin: 0 auto;
+      display: flex;
+      gap: 2.8rem;
+      padding: 2rem 2rem 5rem 2rem;
+      position: relative;
+    }
+
+    /* SIDEBAR LATERAL IZQUIERDA */
+    .doc-sidebar {
+      width: 310px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 85px;
+      height: calc(100vh - 110px);
+      overflow-y: auto;
+      padding-right: 1rem;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    }
+
+    .doc-sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+    .doc-sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+    .doc-sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan);
+    }
+
+    /* BUSCADOR O ENCABEZADO DE SIDEBAR */
+    .sidebar-header-box {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar-header-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .sidebar-header-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* GRUPOS DE NAVEGACIÓN EN SIDEBAR */
+    .sidebar-group {
+      margin-bottom: 1.6rem;
+    }
+
+    .sidebar-group-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+      padding-left: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .sidebar-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .sidebar-link:hover {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .sidebar-link.active-section {
+      color: #fff;
+      background: rgba(0, 212, 255, 0.1);
+      border-left: 3px solid var(--cyan);
+      font-weight: 700;
+    }
+
+    .sidebar-badge-soon {
+      font-size: 0.65rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .sidebar-badge-active {
+      font-size: 0.65rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 4px;
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    /* SUB-ÍNDICE DE PUNTOS INTERNOS DENTRO DE LA SECCIÓN ACTIVA */
+    .sidebar-sublinks {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding-left: 0.8rem;
+      margin: 0.4rem 0 0.8rem 0.4rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .sidebar-sublink {
+      display: block;
+      padding: 0.28rem 0.6rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      line-height: 1.35;
+    }
+
+    .sidebar-sublink:hover {
+      color: #38bdf8;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .sidebar-sublink.active-item {
+      color: var(--cyan);
+      background: rgba(0, 212, 255, 0.12);
+      font-weight: 700;
+      border-left: 2px solid var(--cyan);
+      padding-left: 0.5rem;
+    }
+
+    .sidebar-sublink.sub-indent {
+      padding-left: 1.2rem;
+      font-size: 0.76rem;
+      color: #64748b;
+    }
+
+    .sidebar-sublink.sub-indent.active-item {
+      padding-left: 1.1rem;
+      color: var(--cyan);
+    }
+
+    /* CONTENIDO PRINCIPAL */
+    .doc-content {
+      flex: 1;
+      min-width: 0; /* Previene desbordamiento horizontal */
+      max-width: 1060px;
+    }
+
+    /* CABECERA DOCUMENTO */
+    .doc-header {
+      margin-bottom: 3rem;
+    }
+
+    .doc-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .doc-breadcrumb a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    .doc-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .doc-header h1 {
+      font-size: clamp(2rem, 3.8vw, 3rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.5px;
+    }
+
+    .doc-header h1 span.gradient-text {
+      background: linear-gradient(135deg, #00d4ff 0%, #38bdf8 50%, #9333ea 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .doc-header p.lead {
+      font-size: 1.12rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-weight: 400;
+    }
+
+    /* TARJETAS PRINCIPALES */
+    .doc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 2.2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.6), transparent);
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .card-icon-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .doc-card h2 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .doc-card h3 {
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin: 1.6rem 0 0.8rem 0;
+    }
+
+    .doc-card p {
+      color: #cbd5e1;
+      margin-bottom: 1rem;
+      font-size: 1.01rem;
+    }
+
+    /* COMPARADOR DE MODELOS */
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.3rem;
+      margin: 1.8rem 0;
+    }
+
+    .model-box {
+      background: var(--bg-card-inner);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .model-box.bad {
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.04);
+    }
+
+    .model-box.bad .model-badge {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .model-box.pro {
+      border-color: rgba(0, 212, 255, 0.45);
+      background: rgba(0, 212, 255, 0.04);
+      box-shadow: 0 0 25px rgba(0, 212, 255, 0.1);
+    }
+
+    .model-box.pro .model-badge {
+      background: rgba(0, 212, 255, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(0, 212, 255, 0.5);
+    }
+
+    .model-badge {
+      align-self: flex-start;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.2rem 0.65rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .model-title {
+      font-weight: 700;
+      font-size: 1.12rem;
+      color: #fff;
+    }
+
+    .model-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* DIAGRAMA SVG WRAPPER */
+    .diagram-wrap {
+      background: #111622;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+
+    .diagram-wrap img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .diagram-caption {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* CAPAS DE PROTECCIÓN LISTA */
+    .layers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin: 1.8rem 0;
+    }
+
+    .layer-item {
+      background: var(--bg-card-inner);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 4px solid var(--cyan);
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .layer-item:nth-child(2) { border-left-color: #38bdf8; }
+    .layer-item:nth-child(3) { border-left-color: #10b981; }
+    .layer-item:nth-child(4) { border-left-color: #a855f7; }
+    .layer-item:nth-child(5) { border-left-color: #f59e0b; }
+
+    .layer-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .layer-num {
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .layer-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .math-formula-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      margin: 0.6rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      color: #38bdf8;
+      font-size: 0.95rem;
+      display: inline-block;
+    }
+
+    /* TABLA RESILIENTE */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.8rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+
+    table.resilience-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      text-align: left;
+    }
+
+    table.resilience-table th {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 1rem 1.2rem;
+      color: #fff;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.resilience-table td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+    }
+
+    table.resilience-table tr:hover td {
+      background: rgba(0, 212, 255, 0.02);
+    }
+
+    /* METRIC ROW PREVIEW INTERACTIVO */
+    .metrics-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .metric-preview-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .metric-preview-title {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.4rem;
+    }
+
+    .metric-preview-val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-preview-val.cyan { color: var(--cyan); text-shadow: 0 0 10px rgba(0, 212, 255, 0.4); }
+    .metric-preview-val.emerald { color: var(--emerald); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+
+    .metric-preview-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 0.3rem;
+    }
+
+    /* CÓDIGO JSON */
+    pre.code-block {
+      background: #080d14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: #a5f3fc;
+      line-height: 1.5;
+    }
+
+    /* MODAL O MENÚ DESPLEGABLE MÓVIL */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 150;
+    }
+
+    /* FOOTER */
+    .doc-footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .doc-footer a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 1024px) {
+      .btn-mobile-sidebar-toggle {
+        display: inline-flex;
+      }
+
+      .doc-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100vh;
+        z-index: 200;
+        background: #080d14;
+        width: 320px;
+        padding: 2rem 1.5rem;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .doc-sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+
+      .doc-layout {
+        padding: 1.5rem 1rem 4rem 1rem;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN SUPERIOR -->
+  <nav class="doc-nav">
+    <div class="nav-left-group">
+      <button class="btn-mobile-sidebar-toggle" id="btnToggleSidebar" aria-label="Abrir índice">
+        <span>☰</span>
+        <span>Índice</span>
+      </button>
+
+      <a href="../index.html" class="nav-brand">
+        <img src="../assets/icon.ico" alt="SAVIN-HOLLOWDRIVE" />
+        <span>SAVIN-HOLLOWDRIVE</span>
+        <span class="badge">DOCUMENTACIÓN</span>
+      </a>
+    </div>
+
+    <div class="nav-links">
+      <a href="sistema_estimacion_tiempo.md" target="_blank" title="Ver archivo fuente en Markdown">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Markdown
+      </a>
+      <a href="../index.html" class="btn-back-home">
+        ⬅ Volver a la Web Principal
+      </a>
+    </div>
+  </nav>
+
+  <!-- OVERLAY PARA MÓVILES -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- LAYOUT DOCUMENTACIÓN: SIDEBAR IZQUIERDA + CONTENIDO -->
+  <div class="doc-layout">
+
+    <!-- ÍNDICE JERÁRQUICO LATERAL IZQUIERDO -->
+    <aside class="doc-sidebar" id="docSidebar">
+      
+      <div class="sidebar-header-box">
+        <div class="sidebar-header-title">
+          <span>📚</span> ÍNDICE DE CONTENIDOS
+        </div>
+        <div class="sidebar-header-sub">Documentación Técnica v2.0</div>
+      </div>
+
+      <!-- GRUPO 1: COMENZANDO -->
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">🚀 COMENZANDO</div>
+        <ul class="sidebar-links">
+          <li>
+            <a href="#sec-intro" class="sidebar-link" title="Visión General">
+              <span>Introducción y Objetivos</span>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Requisitos & USBs</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- GRUPO 2: ARQUITECTURA & MOTOR (SECCIÓN ACTIVA) -->
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">⚙️ ARQUITECTURA & MOTOR</div>
+        <ul class="sidebar-links">
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Particionado & Ventoy</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Streaming RAM vs Disco</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+          <li>
+            <!-- ENLACE PADRE DE LA SECCIÓN ACTIVA -->
+            <a href="#sec-telemetria-intro" class="sidebar-link active-section" id="linkSecTelemetria">
+              <span>⏱️ Telemetría y Tiempo Restante</span>
+              <span class="sidebar-badge-active">Activo</span>
+            </a>
+
+            <!-- SUB-ÍNDICE DESPLEGADO DE LA SECCIÓN ACTUAL -->
+            <ul class="sidebar-sublinks">
+              <li>
+                <a href="#sec-1-problema" class="sidebar-sublink" id="subLink1">
+                  1. El Problema de Estimación
+                </a>
+              </li>
+              <li>
+                <a href="#sec-2-diagrama" class="sidebar-sublink" id="subLink2">
+                  2. Diagrama de Flujo
+                </a>
+              </li>
+              <li>
+                <a href="#sec-3-capas" class="sidebar-sublink" id="subLink3">
+                  3. Las 7 Capas de Control
+                </a>
+                <a href="#sec-3-1-sondeo" class="sidebar-sublink sub-indent" id="subLink3_1">• 3.1 Micro-Sondeo CDN</a>
+                <a href="#sec-3-2-fsync" class="sidebar-sublink sub-indent" id="subLink3_2">• 3.2 Sondeo Físico fsync</a>
+                <a href="#sec-3-3-ratios" class="sidebar-sublink sub-indent" id="subLink3_3">• 3.3 Ratios Universales I/O</a>
+                <a href="#sec-3-4-cuellos" class="sidebar-sublink sub-indent" id="subLink3_4">• 3.4 Cuellos RAM / Disco</a>
+                <a href="#sec-3-5-calibracion" class="sidebar-sublink sub-indent" id="subLink3_5">• 3.5 Calibración Paso 1</a>
+                <a href="#sec-3-6-bayes" class="sidebar-sublink sub-indent" id="subLink3_6">• 3.6 Fusión Bayesiana 1 Hz</a>
+                <a href="#sec-3-7-antifreeze" class="sidebar-sublink sub-indent" id="subLink3_7">• 3.7 Propagación Anti-Freeze</a>
+              </li>
+              <li>
+                <a href="#sec-4-resiliencia" class="sidebar-sublink" id="subLink4">
+                  4. Matriz de Resiliencia
+                </a>
+              </li>
+              <li>
+                <a href="#sec-5-aprendizaje" class="sidebar-sublink" id="subLink5">
+                  5. Memoria Aprendida
+                </a>
+              </li>
+              <li>
+                <a href="#sec-6-telemetria" class="sidebar-sublink" id="subLink6">
+                  6. Telemetría en la UI
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!-- GRUPO 3: HOLLOWTOOLS -->
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">🧰 HOLLOWTOOLS</div>
+        <ul class="sidebar-links">
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Gestor de ISOs (.iso)</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Inyección de Paquetes</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>CachyOS Portable Tool</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- GRUPO 4: SISTEMAS INTEGRADOS -->
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">🕹️ SISTEMAS INTEGRADOS</div>
+        <ul class="sidebar-links">
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Batocera Linux (Retrogaming)</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>CachyOS (Arch Optimizado)</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- GRUPO 5: SOPORTE & FAQ -->
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">❓ SOPORTE & FAQ</div>
+        <ul class="sidebar-links">
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Preguntas Frecuentes</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" class="sidebar-link" style="opacity: 0.6;" title="Próximamente">
+              <span>Solución de Problemas</span>
+              <span class="sidebar-badge-soon">Pronto</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- ÁREA DE CONTENIDO DE LA DOCUMENTACIÓN -->
+    <main class="doc-content">
+
+      <!-- CABECERA DE LA SECCIÓN -->
+      <header class="doc-header" id="sec-telemetria-intro">
+        <div class="doc-breadcrumb">
+          <a href="../index.html">Inicio</a>
+          <span>/</span>
+          <a href="#sec-telemetria-intro">Arquitectura & Motor</a>
+          <span>/</span>
+          <span style="color: #fff;">Telemetría y Tiempo Restante</span>
+        </div>
+
+        <div class="doc-tag">ARQUITECTURA DE TELEMETRÍA PREDICTIVA</div>
+        <h1>Estimación de Tiempo en <span class="gradient-text">Bucle Cerrado</span></h1>
+        <p class="lead">
+          Análisis técnico y formulación matemática del motor predictivo adaptativo de SAVIN-HOLLOWDRIVE. Diseñado para desacoplar el cálculo del tiempo global de las perturbaciones de red, garantizando resiliencia y actualización visual a 1 Hz sin saltos caóticos.
+        </p>
+      </header>
+
+      <!-- PUNTO 1: EL PROBLEMA -->
+      <section class="doc-card" id="sec-1-problema">
+        <div class="card-title-row">
+          <div class="card-icon-badge">⚖</div>
+          <h2>1. ¿Por qué fallan los estimadores convencionales?</h2>
+        </div>
+        <p>
+          La estimación de tiempo en instaladores de sistemas operativos y utilidades de flasheo suele ser imprecisa o generar falsas alarmas debido a la enorme dispersión de rendimientos entre conexiones y unidades flash. Típicamente, los programas caen en uno de dos errores de diseño:
+        </p>
+
+        <div class="models-grid">
+          <div class="model-box bad">
+            <span class="model-badge">Defecto 1</span>
+            <div class="model-title">Modelo Estático "Ciego"</div>
+            <div class="model-desc">
+              Predice <em>"Tardará 35 minutos"</em> de forma prefijada asumiendo un hardware y conexión estándar. Falla rotundamente cuando el usuario opera sobre una red rural de 4 MB/s o un puerto USB 2.0: los 35 minutos se convierten en 2 horas y el usuario asume que la aplicación se ha congelado.
+            </div>
+          </div>
+
+          <div class="model-box bad">
+            <span class="model-badge">Defecto 2</span>
+            <div class="model-title">Modelo Instantáneo (Windows/Browser)</div>
+            <div class="model-desc">
+              Calcula <code>Tiempo = Bytes_Restantes / Velocidad_Actual</code>. En cuanto hay un microcorte de red de 2 segundos o se vacía un búfer intermedio, la tasa cae a 0 MB/s y el tiempo restante salta caóticamente a <em>"Faltan 4 días"</em>, para luego descender a <em>"Faltan 20 segundos"</em>.
+            </div>
+          </div>
+
+          <div class="model-box pro">
+            <span class="model-badge">Nuestra Solución</span>
+            <div class="model-title">Bucle Cerrado Adaptativo</div>
+            <div class="model-desc">
+              Combina un micro-sondeo inicial real con calibración de hardware en el Paso 1, un ticker desacoplado a 1 Hz, fusión Bayesiana progresiva y propagación amortiguada de factores ambientales a las fases que aún no han comenzado.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PUNTO 2: DIAGRAMA DE FLUJO -->
+      <section class="doc-card" id="sec-2-diagrama">
+        <div class="card-title-row">
+          <div class="card-icon-badge">🗺</div>
+          <h2>2. Diagrama de Flujo del Algoritmo</h2>
+        </div>
+        <p>
+          El siguiente esquema describe las 4 etapas del motor: desde la toma de muestras de red en pre-vuelo hasta la absorción de anomalías en tiempo de ejecución:
+        </p>
+
+        <div class="diagram-wrap">
+          <img src="diagrama_contador.svg" alt="Diagrama de Arquitectura del Algoritmo de Estimación de Tiempo" />
+          <div class="diagram-caption">Diagrama oficial del motor de telemetría de SAVIN-HOLLOWDRIVE</div>
+        </div>
+      </section>
+
+      <!-- PUNTO 3: LAS 7 CAPAS DE CONTROL -->
+      <section class="doc-card" id="sec-3-capas">
+        <div class="card-title-row">
+          <div class="card-icon-badge">🛡</div>
+          <h2>3. Las 7 Capas de Protección Activa</h2>
+        </div>
+        <p>
+          Para garantizar que el contador no se descalibre ni falle ante escenarios heterogéneos, el sistema aplica siete barreras de control analítico y físico:
+        </p>
+
+        <div class="layers-list">
+          <!-- Capa 1 -->
+          <div class="layer-item" id="sec-3-1-sondeo">
+            <div class="layer-header">
+              <span class="layer-num">CAPA 01</span>
+              <div class="layer-title">3.1 Micro-Sondeo Pre-Vuelo de Ancho de Banda Real (CDN Cloudflare R2)</div>
+            </div>
+            <p>
+              Antes de tocar el disco, el backend ejecuta una micro-petición HTTP en streaming parcial (HTTP Range de 1–3 MB) en menos de 1.2 segundos directamente contra el CDN Cloudflare R2 donde se hospedan los paquetes. Se obtiene el ancho de banda efectivo <code>V_red</code> entre el cliente y el servidor.
+            </p>
+            <div class="math-formula-box">
+              V_red = (Bytes_Recibidos) / (Tiempo_Respuesta) &nbsp; [MB/s]
+            </div>
+            <p>
+              Si el usuario cuenta con fibra óptica simétrica o una conexión ADSL restringida, el plan maestro inicial ya nace calibrado para esa realidad.
+            </p>
+          </div>
+
+          <!-- Capa 2 -->
+          <div class="layer-item" id="sec-3-2-fsync">
+            <div class="layer-header">
+              <span class="layer-num">CAPA 02</span>
+              <div class="layer-title">3.2 Calibración Física Directa con fsync y Saturación SLC</div>
+            </div>
+            <p>
+              Durante la ventana de preparación inicial previa a las descargas pesadas (<code>probe_usb_write_speed</code>), el motor escribe un bloque continuo de hasta 48 MB directamente sobre el pendrive forzando la sincronización al medio con <code>flush()</code> y <code>os.fsync()</code>.
+            </p>
+            <p>
+              Esto supera la memoria caché volátil del controlador USB y satura la caché SLC, capturando la <strong>velocidad sostenida real</strong> (<code>K_usb</code> en MB/s) de las celdas NAND crudas con corte de seguridad de 10s.
+            </p>
+          </div>
+
+          <!-- Capa 3 -->
+          <div class="layer-item" id="sec-3-3-ratios">
+            <div class="layer-header">
+              <span class="layer-num">CAPA 03</span>
+              <div class="layer-title">3.3 Matriz Universal de Ratios Físicos por Tipo de I/O</div>
+            </div>
+            <p>
+              El rendimiento de las celdas flash varía según el patrón de acceso. El motor aplica multiplicadores físicos sobre <code>K_usb</code>:
+            </p>
+            <div class="math-formula-box">
+              V_tar = max(2.5, K_usb * 0.91) &nbsp; // Pack TAR: penalización -9% por metadatos de miles de archivos pequeños<br/>
+              V_single = max(3.0, K_usb * 1.00) &nbsp; // Batocera: 100% en volcado secuencial monolítico continuo<br/>
+              V_flash_small = max(4.0, K_usb * 1.45) &nbsp; // GRUB: +45% aprovechando la ráfaga SLC rápida (&lt;512 MB)<br/>
+              V_flash_large = max(2.5, K_usb * 0.84) &nbsp; // CachyOS: -16% modelando decaimiento térmico sostenido
+            </div>
+          </div>
+
+          <!-- Capa 4 -->
+          <div class="layer-item" id="sec-3-4-cuellos">
+            <div class="layer-header">
+              <span class="layer-num">CAPA 04</span>
+              <div class="layer-title">3.4 Detección Dinámica de Cuellos de Botella por Modo de Descarga</div>
+            </div>
+            <p>
+              El sistema evalúa el camino de los datos según el método seleccionado por el usuario:
+            </p>
+            <p>
+              <strong>A. Streaming en RAM (Pipeline):</strong> Descarga e inyección a disco en simultáneo. El rendimiento lo impone el eslabón más lento:
+            </p>
+            <div class="math-formula-box">
+              V_efectiva = min(V_red, V_usb)
+            </div>
+            <p>
+              <strong>B. Modo Clásico (Disco):</strong> Dos fases secuenciales (descarga a <code>%TEMP%</code> y posterior extracción):
+            </p>
+            <div class="math-formula-box">
+              T_total = (Tamaño / V_red) + (Tamaño / V_usb)
+            </div>
+          </div>
+
+          <!-- Capa 5 -->
+          <div class="layer-item" id="sec-3-5-calibracion">
+            <div class="layer-header">
+              <span class="layer-num">CAPA 05</span>
+              <div class="layer-title">3.5 Autocalibración de Hardware en Vivo (Paso 1: Ventoy 100% Local)</div>
+            </div>
+            <p>
+              El primer paso (formateo y estructuración de particiones Ventoy) no utiliza red. Si se completa en 18–21 s, ratifica una unidad USB 3.x veloz. Si toma 45–55 s, deduce inmediatamente que el dispositivo está conectado a un puerto USB 2.0 legado, calibrando el factor ambiental <code>alpha_env</code> antes de descargar paquetes pesados.
+            </p>
+          </div>
+
+          <!-- Capa 6 -->
+          <div class="layer-item" id="sec-3-6-bayes">
+            <div class="layer-header">
+              <span class="layer-num">CAPA 06</span>
+              <div class="layer-title">3.6 Fusión Bayesiana en Vivo (Ticker Desacoplado a 1 Hz)</div>
+            </div>
+            <p>
+              El reloj de pantalla no se recalcula con cada ráfaga de paquetes. Un temporizador independiente a 1 Hz aplica una ponderación Bayesiana suave entre el cálculo teórico y el ritmo real observado:
+            </p>
+            <div class="math-formula-box">
+              W = min(0.85, max(0, (Progreso - 0.08) * 1.5))
+            </div>
+            <div class="math-formula-box">
+              T_restante = (1 - W) * T_analítico + W * T_observado
+            </div>
+            <p>
+              Durante el primer 8% de la tarea, <code>W = 0</code> para absorber la latencia de arranque; a medida que la tarea se estabiliza, la observación empírica asume el control sin saltos bruscos.
+            </p>
+          </div>
+
+          <!-- Capa 7 -->
+          <div class="layer-item" id="sec-3-7-antifreeze">
+            <div class="layer-header">
+              <span class="layer-num">CAPA 07</span>
+              <div class="layer-title">3.7 Propagación Ambiental y Prevención de Congelamiento (Anti-Freeze)</div>
+            </div>
+            <p>
+              Si un USB sufre calentamiento (<em>thermal throttling</em>) y reduce su tasa de escritura un 35%, ese factor de lentitud se propaga con un 75% de amortiguación a los procesos futuros que aún no han comenzado.
+            </p>
+            <p>
+              Si un proceso supera el tiempo previsto (por ejemplo, por bloqueos temporales de Windows Defender o sincronizaciones de búfer con <code>FlushFileBuffers</code>), el contador <strong>nunca se congela en 00:00 ni muestra valores negativos</strong>. Aplica un decaimiento asintótico suave mostrando <code>Est: ~15:46 (Ajustando)</code>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PUNTO 4: MATRIZ DE RESILIENCIA -->
+      <section class="doc-card" id="sec-4-resiliencia">
+        <div class="card-title-row">
+          <div class="card-icon-badge">⚡</div>
+          <h2>4. Matriz de Resiliencia ante Fallos</h2>
+        </div>
+        <p>
+          Comparativa directa de comportamiento ante incidencias operativas reales:
+        </p>
+
+        <div class="table-wrap">
+          <table class="resilience-table">
+            <thead>
+              <tr>
+                <th>Incidencia o Factor Externo</th>
+                <th>Respuesta en Software Tradicional</th>
+                <th>Respuesta en SAVIN-HOLLOWDRIVE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Microcorte de red de 2s</strong></td>
+                <td>La tasa cae a 0 KB/s; el tiempo restante salta a <em>"Faltan 4 días"</em>.</td>
+                <td>El ticker a 1 Hz mantiene el avance continuo sin saltos gracias a la inercia Bayesiana.</td>
+              </tr>
+              <tr>
+                <td><strong>USB 3.0 en puerto USB 2.0</strong></td>
+                <td>Predice 20 min pero demora 1h 40m; la barra se percibe estancada.</td>
+                <td>Paso 1 detecta el puerto lento (~48s) y escala las fases posteriores de forma anticipada.</td>
+              </tr>
+              <tr>
+                <td><strong>Estrangulamiento Térmico (Throttling)</strong></td>
+                <td>El USB cae de 40 a 12 MB/s; el reloj se descalibra y no acierta.</td>
+                <td>Se calcula la desviación ambiental <code>alpha_env</code> y se propaga a los siguientes pasos.</td>
+              </tr>
+              <tr>
+                <td><strong>Conexión Lenta (5 Mbps)</strong></td>
+                <td>Predice tiempos de alta velocidad que nunca se cumplen.</td>
+                <td>El micro-sondeo inicial ajusta las duraciones de los paquetes antes del inicio.</td>
+              </tr>
+              <tr>
+                <td><strong>Retención por Antivirus / Flush</strong></td>
+                <td>El reloj llega a 00:00 y se congela, simulando un fallo o bloqueo.</td>
+                <td>Decaimiento asintótico dinámico: muestra <code>(Ajustando)</code> y sigue marcando actividad.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PUNTO 5: APRENDIZAJE PERSISTENTE -->
+      <section class="doc-card" id="sec-5-aprendizaje">
+        <div class="card-title-row">
+          <div class="card-icon-badge">💾</div>
+          <h2>5. Registro de Aprendizaje (`usb_history.json`)</h2>
+        </div>
+        <p>
+          Al finalizar cada instalación con éxito, el motor almacena métricas empíricas del dispositivo para perfeccionar futuras estimaciones sobre esa misma unidad:
+        </p>
+
+        <pre class="code-block"><code>{
+  "USB SanDisk 3.2Gen1 USB": {
+    "tier": "usb3_standard",
+    "samples": 3,
+    "last_date": "2026-10-02 04:11:03",
+    "ventoy_sec": 21.0,
+    "settle_sec": 7.0,
+    "grub_part_sec": 10.0,
+    "cachy_part_sec": 26.0,
+    "v_tar_mb_s": 8.73,
+    "v_single_file_mb_s": 9.70,
+    "v_flash_small_mb_s": 16.17,
+    "v_flash_large_mb_s": 11.55
+  }
+}</code></pre>
+      </section>
+
+      <!-- PUNTO 6: INTERFAZ EN VIVO Y TELEMETRÍA -->
+      <section class="doc-card" id="sec-6-telemetria">
+        <div class="card-title-row">
+          <div class="card-icon-badge">📊</div>
+          <h2>6. Visualización de Telemetría en la Interfaz</h2>
+        </div>
+        <p>
+          Durante el proceso, el usuario visualiza 5 métricas sincronizadas y desacopladas de ruidos momentáneos:
+        </p>
+
+        <div class="metrics-preview-grid">
+          <div class="metric-preview-box">
+            <div class="metric-preview-title">Fase Actual</div>
+            <div class="metric-preview-val cyan">Paso 2/7</div>
+            <div class="metric-preview-sub">Paso 2 de 7</div>
+          </div>
+          <div class="metric-preview-box">
+            <div class="metric-preview-title">Velocidad</div>
+            <div class="metric-preview-val">18.2 MB/S</div>
+            <div class="metric-preview-sub">Transferencia</div>
+          </div>
+          <div class="metric-preview-box">
+            <div class="metric-preview-title">Tiempo Proceso</div>
+            <div class="metric-preview-val">00:15</div>
+            <div class="metric-preview-sub">Est: ~15:46</div>
+          </div>
+          <div class="metric-preview-box">
+            <div class="metric-preview-title">Total Restante</div>
+            <div class="metric-preview-val emerald">36:36</div>
+            <div class="metric-preview-sub">Transc: 00:36</div>
+          </div>
+          <div class="metric-preview-box">
+            <div class="metric-preview-title">Estado</div>
+            <div class="metric-preview-val cyan">Linterna Activa</div>
+            <div class="metric-preview-sub">Caballero WebP</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <h3 style="font-size: 1.05rem; margin-bottom: 0.6rem; color: #38bdf8;">Barras de Progreso Desacopladas y En Línea</h3>
+          <p>
+            • <strong>Progreso del Proceso Actual:</strong> El nombre de la tarea (<code>#lblTaskProgress</code>) y su porcentaje (<code>#taskProgressPct</code>) se disponen en una única línea compacta con la misma tonalidad verde esmeralda neón que la barra de llenado, garantizando máxima legibilidad.<br/><br/>
+            • <strong>Progreso Global:</strong> Una barra inferior con degradado continuo esmeralda-cian avanza con el progreso ponderado de la instalación completa.<br/><br/>
+            • <strong>Vista Simple &amp; Certificación Final:</strong> Para usuarios que prefieren sencillez, la vista simple presenta un cronómetro flotante luminoso y, al terminar, un panel de vidrio translúcido con los tiempos exactos certificados por proceso y el tiempo global.
+          </p>
+        </div>
+      </section>
+
+      <!-- PIE DE PÁGINA -->
+      <footer class="doc-footer">
+        <p>
+          SAVIN-HOLLOWDRIVE &copy; 2026 // Desarrollado por <a href="https://github.com/MVP-Savyn" target="_blank" rel="noopener">MVP-Savyn</a> // Canal de YouTube <a href="https://www.youtube.com/@T0xicAre4" target="_blank" rel="noopener">@T0xicAre4</a>
+        </p>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- SCRIPT PARA INTERACTIVIDAD, TOGGLE MÓVIL Y SCROLLSPY -->
+  <script>
+    // 1. Control del Toggle de Sidebar en Pantallas Pequeñas
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const docSidebar = document.getElementById('docSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleMobileSidebar() {
+      const isOpen = docSidebar.classList.toggle('open');
+      sidebarOverlay.classList.toggle('active', isOpen);
+    }
+
+    function closeMobileSidebar() {
+      docSidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+
+    if (btnToggleSidebar) btnToggleSidebar.addEventListener('click', toggleMobileSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobileSidebar);
+
+    // Cerrar sidebar al hacer clic en un enlace en móviles
+    document.querySelectorAll('.sidebar-sublink, .sidebar-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+          closeMobileSidebar();
+        }
+      });
+    });
+
+    // 2. ScrollSpy Reactivo para resaltar el punto actual en el índice
+    const sublinks = [
+      { id: 'sec-1-problema', el: document.getElementById('subLink1') },
+      { id: 'sec-2-diagrama', el: document.getElementById('subLink2') },
+      { id: 'sec-3-capas', el: document.getElementById('subLink3') },
+      { id: 'sec-3-1-sondeo', el: document.getElementById('subLink3_1') },
+      { id: 'sec-3-2-cuellos', el: document.getElementById('subLink3_2') },
+      { id: 'sec-3-3-calibracion', el: document.getElementById('subLink3_3') },
+      { id: 'sec-3-4-bayes', el: document.getElementById('subLink3_4') },
+      { id: 'sec-3-5-antifreeze', el: document.getElementById('subLink3_5') },
+      { id: 'sec-4-resiliencia', el: document.getElementById('subLink4') },
+      { id: 'sec-5-aprendizaje', el: document.getElementById('subLink5') },
+      { id: 'sec-6-telemetria', el: document.getElementById('subLink6') }
+    ];
+
+    let ticking = false;
+    function updateScrollSpy() {
+      const scrollPos = window.scrollY + 130;
+      let activeTargetId = '';
+
+      for (let i = 0; i < sublinks.length; i++) {
+        const sec = document.getElementById(sublinks[i].id);
+        if (sec && sec.offsetTop <= scrollPos) {
+          activeTargetId = sublinks[i].id;
+        }
+      }
+
+      sublinks.forEach(item => {
+        if (item.el) {
+          item.el.classList.toggle('active-item', item.id === activeTargetId);
+        }
+      });
+
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateScrollSpy);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    updateScrollSpy();
+  </script>
+
+</body>
+</html>

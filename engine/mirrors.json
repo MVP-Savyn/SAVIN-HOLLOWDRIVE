@@ -34,16 +34,6 @@
     ]
   },
   "cachyos_images": {
-    "efi_grub": {
-      "mirrors": [
-        { "url": "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_efi.img" }
-      ]
-    },
-    "sistema": {
-      "mirrors": [
-        { "url": "https://huggingface.co/datasets/HollowDrive/HollowDrive/resolve/main/hollowdrive_cachy_sistema.img" }
-      ]
-    },
     "efi_grub_hyprland": {
       "mirrors": [
         { "url": "https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev/grub_boot.img" }

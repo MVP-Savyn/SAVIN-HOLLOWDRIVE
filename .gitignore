@@ -1,17 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
 venv/
 .venv/
-__pycache__
-engine/tools/
+ENV/
 build/
-requeriments.txt
-Savin_GUI.spec
-Savin_GUI.build/
-Savin_GUI.onefile-build/
-.DS_Store
-jolowcoras (2).png
-Savin_GUI.dist/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller / Nuitka / Binaries
+*.manifest
+*.spec
+*.build/
+*.dist/
+*.onefile-build/
 HollowDrive.exe
-installer/installer.build
-installer/installer.onefile-build
-installer/installer.dist
-engine\__pycache__"
+installer/*.exe
+installer/*.zip
+
+# Logs and runtime telemetry
+logs/
+*.log
+engine/resources/ventoy-1.1.17/cli_*.txt
+engine/usb_history.json
+
+# Scratch, temp, browser profiles and IDE caches
+scratch/
+tmp/
+.claude/
+.vscode/
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
