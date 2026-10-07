@@ -252,22 +252,30 @@
           <!-- PASO 1: SELECCIÓN DE USB -->
           <div class="wizard-step-pane active" data-step="1">
             <div class="usb-select-center">
-              <h2 style="font-size: 1.6rem; text-align: center;" id="usbStepTitle">Selecciona una unidad</h2>
-
-              <div class="usb-dropdown-row">
-                <button class="btn-refresh-icon" id="btnRefreshUsb" title="Actualizar lista de unidades">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+              <div class="usb-step-title-wrap">
+                <div class="usb-step-title-badge">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15 7v4h1v2h-3V5h2l-3-4-3 4h2v8H8v-2h1V7H5v4h1v3h3v8h2v-8h3v-3h1v-4h-1z"/>
                   </svg>
-                </button>
-                <select class="usb-select" id="usbSelect">
-                  <option value="">Buscando unidades disponibles...</option>
-                </select>
+                </div>
+                <h2 class="usb-step-title" id="usbStepTitle">Selecciona una unidad</h2>
               </div>
 
-              <!-- Fila secundaria: Toggle Discos Internos alineado y limpio -->
-              <div class="usb-options-row">
-                <label class="internal-disks-toggle-row">
+              <!-- Bloque principal con selector de USBs y cuadradito de discos internos a su derecha -->
+              <div class="usb-selection-row" id="usbSelectionRow">
+                <div class="usb-dropdown-row" id="usbDropdownRow">
+                  <button class="btn-refresh-icon" id="btnRefreshUsb" title="Actualizar lista de unidades">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                  </button>
+                  <select class="usb-select" id="usbSelect">
+                    <option value="">Buscando unidades disponibles...</option>
+                  </select>
+                </div>
+
+                <!-- Cuadradito de mostrar discos internos colocado a la derecha del bloque de USBs -->
+                <label class="internal-disks-toggle-row" id="internalDisksToggle">
                   <input type="checkbox" id="chkShowInternal" />
                   <span id="lblShowInternal">Mostrar discos internos</span>
                 </label>
@@ -377,7 +385,7 @@
           <div class="wizard-step-pane" data-step="4">
             <div class="pane-header-row">
               <div class="pane-title-group">
-                <img src="/media/sistemas.png" alt="Sistemas" class="pane-title-gamepad" />
+                <img src="/media/sistemas.png" alt="Sistemas" class="pane-title-gamepad" id="paneTitleSystemIcon" />
                 <h2 class="pane-title" id="paneTitleSystem">Elige un sistema portable</h2>
               </div>
               <!-- Selector de Entornos (Hyprland / KDE) y Botón de Información a la derecha -->
@@ -405,75 +413,109 @@
 
             <!-- Contenedor Principal de la Ruleta Interactiva (Gira lentamente hasta hover) -->
             <div class="portable-roulette-wrap" id="portableRouletteWrap">
-              <div class="roulette-stage">
-                <!-- Anillo orbital decorativo -->
-                <div class="roulette-orbital-ring"></div>
+              <div class="roulette-stage" id="rouletteStage">
+                <!-- Líneas fluctuantes orbitales al estilo PSP -->
+                <svg class="roulette-psp-waves" viewBox="0 0 400 400" fill="none">
+                  <defs>
+                    <linearGradient id="pspGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.85"/>
+                      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#818cf8" stop-opacity="0.85"/>
+                    </linearGradient>
+                    <linearGradient id="pspGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+                      <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.8"/>
+                      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.4"/>
+                    </linearGradient>
+                    <filter id="pspGlow" x="-30%" y="-30%" width="160%" height="160%">
+                      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+                      <feMerge>
+                        <feMergeNode in="blur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <path class="psp-wave-line psp-wave-1" filter="url(#pspGlow)" stroke="url(#pspGrad1)" stroke-width="2" d="M 345 200 C 348.8 216.5, 351.8 236.9, 347.6 253.7 C 343.5 270.6, 332.9 289.0, 320.4 301.0 C 307.8 313.0, 288.7 320.6, 272.5 325.6 C 256.3 330.6, 239.0 330.0, 223.1 330.9 C 207.1 331.7, 192.9 331.7, 176.9 330.9 C 161.0 330.0, 143.7 330.6, 127.5 325.6 C 111.3 320.6, 92.2 313.0, 79.6 301.0 C 67.1 289.0, 56.5 270.6, 52.4 253.7 C 48.2 236.9, 51.2 216.5, 55.0 200.0 C 58.8 183.5, 67.9 168.8, 75.1 154.6 C 82.3 140.3, 89.5 127.9, 98.2 114.6 C 106.9 101.2, 115.1 86.0, 127.5 74.4 C 139.9 62.9, 156.1 50.1, 172.7 45.3 C 189.3 40.4, 210.7 40.4, 227.3 45.3 C 243.9 50.1, 260.1 62.9, 272.5 74.4 C 284.9 86.0, 293.1 101.2, 301.8 114.6 C 310.5 127.9, 317.7 140.3, 324.9 154.6 C 332.1 168.8, 341.2 183.5, 345.0 200.0 Z"/>
+                  <path class="psp-wave-line psp-wave-2" filter="url(#pspGlow)" stroke="url(#pspGrad2)" stroke-width="1.6" d="M 345 200 C 341.2 216.5, 332.1 231.2, 324.9 245.4 C 317.7 259.7, 310.5 272.1, 301.8 285.4 C 293.1 298.8, 284.9 314.0, 272.5 325.6 C 260.1 337.1, 243.9 349.9, 227.3 354.7 C 210.7 359.6, 189.3 359.6, 172.7 354.7 C 156.1 349.9, 139.9 337.1, 127.5 325.6 C 115.1 314.0, 106.9 298.8, 98.2 285.4 C 89.5 272.1, 82.3 259.7, 75.1 245.4 C 67.9 231.2, 58.8 216.5, 55.0 200.0 C 51.2 183.5, 48.2 163.1, 52.4 146.3 C 56.5 129.4, 67.1 111.0, 79.6 99.0 C 92.2 87.0, 111.3 79.4, 127.5 74.4 C 143.7 69.4, 161.0 70.0, 176.9 69.1 C 192.9 68.3, 207.1 68.3, 223.1 69.1 C 239.0 70.0, 256.3 69.4, 272.5 74.4 C 288.7 79.4, 307.8 87.0, 320.4 99.0 C 332.9 111.0, 343.5 129.4, 347.6 146.3 C 351.8 163.1, 348.8 183.5, 345.0 200.0 Z"/>
+                </svg>
 
                 <!-- Pista rotatoria de opciones: 7 sistemas con ángulo de 51.43° -->
                 <div class="roulette-track" id="rouletteTrack">
-                  <!-- 1. CachyOS (Disponible, color completo) -->
-                  <div class="roulette-item available" data-os="cachyos" data-name="CachyOS Linux" data-sub="Arch Linux Optimizado (Disponible)" style="--item-angle: 0deg;" title="CachyOS Linux">
+                  <!-- 1. CachyOS (Disponible) -->
+                  <div class="roulette-item available" data-os="cachyos" data-name="CachyOS Linux" data-url="https://cachyos.org" style="--item-angle: 0deg;" title="CachyOS Linux">
+                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de CachyOS" data-url="https://cachyos.org">
+                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                     <div class="roulette-item-inner">
                       <img src="/media/systems/cachyos-linux.svg" alt="CachyOS" class="roulette-item-icon" />
                     </div>
-                    <div class="roulette-item-tooltip">CachyOS Linux</div>
+                    <div class="roulette-item-name-tag">CachyOS Linux</div>
                   </div>
 
-                  <!-- 2. Ubuntu (Próximamente, gris) -->
-                  <div class="roulette-item disabled" data-os="ubuntu" data-name="Ubuntu Linux" data-sub="Próximamente" style="--item-angle: 51.43deg;" title="Ubuntu Linux (Próximamente)">
+                  <!-- 2. Ubuntu -->
+                  <div class="roulette-item disabled" data-os="ubuntu" data-name="Ubuntu Linux" data-url="https://ubuntu.com" style="--item-angle: 51.43deg;" title="Ubuntu Linux (Próximamente)">
+                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Ubuntu" data-url="https://ubuntu.com">
+                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                     <div class="roulette-item-inner">
                       <img src="/media/systems/ubuntu-linux.svg" alt="Ubuntu" class="roulette-item-icon" />
                     </div>
-                    <div class="roulette-item-tooltip">Ubuntu (Próximamente)</div>
+                    <div class="roulette-item-name-tag">Ubuntu Linux</div>
                   </div>
 
-                  <!-- 3. Debian (Próximamente, gris) -->
-                  <div class="roulette-item disabled" data-os="debian" data-name="Debian Linux" data-sub="Próximamente" style="--item-angle: 102.86deg;" title="Debian Linux (Próximamente)">
+                  <!-- 3. Debian -->
+                  <div class="roulette-item disabled" data-os="debian" data-name="Debian Linux" data-url="https://www.debian.org" style="--item-angle: 102.86deg;" title="Debian Linux (Próximamente)">
+                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Debian" data-url="https://www.debian.org">
+                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                     <div class="roulette-item-inner">
                       <img src="/media/systems/debian-linux.svg" alt="Debian" class="roulette-item-icon" />
                     </div>
-                    <div class="roulette-item-tooltip">Debian (Próximamente)</div>
+                    <div class="roulette-item-name-tag">Debian Linux</div>
                   </div>
 
-                  <!-- 4. Zorin OS (Próximamente, gris) -->
-                  <div class="roulette-item disabled" data-os="zorin" data-name="Zorin OS" data-sub="Próximamente" style="--item-angle: 154.29deg;" title="Zorin OS (Próximamente)">
+                  <!-- 4. Zorin OS -->
+                  <div class="roulette-item disabled" data-os="zorin" data-name="Zorin OS" data-url="https://zorin.com/os" style="--item-angle: 154.29deg;" title="Zorin OS (Próximamente)">
+                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Zorin OS" data-url="https://zorin.com/os">
+                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                     <div class="roulette-item-inner">
                       <img src="/media/systems/zorin-os.svg" alt="Zorin OS" class="roulette-item-icon" />
                     </div>
-                    <div class="roulette-item-tooltip">Zorin OS (Próximamente)</div>
+                    <div class="roulette-item-name-tag">Zorin OS</div>
                   </div>
 
-                  <!-- 5. Deepin (Próximamente, gris) -->
-                  <div class="roulette-item disabled" data-os="deepin" data-name="Deepin OS" data-sub="Próximamente" style="--item-angle: 205.71deg;" title="Deepin OS (Próximamente)">
+                  <!-- 5. Deepin -->
+                  <div class="roulette-item disabled" data-os="deepin" data-name="Deepin OS" data-url="https://www.deepin.org" style="--item-angle: 205.71deg;" title="Deepin OS (Próximamente)">
+                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Deepin" data-url="https://www.deepin.org">
+                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                     <div class="roulette-item-inner">
                       <img src="/media/systems/deepin.svg" alt="Deepin" class="roulette-item-icon" />
                     </div>
-                    <div class="roulette-item-tooltip">Deepin OS (Próximamente)</div>
+                    <div class="roulette-item-name-tag">Deepin OS</div>
                   </div>
 
-                  <!-- 6. PikaOS (Próximamente, gris) -->
-                  <div class="roulette-item disabled" data-os="pikaos" data-name="PikaOS" data-sub="Próximamente" style="--item-angle: 257.14deg;" title="PikaOS (Próximamente)">
+                  <!-- 6. PikaOS -->
+                  <div class="roulette-item disabled" data-os="pikaos" data-name="PikaOS" data-url="https://pika-os.com" style="--item-angle: 257.14deg;" title="PikaOS (Próximamente)">
+                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de PikaOS" data-url="https://pika-os.com">
+                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                     <div class="roulette-item-inner">
                       <img src="/media/systems/pikaos.svg" alt="PikaOS" class="roulette-item-icon" />
                     </div>
-                    <div class="roulette-item-tooltip">PikaOS (Próximamente)</div>
+                    <div class="roulette-item-name-tag">PikaOS</div>
                   </div>
 
-                  <!-- 7. Ninguno (X Azul, disponible) -->
-                  <div class="roulette-item available item-none" data-os="none" data-name="Ninguno" data-sub="No instalar sistema portable" style="--item-angle: 308.57deg;" title="Ninguno">
+                  <!-- 7. Ninguno -->
+                  <div class="roulette-item available item-none" data-os="none" data-name="Ninguno" data-url="https://www.ventoy.net" style="--item-angle: 308.57deg;" title="Ninguno (Sin Sistema)">
+                    <button class="roulette-item-info-btn" type="button" title="Información sobre Ventoy y almacenamiento" data-url="https://www.ventoy.net">
+                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                     <div class="roulette-item-inner">
                       <img src="/media/systems/ninguno.svg" alt="Ninguno" class="roulette-item-icon icon-none" />
                     </div>
-                    <div class="roulette-item-tooltip">Ninguno (Sin Sistema)</div>
-                  </div>
-                </div>
-
-                <!-- Núcleo Central de la Ruleta (Muestra dinámicamente el sistema al pasar el cursor) -->
-                <div class="roulette-hub" id="rouletteHub">
-                  <div class="roulette-hub-inner">
-                    <img src="/media/sistemas.png" alt="Sistemas" class="roulette-hub-img" id="rouletteHubImg" />
-                    <span class="roulette-hub-title" id="rouletteHubTitle">Elige tu Sistema</span>
-                    <span class="roulette-hub-sub" id="rouletteHubSub">Pasa el cursor o selecciona</span>
+                    <div class="roulette-item-name-tag">Ninguno (Sin Sistema)</div>
                   </div>
                 </div>
               </div>

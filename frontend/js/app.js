@@ -172,6 +172,7 @@ function initApp() {
     
     // Step 4: Sistema Portable
     paneTitleSystem: document.getElementById('paneTitleSystem'),
+    paneTitleSystemIcon: document.getElementById('paneTitleSystemIcon'),
     selectPortableOs: document.getElementById('selectPortableOs'),
     optOsCachy: document.getElementById('optOsCachy'),
     optOsNone: document.getElementById('optOsNone'),
@@ -497,7 +498,20 @@ function initApp() {
     if (DOM.btnBato32) DOM.btnBato32.textContent = L('bato_arch32', 'Batocera 32bits (Próximamente)');
 
     // 6. Step 4: Sistema Portable
-    if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = L('sys_title', 'Elige un sistema portable');
+    if (DOM.paneTitleSystem) {
+      if (State.portableSystemSelected) {
+        DOM.paneTitleSystem.textContent = (State.portableOs === 'cachyos' ? 'CachyOS Linux' : 'Ninguno');
+      } else {
+        DOM.paneTitleSystem.textContent = L('sys_title', 'Elige un sistema portable');
+      }
+    }
+    if (DOM.paneTitleSystemIcon) {
+      if (State.portableSystemSelected) {
+        DOM.paneTitleSystemIcon.src = (State.portableOs === 'cachyos' ? '/media/systems/cachyos-linux.svg' : '/media/systems/ninguno.svg');
+      } else {
+        DOM.paneTitleSystemIcon.src = '/media/sistemas.png';
+      }
+    }
     if (DOM.optOsCachy) DOM.optOsCachy.textContent = L('sys_opt_cachy', 'CachyOS (Arch Linux Optimizado)');
     if (DOM.optOsNone) DOM.optOsNone.textContent = L('sys_opt_none', 'Ninguno (No instalar sistema)');
     if (DOM.optOsZorin) DOM.optOsZorin.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Zorin OS');
@@ -1001,6 +1015,9 @@ function initApp() {
   // Sincronizar estado al cambiar el tamaño de ventana
   window.addEventListener('resize', () => {
     updateResponsiveState();
+    if (typeof updateUsbBlockWidth === 'function') {
+      updateUsbBlockWidth();
+    }
     if (window.hollowdrive?.windowGetState) {
       window.hollowdrive.windowGetState().then(st => {
         if (st && typeof st.is_maximized === 'boolean') {
@@ -1835,8 +1852,46 @@ function initApp() {
         DOM.usbWarningText.style.color = '';
       }
     }
+    updateUsbBlockWidth();
     updateWizardUI();
   }
+
+  function updateUsbBlockWidth() {
+    const row = document.getElementById('usbDropdownRow');
+    const select = DOM.usbSelect || document.getElementById('usbSelect');
+    if (!row || !select) return;
+
+    // "Por supuesto no se adaptará hasta que se haya seleccionado uno."
+    if (!State.selectedDisk || !select.value) {
+      row.style.width = '380px';
+      return;
+    }
+
+    const selectedOption = select.options[select.selectedIndex];
+    const text = selectedOption ? selectedOption.text : '';
+    if (!text) {
+      row.style.width = '380px';
+      return;
+    }
+
+    try {
+      const canvas = updateUsbBlockWidth.canvas || (updateUsbBlockWidth.canvas = document.createElement('canvas'));
+      const context = canvas.getContext('2d');
+      const compStyle = window.getComputedStyle(select);
+      const font = `${compStyle.fontWeight || '400'} ${compStyle.fontSize || '14px'} ${compStyle.fontFamily || 'monospace'}`;
+      context.font = font;
+      const textWidth = context.measureText(text).width;
+
+      // Calcular ancho: texto + botón recarga + márgenes/paddings + flecha select
+      const neededWidth = Math.ceil(textWidth + 120);
+      const maxWidth = Math.min(600, Math.floor(window.innerWidth * 0.65));
+      const targetWidth = Math.max(380, Math.min(neededWidth, maxWidth));
+      row.style.width = `${targetWidth}px`;
+    } catch (_) {
+      row.style.width = '440px';
+    }
+  }
+  window.updateUsbBlockWidth = updateUsbBlockWidth;
 
   DOM.usbSelect.addEventListener('change', (e) => {
     const rawVal = e.target.value;
@@ -2006,45 +2061,141 @@ function initApp() {
   }
   window.selectPortableSystem = selectPortableSystem;
 
-  const rouletteItems = document.querySelectorAll('.roulette-item');
-  const rouletteHubImg = document.getElementById('rouletteHubImg');
-  const rouletteHubTitle = document.getElementById('rouletteHubTitle');
-  const rouletteHubSub = document.getElementById('rouletteHubSub');
-  const rouletteStage = document.querySelector('.roulette-stage');
-
-  function resetRouletteHub() {
-    if (rouletteHubImg) rouletteHubImg.src = '/media/sistemas.png';
-    if (rouletteHubTitle) rouletteHubTitle.textContent = getT('sys_choose_title', 'Elige tu Sistema');
-    if (rouletteHubSub) rouletteHubSub.textContent = getT('sys_choose_sub', 'Pasa el cursor o selecciona');
-  }
-
-  rouletteItems.forEach(item => {
-    item.addEventListener('mouseenter', () => {
-      const name = item.dataset.name || '';
-      const sub = item.dataset.sub || '';
-      const icon = item.querySelector('.roulette-item-icon')?.getAttribute('src') || '/media/sistemas.png';
-      if (rouletteHubImg) rouletteHubImg.src = icon;
-      if (rouletteHubTitle) rouletteHubTitle.textContent = name;
-      if (rouletteHubSub) rouletteHubSub.textContent = sub;
-    });
-
-    item.addEventListener('mouseleave', () => {
-      resetRouletteHub();
-    });
-
-    item.addEventListener('click', () => {
-      if (item.classList.contains('disabled')) {
-        return;
+  function openExternalUrl(url) {
+    if (!url) return;
+    try {
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.open_url) {
+        window.pywebview.api.open_url(url);
+      } else if (window.hollowdrive && window.hollowdrive.openExternalUrl) {
+        window.hollowdrive.openExternalUrl(url);
+      } else {
+        window.open(url, '_blank', 'noopener,noreferrer');
       }
-      selectPortableSystem(item.dataset.os);
+    } catch (_) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
+  window.openExternalUrl = openExternalUrl;
+
+  // Botones de información [ ℹ ] en cada orbe de sistema portable
+  document.querySelectorAll('.roulette-item-info-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const targetUrl = btn.dataset.url || btn.closest('.roulette-item')?.dataset.url;
+      if (targetUrl) {
+        openExternalUrl(targetUrl);
+      }
     });
   });
 
-  if (rouletteStage) {
-    rouletteStage.addEventListener('mouseleave', () => {
-      resetRouletteHub();
+  let isSelectingOrb = false;
+
+  function animateAndSelectPortableSystem(selectedItem) {
+    if (isSelectingOrb) return;
+    isSelectingOrb = true;
+
+    const os = selectedItem.dataset.os;
+    const systemName = selectedItem.dataset.name || (os === 'cachyos' ? 'CachyOS Linux' : 'Ninguno');
+    const stage = document.querySelector('.roulette-stage');
+    const items = document.querySelectorAll('.roulette-item');
+    const titleIcon = document.getElementById('paneTitleSystemIcon') || DOM.paneTitleSystemIcon;
+    const titleText = document.getElementById('paneTitleSystem') || DOM.paneTitleSystem;
+
+    // 1. Fase 1: Activar vórtice acelerado en el escenario
+    if (stage) stage.classList.add('is-animating-selection');
+
+    // El orbe seleccionado se coloca en el centro y hace zoom; los demás se empequeñecen y son absorbidos
+    items.forEach(item => {
+      if (item === selectedItem) {
+        item.classList.add('is-selected-orb');
+      } else {
+        item.classList.add('is-absorbed-orb');
+      }
     });
+
+    // Duración de la fase 1 (absorción vorticial y zoom en el centro): 650ms
+    setTimeout(() => {
+      // 2. Fase 2: Deslizamiento fluido del icono hacia la cabecera
+      const iconImg = selectedItem.querySelector('.roulette-item-icon');
+      const iconSrc = iconImg ? iconImg.src : (os === 'cachyos' ? '/media/systems/cachyos-linux.svg' : '/media/systems/ninguno.svg');
+
+      const inner = selectedItem.querySelector('.roulette-item-inner');
+      const startRect = inner ? inner.getBoundingClientRect() : selectedItem.getBoundingClientRect();
+      const targetRect = titleIcon ? titleIcon.getBoundingClientRect() : null;
+
+      if (targetRect && startRect.width > 0) {
+        const flyingGhost = document.createElement('div');
+        flyingGhost.className = 'roulette-flying-ghost';
+        flyingGhost.style.position = 'fixed';
+        flyingGhost.style.left = `${startRect.left}px`;
+        flyingGhost.style.top = `${startRect.top}px`;
+        flyingGhost.style.width = `${startRect.width}px`;
+        flyingGhost.style.height = `${startRect.height}px`;
+        flyingGhost.style.zIndex = '99999';
+        flyingGhost.style.pointerEvents = 'none';
+        flyingGhost.style.borderRadius = '50%';
+        flyingGhost.style.transition = 'all 0.52s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        flyingGhost.style.boxShadow = '0 0 25px rgba(0, 212, 255, 0.85)';
+        flyingGhost.innerHTML = `<img src="${iconSrc}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 10px #00d4ff);" />`;
+        document.body.appendChild(flyingGhost);
+
+        // Ocultar temporalmente el orbe central
+        selectedItem.style.opacity = '0';
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            flyingGhost.style.left = `${targetRect.left}px`;
+            flyingGhost.style.top = `${targetRect.top}px`;
+            flyingGhost.style.width = `${targetRect.width}px`;
+            flyingGhost.style.height = `${targetRect.height}px`;
+            flyingGhost.style.borderRadius = '6px';
+            flyingGhost.style.boxShadow = '0 0 12px rgba(0, 212, 255, 0.4)';
+          });
+        });
+
+        setTimeout(() => {
+          if (flyingGhost.parentNode) flyingGhost.parentNode.removeChild(flyingGhost);
+
+          // Actualizar icono y texto del título con morph visual
+          if (titleIcon) {
+            titleIcon.src = iconSrc;
+            titleIcon.classList.remove('title-icon-morph');
+            void titleIcon.offsetWidth;
+            titleIcon.classList.add('title-icon-morph');
+          }
+          if (titleText) {
+            titleText.textContent = systemName;
+            titleText.classList.remove('title-text-morph');
+            void titleText.offsetWidth;
+            titleText.classList.add('title-text-morph');
+          }
+
+          // Completar la selección del sistema
+          selectPortableSystem(os);
+          isSelectingOrb = false;
+        }, 530);
+      } else {
+        if (titleIcon) titleIcon.src = iconSrc;
+        if (titleText) titleText.textContent = systemName;
+        selectPortableSystem(os);
+        isSelectingOrb = false;
+      }
+    }, 650);
   }
+
+  const rouletteItems = document.querySelectorAll('.roulette-item');
+  rouletteItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      // Si el clic fue en el botón de info, no seleccionar
+      if (e.target.closest('.roulette-item-info-btn')) return;
+
+      if (item.classList.contains('disabled')) {
+        return;
+      }
+      animateAndSelectPortableSystem(item);
+    });
+  });
 
   if (DOM.btnCachyHypr) {
     DOM.btnCachyHypr.addEventListener('click', () => {
@@ -2061,6 +2212,28 @@ function initApp() {
   if (DOM.btnChangeSystem) {
     DOM.btnChangeSystem.addEventListener('click', () => {
       State.portableSystemSelected = false;
+      isSelectingOrb = false;
+
+      // Restaurar cabecera e icono del título
+      const titleIcon = document.getElementById('paneTitleSystemIcon') || DOM.paneTitleSystemIcon;
+      const titleText = document.getElementById('paneTitleSystem') || DOM.paneTitleSystem;
+      if (titleIcon) {
+        titleIcon.src = '/media/sistemas.png';
+        titleIcon.classList.remove('title-icon-morph');
+      }
+      if (titleText) {
+        titleText.textContent = getT('sys_title', 'Elige un sistema portable');
+        titleText.classList.remove('title-text-morph');
+      }
+
+      // Limpiar clases de animación en orbes y escenario de la ruleta
+      const stage = document.querySelector('.roulette-stage');
+      if (stage) stage.classList.remove('is-animating-selection');
+      document.querySelectorAll('.roulette-item').forEach(item => {
+        item.classList.remove('is-selected-orb', 'is-absorbed-orb');
+        item.style.opacity = '';
+      });
+
       syncPortableSystemUI();
       updateWizardUIControls();
     });
