@@ -2090,10 +2090,12 @@ function initApp() {
   });
 
   let isSelectingOrb = false;
+  let selectionStartTime = 0;
 
   function animateAndSelectPortableSystem(selectedItem) {
     if (isSelectingOrb) return;
     isSelectingOrb = true;
+    selectionStartTime = performance.now();
 
     const os = selectedItem.dataset.os;
     const systemName = selectedItem.dataset.name || (os === 'cachyos' ? 'CachyOS Linux' : 'Ninguno');
@@ -2232,17 +2234,36 @@ function initApp() {
 
     const cx = width / 2;
     const cy = height / 2;
-    const radius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 140;
+    const baseRadius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 116;
 
-    // Curva 1: Armónicos fluctuantes suaves estilo PSP Wave
+    // Si está en absorción de selección: las ondas se contraen hacia el centro hasta desaparecer bajo el sistema seleccionado
+    let currentRadius = baseRadius;
+    let waveAlpha = 0.85;
+    let spinOffset = 0;
+
+    if (isSelectingOrb && selectionStartTime > 0) {
+      const elapsed = Math.min((performance.now() - selectionStartTime) / 650, 1);
+      // Contracción acelerada hacia el centro
+      currentRadius = baseRadius * Math.max(1 - Math.pow(elapsed, 1.4), 0);
+      waveAlpha = Math.max(1 - elapsed, 0) * 0.85;
+      spinOffset = elapsed * 8.0; // Giro acelerado de las ondas mientras se contraen
+    }
+
+    if (currentRadius <= 0.5 || waveAlpha <= 0.01) {
+      ctx.restore();
+      return;
+    }
+
+    // Curva 1: Ondulaciones pequeñas y en gran cantidad (Frecuencias 12, 18, 24 con amplitud muy pequeña 3.2px, 2.0px, 1.2px)
     ctx.beginPath();
-    const steps = 140;
+    const steps = 300;
     for (let i = 0; i <= steps; i++) {
       const theta = (i / steps) * Math.PI * 2;
-      const dr = 14 * Math.sin(3 * theta + timeSec * 1.3) +
-                 8 * Math.cos(2 * theta - timeSec * 0.9 + 1.0) +
-                 5 * Math.sin(5 * theta + timeSec * 0.6 + 2.2);
-      const r = radius + dr;
+      const effectiveTheta = theta + spinOffset;
+      const dr = 3.2 * Math.sin(12 * effectiveTheta + timeSec * 2.2) +
+                 2.0 * Math.cos(18 * effectiveTheta - timeSec * 1.8 + 0.9) +
+                 1.2 * Math.sin(24 * effectiveTheta + timeSec * 2.8 + 1.8);
+      const r = currentRadius + dr;
       const x = cx + r * Math.sin(theta);
       const y = cy - r * Math.cos(theta);
       if (i === 0) ctx.moveTo(x, y);
@@ -2251,19 +2272,20 @@ function initApp() {
     ctx.closePath();
     ctx.strokeStyle = '#00d4ff';
     ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = 12;
-    ctx.lineWidth = 2.2;
-    ctx.globalAlpha = 0.85;
+    ctx.shadowBlur = 10;
+    ctx.lineWidth = 1.9;
+    ctx.globalAlpha = waveAlpha;
     ctx.stroke();
 
-    // Curva 2: Segundo armónico fluido desfasado (Onda dual PSP)
+    // Curva 2: Segundo armónico fluido con alta densidad de ondas pequeñas (Frecuencias 14, 20, 28 con amplitud 3.0px, 2.1px, 1.1px)
     ctx.beginPath();
     for (let i = 0; i <= steps; i++) {
       const theta = (i / steps) * Math.PI * 2;
-      const dr = 16 * Math.cos(2 * theta + timeSec * 0.85 + 1.4) +
-                 9 * Math.sin(4 * theta - timeSec * 1.1 + 0.7) +
-                 6 * Math.cos(3 * theta + timeSec * 0.5 + 3.0);
-      const r = radius + dr;
+      const effectiveTheta = theta + spinOffset;
+      const dr = 3.0 * Math.cos(14 * effectiveTheta + timeSec * 2.0 + 1.4) +
+                 2.1 * Math.sin(20 * effectiveTheta - timeSec * 2.4 + 0.7) +
+                 1.1 * Math.cos(28 * effectiveTheta + timeSec * 3.1 + 2.5);
+      const r = currentRadius + dr;
       const x = cx + r * Math.sin(theta);
       const y = cy - r * Math.cos(theta);
       if (i === 0) ctx.moveTo(x, y);
@@ -2272,9 +2294,9 @@ function initApp() {
     ctx.closePath();
     ctx.strokeStyle = '#38bdf8';
     ctx.shadowColor = '#818cf8';
-    ctx.shadowBlur = 10;
-    ctx.lineWidth = 1.6;
-    ctx.globalAlpha = 0.65;
+    ctx.shadowBlur = 8;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = waveAlpha * 0.75;
     ctx.stroke();
 
     ctx.restore();
@@ -2291,8 +2313,8 @@ function initApp() {
     const dy = e.clientY - cy;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    const radius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 140;
-    const itemSize = parseFloat(getComputedStyle(stage).getPropertyValue('--item-size')) || 64;
+    const radius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 116;
+    const itemSize = parseFloat(getComputedStyle(stage).getPropertyValue('--item-size')) || 58;
     const innerHoleRadius = radius - (itemSize * 0.55); // Hueco interior según el diagrama del usuario
     const outerLimitRadius = radius + itemSize + 40;   // Límite exterior de los sectores
 
@@ -2375,8 +2397,8 @@ function initApp() {
         rouletteTrackAngle = (rouletteTrackAngle + degreesPerSecond * dt) % 360;
         track.style.setProperty('--track-angle', `${rouletteTrackAngle.toFixed(3)}deg`);
       } else if (isSelectingOrb) {
-        // En vórtice acelerado
-        rouletteTrackAngle = (rouletteTrackAngle + 720 * dt) % 360;
+        // En vórtice acelerado: los demás sistemas giran y se contraen
+        rouletteTrackAngle = (rouletteTrackAngle + 900 * dt) % 360;
         track.style.setProperty('--track-angle', `${rouletteTrackAngle.toFixed(3)}deg`);
       }
 
@@ -2404,6 +2426,7 @@ function initApp() {
     DOM.btnChangeSystem.addEventListener('click', () => {
       State.portableSystemSelected = false;
       isSelectingOrb = false;
+      selectionStartTime = 0;
       isRoulettePaused = false;
       hoveredSectorIndex = -1;
 
