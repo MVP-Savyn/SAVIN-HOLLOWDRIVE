@@ -373,40 +373,117 @@
             </div>
           </div>
 
-          <!-- PASO 4: SISTEMA PORTABLE (SIN CACHY, SIN EMOJIS) -->
+          <!-- PASO 4: SISTEMA PORTABLE -->
           <div class="wizard-step-pane" data-step="4">
             <div class="pane-header-row">
               <div class="pane-title-group">
                 <img src="/media/sistemas.png" alt="Sistemas" class="pane-title-gamepad" />
-                <h2 class="pane-title" id="paneTitleSystem">¿Instalar Sistema Portable?</h2>
+                <h2 class="pane-title" id="paneTitleSystem">Elige un sistema portable</h2>
+              </div>
+              <!-- Selector de Entornos (Hyprland / KDE) y Botón de Información a la derecha -->
+              <div class="pane-actions-right">
+                <div class="segmented-selector" id="cachyFlavorWrap">
+                  <button class="segment-btn active" id="btnCachyHypr" type="button">Hyprland</button>
+                  <button class="segment-btn" id="btnCachyKde" type="button">KDE</button>
+                </div>
                 <!-- Botón de información independiente [ ℹ ] -->
-                <button class="btn-mini-info" id="btnCachyInfo" title="Información sobre Sistemas Portables" onclick="window.openModal && window.openModal(document.getElementById('modalCachy'))">
+                <button class="btn-mini-info" id="btnCachyInfo" type="button" title="Información sobre Sistemas Portables" onclick="window.openModal && window.openModal(document.getElementById('modalCachy'))">
                   <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                 </button>
-              </div>
-              <!-- Selector de Sistemas Portables a la derecha -->
-              <div class="pane-actions-right">
-                <select class="portable-os-select" id="selectPortableOs">
+                <!-- Selector legacy oculto para compatibilidad con scripts existentes -->
+                <select class="portable-os-select" id="selectPortableOs" style="display: none;">
                   <option value="cachyos" selected id="optOsCachy">CachyOS (Arch Linux Optimizado)</option>
                   <option value="none" id="optOsNone">Ninguno (No instalar sistema)</option>
                   <option value="zorin" disabled id="optOsZorin">Zorin OS (Próximamente)</option>
                   <option value="deepin" disabled id="optOsDeepin">Deepin OS (Próximamente)</option>
                   <option value="ubuntu" disabled id="optOsUbuntu">Ubuntu (Próximamente)</option>
                   <option value="debian" disabled id="optOsDebian">Debian (Próximamente)</option>
+                  <option value="pikaos" disabled id="optOsPika">PikaOS (Próximamente)</option>
                 </select>
-                <!-- Selector de Entornos (Hyprland / KDE) -->
-                <div class="segmented-selector" id="cachyFlavorWrap">
-                  <button class="segment-btn active" id="btnCachyHypr">Hyprland</button>
-                  <button class="segment-btn" id="btnCachyKde" disabled style="opacity:0.45; cursor:not-allowed;">KDE Plasma (Próximamente)</button>
+              </div>
+            </div>
+
+            <!-- Contenedor Principal de la Ruleta Interactiva (Gira lentamente hasta hover) -->
+            <div class="portable-roulette-wrap" id="portableRouletteWrap">
+              <div class="roulette-stage">
+                <!-- Anillo orbital decorativo -->
+                <div class="roulette-orbital-ring"></div>
+
+                <!-- Pista rotatoria de opciones: 7 sistemas con ángulo de 51.43° -->
+                <div class="roulette-track" id="rouletteTrack">
+                  <!-- 1. CachyOS (Disponible, color completo) -->
+                  <div class="roulette-item available" data-os="cachyos" data-name="CachyOS Linux" data-sub="Arch Linux Optimizado (Disponible)" style="--item-angle: 0deg;" title="CachyOS Linux">
+                    <div class="roulette-item-inner">
+                      <img src="/media/systems/cachyos-linux.svg" alt="CachyOS" class="roulette-item-icon" />
+                    </div>
+                    <div class="roulette-item-tooltip">CachyOS Linux</div>
+                  </div>
+
+                  <!-- 2. Ubuntu (Próximamente, gris) -->
+                  <div class="roulette-item disabled" data-os="ubuntu" data-name="Ubuntu Linux" data-sub="Próximamente" style="--item-angle: 51.43deg;" title="Ubuntu Linux (Próximamente)">
+                    <div class="roulette-item-inner">
+                      <img src="/media/systems/ubuntu-linux.svg" alt="Ubuntu" class="roulette-item-icon" />
+                    </div>
+                    <div class="roulette-item-tooltip">Ubuntu (Próximamente)</div>
+                  </div>
+
+                  <!-- 3. Debian (Próximamente, gris) -->
+                  <div class="roulette-item disabled" data-os="debian" data-name="Debian Linux" data-sub="Próximamente" style="--item-angle: 102.86deg;" title="Debian Linux (Próximamente)">
+                    <div class="roulette-item-inner">
+                      <img src="/media/systems/debian-linux.svg" alt="Debian" class="roulette-item-icon" />
+                    </div>
+                    <div class="roulette-item-tooltip">Debian (Próximamente)</div>
+                  </div>
+
+                  <!-- 4. Zorin OS (Próximamente, gris) -->
+                  <div class="roulette-item disabled" data-os="zorin" data-name="Zorin OS" data-sub="Próximamente" style="--item-angle: 154.29deg;" title="Zorin OS (Próximamente)">
+                    <div class="roulette-item-inner">
+                      <img src="/media/systems/zorin-os.svg" alt="Zorin OS" class="roulette-item-icon" />
+                    </div>
+                    <div class="roulette-item-tooltip">Zorin OS (Próximamente)</div>
+                  </div>
+
+                  <!-- 5. Deepin (Próximamente, gris) -->
+                  <div class="roulette-item disabled" data-os="deepin" data-name="Deepin OS" data-sub="Próximamente" style="--item-angle: 205.71deg;" title="Deepin OS (Próximamente)">
+                    <div class="roulette-item-inner">
+                      <img src="/media/systems/deepin.svg" alt="Deepin" class="roulette-item-icon" />
+                    </div>
+                    <div class="roulette-item-tooltip">Deepin OS (Próximamente)</div>
+                  </div>
+
+                  <!-- 6. PikaOS (Próximamente, gris) -->
+                  <div class="roulette-item disabled" data-os="pikaos" data-name="PikaOS" data-sub="Próximamente" style="--item-angle: 257.14deg;" title="PikaOS (Próximamente)">
+                    <div class="roulette-item-inner">
+                      <img src="/media/systems/pikaos.svg" alt="PikaOS" class="roulette-item-icon" />
+                    </div>
+                    <div class="roulette-item-tooltip">PikaOS (Próximamente)</div>
+                  </div>
+
+                  <!-- 7. Ninguno (X Azul, disponible) -->
+                  <div class="roulette-item available item-none" data-os="none" data-name="Ninguno" data-sub="No instalar sistema portable" style="--item-angle: 308.57deg;" title="Ninguno">
+                    <div class="roulette-item-inner">
+                      <img src="/media/systems/ninguno.svg" alt="Ninguno" class="roulette-item-icon icon-none" />
+                    </div>
+                    <div class="roulette-item-tooltip">Ninguno (Sin Sistema)</div>
+                  </div>
+                </div>
+
+                <!-- Núcleo Central de la Ruleta (Muestra dinámicamente el sistema al pasar el cursor) -->
+                <div class="roulette-hub" id="rouletteHub">
+                  <div class="roulette-hub-inner">
+                    <img src="/media/sistemas.png" alt="Sistemas" class="roulette-hub-img" id="rouletteHubImg" />
+                    <span class="roulette-hub-title" id="rouletteHubTitle">Elige tu Sistema</span>
+                    <span class="roulette-hub-sub" id="rouletteHubSub">Pasa el cursor o selecciona</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Preview Sistema Portable en bucle -->
-            <div class="video-preview-wrap">
+            <!-- Preview Vídeo del Sistema Seleccionado (Se muestra al elegir sistema con vídeo) -->
+            <div class="video-preview-wrap portable-selected-video-wrap" id="portableVideoWrap" style="display: none;">
               <div class="video-preview-box" data-video="videoCachy">
                 <video id="videoCachy" loop muted playsinline preload="metadata">
-                  <source src="/media/sistema.mp4" type="video/mp4" />
+                  <source id="videoCachySource" src="/media/sistema.mp4" type="video/mp4" />
                 </video>
                 <div class="video-hover-bar">
                   <button class="video-play-btn" type="button" title="Reproducir / Pausar">
@@ -418,6 +495,23 @@
                     <div class="video-scrub-thumb"></div>
                   </div>
                   <span class="video-time-chip">0:00 / 0:00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vista 'Ninguno' cuando se selecciona no instalar sistema -->
+            <div class="portable-none-wrap" id="portableNoneWrap" style="display: none;">
+              <div class="portable-none-card">
+                <div class="portable-none-icon-box">
+                  <img src="/media/systems/ninguno.svg" alt="Sin Sistema" class="portable-none-img" />
+                </div>
+                <h3 class="portable-none-title">Sin Sistema Portable</h3>
+                <p class="portable-none-desc">
+                  No se instalará ningún sistema operativo portable en la memoria USB.<br/>
+                  Todo el espacio disponible quedará reservado para HollowDrive y tus imágenes ISO personalizadas.
+                </p>
+                <div class="portable-none-badge">
+                  <span>⚡ 100% Espacio para Ventoy e ISOs</span>
                 </div>
               </div>
             </div>
@@ -791,6 +885,7 @@
         <!-- Barra Inferior de Navegación del Asistente -->
         <footer class="wizard-footer">
           <button class="btn-nav btn-prev" id="btnPrev">⬅ Volver al Menú</button>
+          <button class="btn-nav btn-change-system" id="btnChangeSystem" type="button" style="display: none;">🔄 Cambiar</button>
           <button class="btn-nav btn-next" id="btnNext" disabled>Siguiente ➡</button>
           <button class="btn-nav btn-cancel-install" id="btnCancelInstallProcess" style="display: none;">❌ Cancelar instalación</button>
         </footer>

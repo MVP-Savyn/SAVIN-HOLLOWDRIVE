@@ -40,6 +40,7 @@ function initApp() {
     portableOs: 'cachyos', // 'none' | 'cachyos'
     installCachy: true,
     cachyFlavor: 'hyprland',
+    portableSystemSelected: false,
     downloadMode: 'ram', // 'ram' (Asíncrona) | 'disco' (Clásica)
     preserveSpace: false,
     
@@ -184,6 +185,15 @@ function initApp() {
     btnCachyInfo: document.getElementById('btnCachyInfo'),
     videoCachy: document.getElementById('videoCachy'),
     modalCachy: document.getElementById('modalCachy'),
+    portableRouletteWrap: document.getElementById('portableRouletteWrap'),
+    rouletteTrack: document.getElementById('rouletteTrack'),
+    rouletteHub: document.getElementById('rouletteHub'),
+    rouletteHubImg: document.getElementById('rouletteHubImg'),
+    rouletteHubTitle: document.getElementById('rouletteHubTitle'),
+    rouletteHubSub: document.getElementById('rouletteHubSub'),
+    portableVideoWrap: document.getElementById('portableVideoWrap'),
+    portableNoneWrap: document.getElementById('portableNoneWrap'),
+    btnChangeSystem: document.getElementById('btnChangeSystem'),
     
     // Step 5: Particionado Real
     partitionHeading: document.getElementById('partitionHeading'),
@@ -487,14 +497,16 @@ function initApp() {
     if (DOM.btnBato32) DOM.btnBato32.textContent = L('bato_arch32', 'Batocera 32bits (Próximamente)');
 
     // 6. Step 4: Sistema Portable
-    if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = L('sys_title', '¿Instalar Sistema Portable?');
+    if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = L('sys_title', 'Elige un sistema portable');
     if (DOM.optOsCachy) DOM.optOsCachy.textContent = L('sys_opt_cachy', 'CachyOS (Arch Linux Optimizado)');
     if (DOM.optOsNone) DOM.optOsNone.textContent = L('sys_opt_none', 'Ninguno (No instalar sistema)');
     if (DOM.optOsZorin) DOM.optOsZorin.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Zorin OS');
     if (DOM.optOsDeepin) DOM.optOsDeepin.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Deepin OS');
     if (DOM.optOsUbuntu) DOM.optOsUbuntu.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Ubuntu');
     if (DOM.optOsDebian) DOM.optOsDebian.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Debian');
-    if (DOM.btnCachyKde) DOM.btnCachyKde.textContent = L('sys_plasma_soon', 'KDE Plasma (Próximamente)');
+    if (DOM.btnCachyHypr) DOM.btnCachyHypr.textContent = 'Hyprland';
+    if (DOM.btnCachyKde) DOM.btnCachyKde.textContent = 'KDE';
+    if (DOM.btnChangeSystem) DOM.btnChangeSystem.textContent = L('btn_change_system', '🔄 Cambiar');
 
     // 7. Step 5: Método de Descarga
     if (DOM.downloadModeTitle) DOM.downloadModeTitle.textContent = L('dl_title', '¿Cómo deseas descargar los paquetes?');
@@ -1504,7 +1516,7 @@ function initApp() {
       }
     }
     if (vCachy) {
-      if (isWizard && activeStep === 4) {
+      if (isWizard && activeStep === 4 && State.portableSystemSelected && State.portableOs === 'cachyos') {
         vCachy.currentTime = 0;
         vCachy.play().catch(() => {});
       } else {
@@ -1616,6 +1628,19 @@ function initApp() {
       DOM.btnPrev.textContent = getT('nav_back', '⬅ Anterior');
     }
 
+    // Botón Cambiar (Entre Anterior y Siguiente, visible en Paso 4 si ya se ha seleccionado un sistema o 'ninguno')
+    if (DOM.btnChangeSystem) {
+      if (State.wizardStep === 4 && State.portableSystemSelected) {
+        DOM.btnChangeSystem.style.display = 'flex';
+      } else {
+        DOM.btnChangeSystem.style.display = 'none';
+      }
+    }
+
+    if (State.wizardStep === 4) {
+      syncPortableSystemUI();
+    }
+
     // EN EL PASO 6: SE OCULTA COMPLETAMENTE EL BOTÓN SIGUIENTE DEL FOOTER
     // (El usuario explícitamente pidió: "Quita el botón de comenzar la instalación del final")
     if (State.wizardStep === 6) {
@@ -1627,6 +1652,8 @@ function initApp() {
       if (State.wizardStep === 1) {
         const isDiskValid = State.selectedDisk && State.totalDiskGb >= MIN_DRIVE_GB;
         DOM.btnNext.disabled = (!isDiskValid || !State.lockConfirmed);
+      } else if (State.wizardStep === 4) {
+        DOM.btnNext.disabled = !State.portableSystemSelected;
       } else {
         DOM.btnNext.disabled = false;
       }
@@ -1760,10 +1787,19 @@ function initApp() {
       }
 
       // Restricción dinámica de CachyOS si la unidad es menor a 28 GB (20 GB sistema + GRUB + Hollowdrive)
-      if (DOM.optOsCachy) {
+      const cachyItem = document.querySelector('.roulette-item[data-os="cachyos"]');
+      if (DOM.optOsCachy || cachyItem) {
         if (State.totalDiskGb < 28.0) {
-          DOM.optOsCachy.disabled = true;
-          DOM.optOsCachy.textContent = "CachyOS (Requiere unidad ≥ 32 GB)";
+          if (DOM.optOsCachy) {
+            DOM.optOsCachy.disabled = true;
+            DOM.optOsCachy.textContent = "CachyOS (Requiere unidad ≥ 32 GB)";
+          }
+          if (cachyItem) {
+            cachyItem.classList.remove('available');
+            cachyItem.classList.add('disabled');
+            cachyItem.dataset.sub = "Requiere unidad ≥ 32 GB";
+            cachyItem.title = "CachyOS (Requiere unidad ≥ 32 GB)";
+          }
           if (State.portableOs === 'cachyos') {
             State.portableOs = 'none';
             State.installCachy = false;
@@ -1771,10 +1807,19 @@ function initApp() {
             if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'none';
             if (DOM.cachySliderGroup) DOM.cachySliderGroup.style.display = 'none';
             if (DOM.legendCachyItem) DOM.legendCachyItem.style.display = 'none';
+            if (State.portableSystemSelected) syncPortableSystemUI();
           }
         } else {
-          DOM.optOsCachy.disabled = false;
-          DOM.optOsCachy.textContent = getT('sys_opt_cachy', 'CachyOS (Arch Linux Optimizado)');
+          if (DOM.optOsCachy) {
+            DOM.optOsCachy.disabled = false;
+            DOM.optOsCachy.textContent = getT('sys_opt_cachy', 'CachyOS (Arch Linux Optimizado)');
+          }
+          if (cachyItem) {
+            cachyItem.classList.add('available');
+            cachyItem.classList.remove('disabled');
+            cachyItem.dataset.sub = "Arch Linux Optimizado (Disponible)";
+            cachyItem.title = "CachyOS Linux";
+          }
         }
       }
 
@@ -1862,30 +1907,170 @@ function initApp() {
     DOM.btnBato64.classList.add('active');
   });
 
-  // Paso 4: Sistema Portable (Dropdown con Sistema Portable, Ninguno, y distros bloqueadas)
-  DOM.selectPortableOs.addEventListener('change', (e) => {
-    const val = e.target.value;
-    State.portableOs = val;
-    State.installCachy = (val === 'cachyos');
+  // =========================================================================
+  // 🎡 PASO 4: RULETA INTERACTIVA Y GESTIÓN DE SISTEMAS PORTABLES
+  // =========================================================================
 
-    if (DOM.cachyFlavorWrap) {
-      DOM.cachyFlavorWrap.style.display = State.installCachy ? 'flex' : 'none';
-    }
-    if (DOM.cachySliderGroup) {
-      DOM.cachySliderGroup.style.display = State.installCachy ? 'flex' : 'none';
-    }
-    if (DOM.legendCachyItem) {
-      DOM.legendCachyItem.style.display = State.installCachy ? 'flex' : 'none';
-    }
+  function switchCachyVideo(flavor) {
+    State.cachyFlavor = flavor;
+    if (DOM.btnCachyHypr) DOM.btnCachyHypr.classList.toggle('active', flavor === 'hyprland');
+    if (DOM.btnCachyKde) DOM.btnCachyKde.classList.toggle('active', flavor === 'kde');
 
-    rebalancePartitionsInitial();
+    const vCachy = DOM.videoCachy || document.getElementById('videoCachy');
+    if (!vCachy) return;
+
+    const targetSrc = (flavor === 'kde') ? '/media/cachy_opt.mp4' : '/media/sistema.mp4';
+    const currentSrc = vCachy.currentSrc || vCachy.getAttribute('src') || '';
+    if (!currentSrc.endsWith(targetSrc.replace('/media/', ''))) {
+      const isPlaying = !vCachy.paused;
+      vCachy.src = targetSrc;
+      vCachy.load();
+      if (isPlaying || (State.screen === 'wizard' && State.wizardStep === 4 && State.portableSystemSelected && State.portableOs === 'cachyos')) {
+        vCachy.play().catch(() => {});
+      }
+    }
+  }
+  window.switchCachyVideo = switchCachyVideo;
+
+  function syncPortableSystemUI() {
+    const wrapRoulette = DOM.portableRouletteWrap || document.getElementById('portableRouletteWrap');
+    const wrapVideo = DOM.portableVideoWrap || document.getElementById('portableVideoWrap');
+    const wrapNone = DOM.portableNoneWrap || document.getElementById('portableNoneWrap');
+    const btnChange = DOM.btnChangeSystem || document.getElementById('btnChangeSystem');
+    const vCachy = DOM.videoCachy || document.getElementById('videoCachy');
+
+    if (!wrapRoulette) return;
+
+    if (State.portableSystemSelected) {
+      wrapRoulette.style.display = 'none';
+      if (btnChange) btnChange.style.display = 'flex';
+
+      if (State.portableOs === 'cachyos') {
+        if (wrapVideo) wrapVideo.style.display = 'flex';
+        if (wrapNone) wrapNone.style.display = 'none';
+        if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'flex';
+        if (State.screen === 'wizard' && State.wizardStep === 4) {
+          if (vCachy) {
+            vCachy.play().catch(() => {});
+          }
+        }
+      } else {
+        if (wrapVideo) wrapVideo.style.display = 'none';
+        if (wrapNone) wrapNone.style.display = 'flex';
+        if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'none';
+        if (vCachy) vCachy.pause();
+      }
+    } else {
+      wrapRoulette.style.display = 'flex';
+      if (wrapVideo) wrapVideo.style.display = 'none';
+      if (wrapNone) wrapNone.style.display = 'none';
+      if (btnChange) btnChange.style.display = 'none';
+      if (vCachy) vCachy.pause();
+    }
+  }
+  window.syncPortableSystemUI = syncPortableSystemUI;
+
+  function selectPortableSystem(os) {
+    if (os === 'cachyos') {
+      if (State.totalDiskGb > 0 && State.totalDiskGb < 28.0) {
+        showCustomAlert("ESPACIO INSUFICIENTE", "CachyOS requiere una unidad USB de al menos 32 GB.");
+        return;
+      }
+      State.portableOs = 'cachyos';
+      State.installCachy = true;
+      State.portableSystemSelected = true;
+
+      if (DOM.selectPortableOs) DOM.selectPortableOs.value = 'cachyos';
+      if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'flex';
+      if (DOM.cachySliderGroup) DOM.cachySliderGroup.style.display = 'flex';
+      if (DOM.legendCachyItem) DOM.legendCachyItem.style.display = 'flex';
+
+      switchCachyVideo(State.cachyFlavor || 'hyprland');
+      syncPortableSystemUI();
+      rebalancePartitionsInitial();
+      updateWizardUIControls();
+    } else if (os === 'none') {
+      State.portableOs = 'none';
+      State.installCachy = false;
+      State.portableSystemSelected = true;
+
+      if (DOM.selectPortableOs) DOM.selectPortableOs.value = 'none';
+      if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'none';
+      if (DOM.cachySliderGroup) DOM.cachySliderGroup.style.display = 'none';
+      if (DOM.legendCachyItem) DOM.legendCachyItem.style.display = 'none';
+
+      syncPortableSystemUI();
+      rebalancePartitionsInitial();
+      updateWizardUIControls();
+    }
+  }
+  window.selectPortableSystem = selectPortableSystem;
+
+  const rouletteItems = document.querySelectorAll('.roulette-item');
+  const rouletteHubImg = document.getElementById('rouletteHubImg');
+  const rouletteHubTitle = document.getElementById('rouletteHubTitle');
+  const rouletteHubSub = document.getElementById('rouletteHubSub');
+  const rouletteStage = document.querySelector('.roulette-stage');
+
+  function resetRouletteHub() {
+    if (rouletteHubImg) rouletteHubImg.src = '/media/sistemas.png';
+    if (rouletteHubTitle) rouletteHubTitle.textContent = getT('sys_choose_title', 'Elige tu Sistema');
+    if (rouletteHubSub) rouletteHubSub.textContent = getT('sys_choose_sub', 'Pasa el cursor o selecciona');
+  }
+
+  rouletteItems.forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      const name = item.dataset.name || '';
+      const sub = item.dataset.sub || '';
+      const icon = item.querySelector('.roulette-item-icon')?.getAttribute('src') || '/media/sistemas.png';
+      if (rouletteHubImg) rouletteHubImg.src = icon;
+      if (rouletteHubTitle) rouletteHubTitle.textContent = name;
+      if (rouletteHubSub) rouletteHubSub.textContent = sub;
+    });
+
+    item.addEventListener('mouseleave', () => {
+      resetRouletteHub();
+    });
+
+    item.addEventListener('click', () => {
+      if (item.classList.contains('disabled')) {
+        return;
+      }
+      selectPortableSystem(item.dataset.os);
+    });
   });
 
-  DOM.btnCachyHypr.addEventListener('click', () => {
-    State.cachyFlavor = 'hyprland';
-    DOM.btnCachyHypr.classList.add('active');
-    DOM.btnCachyKde.classList.remove('active');
-  });
+  if (rouletteStage) {
+    rouletteStage.addEventListener('mouseleave', () => {
+      resetRouletteHub();
+    });
+  }
+
+  if (DOM.btnCachyHypr) {
+    DOM.btnCachyHypr.addEventListener('click', () => {
+      switchCachyVideo('hyprland');
+    });
+  }
+
+  if (DOM.btnCachyKde) {
+    DOM.btnCachyKde.addEventListener('click', () => {
+      switchCachyVideo('kde');
+    });
+  }
+
+  if (DOM.btnChangeSystem) {
+    DOM.btnChangeSystem.addEventListener('click', () => {
+      State.portableSystemSelected = false;
+      syncPortableSystemUI();
+      updateWizardUIControls();
+    });
+  }
+
+  if (DOM.selectPortableOs) {
+    DOM.selectPortableOs.addEventListener('change', (e) => {
+      selectPortableSystem(e.target.value);
+    });
+  }
 
   // =========================================================================
   // 🎚️ LÓGICA DE PARTISIONADO REAL (HOLLOWDRIVE, SISTEMA, LIBRE)

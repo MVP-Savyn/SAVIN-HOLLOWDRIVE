@@ -1138,6 +1138,382 @@ body.nav-transitioning {
   letter-spacing: 0.5px;
 }
 
+/* =====================================================================
+   PASO 4: RULETA INTERACTIVA DE SISTEMAS PORTABLES
+   ===================================================================== */
+
+/* Contenedor flexible de la ruleta adaptado a cualquier relación de aspecto (16:10, 16:9, etc.) */
+.portable-roulette-wrap {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: visible;
+  padding: 8px 0;
+  animation: fadeInRoulette 0.35s ease;
+}
+
+@keyframes fadeInRoulette {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Escenario circular: calcula su radio según altura y anchura relativa para soportar 16:10, 16:9, etc. */
+.roulette-stage {
+  --roulette-radius: clamp(118px, min(22vh, 20vw), 170px);
+  --item-size: clamp(58px, min(8.5vh, 7.8vw), 72px);
+  position: relative;
+  width: calc(var(--roulette-radius) * 2 + var(--item-size) + 40px);
+  height: calc(var(--roulette-radius) * 2 + var(--item-size) + 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* Anillo orbital decorativo cyber-glow */
+.roulette-orbital-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--roulette-radius) * 2);
+  height: calc(var(--roulette-radius) * 2);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px dashed rgba(0, 212, 255, 0.35);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.12), inset 0 0 30px rgba(0, 212, 255, 0.06);
+  pointer-events: none;
+  animation: pulseOrbitalRing 4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseOrbitalRing {
+  0% { border-color: rgba(0, 212, 255, 0.25); box-shadow: 0 0 18px rgba(0, 212, 255, 0.08); }
+  100% { border-color: rgba(0, 212, 255, 0.55); box-shadow: 0 0 35px rgba(0, 212, 255, 0.22); }
+}
+
+/* Pista rotatoria con animación continua lenta */
+.roulette-track {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--roulette-radius) * 2);
+  height: calc(var(--roulette-radius) * 2);
+  margin-top: calc(-1 * var(--roulette-radius));
+  margin-left: calc(-1 * var(--roulette-radius));
+  border-radius: 50%;
+  animation: spinRouletteWheel 40s linear infinite;
+  transform-origin: center center;
+}
+
+/* Pausa instantánea al pasar el cursor sobre la ruleta */
+.roulette-stage:hover .roulette-track,
+.roulette-stage:hover .roulette-item-inner,
+.roulette-stage:hover .roulette-item-tooltip {
+  animation-play-state: paused !important;
+}
+
+@keyframes spinRouletteWheel {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes counterSpinRoulette {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* Cada ítem orbital posicionado en su ángulo correspondiente */
+.roulette-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--item-size);
+  height: var(--item-size);
+  margin-top: calc(var(--item-size) / -2);
+  margin-left: calc(var(--item-size) / -2);
+  transform: rotate(var(--item-angle, 0deg)) translateY(calc(-1 * var(--roulette-radius))) rotate(calc(-1 * var(--item-angle, 0deg)));
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Envoltorio interno que realiza la contra-rotación continua para mantenerse erguido */
+.roulette-item-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, #1e293b, #090e17 90%);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease, box-shadow 0.22s ease;
+  animation: counterSpinRoulette 40s linear infinite;
+  padding: 8px;
+}
+
+.roulette-item-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+  transition: transform 0.22s ease, filter 0.22s ease;
+  pointer-events: none;
+}
+
+/* Sistemas bloqueados (Próximamente) en escala de grises con buen contraste */
+.roulette-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.roulette-item.disabled .roulette-item-inner {
+  background: radial-gradient(circle at 30% 30%, #1e293b, #070c14 90%);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+.roulette-item.disabled .roulette-item-icon {
+  filter: grayscale(1) brightness(1.25) contrast(1.1) opacity(0.72);
+}
+
+.roulette-item.disabled:hover .roulette-item-inner {
+  transform: scale(1.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
+}
+
+/* CachyOS (Disponible, con brillo cian y color completo) */
+.roulette-item.available[data-os="cachyos"] .roulette-item-inner {
+  border-color: rgba(0, 212, 255, 0.6);
+  background: radial-gradient(circle at 30% 30%, #0d2c52, #041021 90%);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.35), inset 0 0 12px rgba(0, 212, 255, 0.18);
+}
+
+.roulette-item.available[data-os="cachyos"]:hover .roulette-item-inner {
+  transform: scale(1.18);
+  border-color: #00d4ff;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.7), inset 0 0 16px rgba(0, 212, 255, 0.4);
+}
+
+/* Ninguno (X Azul) */
+.roulette-item.item-none .roulette-item-inner {
+  border-color: rgba(56, 189, 248, 0.5);
+  background: radial-gradient(circle at 30% 30%, #0c2340, #030d1c 90%);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+}
+
+.roulette-item.item-none:hover .roulette-item-inner {
+  transform: scale(1.18);
+  border-color: #38bdf8;
+  box-shadow: 0 0 28px rgba(56, 189, 248, 0.6), inset 0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+.roulette-item.item-none .roulette-item-icon {
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+}
+
+/* Chip Tooltip con nombre de cada sistema en hover */
+.roulette-item-tooltip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(3, 7, 18, 0.95);
+  border: 1px solid rgba(0, 212, 255, 0.45);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 0 12px rgba(0, 212, 255, 0.22);
+  z-index: 30;
+  letter-spacing: 0.3px;
+  animation: counterSpinRoulette 40s linear infinite;
+}
+
+.roulette-item:hover .roulette-item-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-3px);
+}
+
+/* Núcleo Central de la Ruleta */
+.roulette-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(118px, min(17vh, 16vw), 154px);
+  height: clamp(118px, min(17vh, 16vw), 154px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #0f1c30, #030712 85%);
+  border: 2px solid rgba(0, 212, 255, 0.45);
+  box-shadow: 0 0 28px rgba(0, 212, 255, 0.28), inset 0 0 20px rgba(0, 212, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 5;
+  pointer-events: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.roulette-hub-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px;
+  max-width: 92%;
+}
+
+.roulette-hub-img {
+  width: clamp(28px, 4vh, 38px);
+  height: clamp(28px, 4vh, 38px);
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 212, 255, 0.35));
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.roulette-hub-title {
+  font-size: clamp(0.74rem, 0.95vw, 0.88rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  letter-spacing: 0.3px;
+  max-width: 100%;
+  text-align: center;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.roulette-hub-sub {
+  font-size: clamp(0.58rem, 0.72vw, 0.68rem);
+  font-weight: 600;
+  color: #94a3b8;
+  line-height: 1.12;
+  max-width: 100%;
+  text-align: center;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Vista Tarjeta cuando se selecciona Ninguno */
+.portable-none-wrap {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  animation: fadeInPortableNone 0.35s ease;
+}
+
+@keyframes fadeInPortableNone {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.portable-none-card {
+  max-width: 500px;
+  width: 92%;
+  background: radial-gradient(circle at 50% 25%, rgba(14, 165, 233, 0.12), rgba(3, 7, 18, 0.92) 80%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 30px rgba(14, 165, 233, 0.15);
+  border-radius: 14px;
+  padding: 22px 28px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.portable-none-icon-box {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(14, 165, 233, 0.1);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portable-none-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.6));
+}
+
+.portable-none-title {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.4px;
+  margin: 0;
+}
+
+.portable-none-desc {
+  font-size: 0.84rem;
+  line-height: 1.48;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.portable-none-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.18);
+}
+
+/* Botón Cambiar en el footer del asistente */
+.btn-change-system {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  color: #38bdf8;
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.18);
+  transition: all 0.2s ease;
+  font-size: 0.88rem;
+}
+
+.btn-change-system:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #38bdf8;
+  color: #fff;
+  box-shadow: 0 0 22px rgba(0, 212, 255, 0.4);
+  transform: translateY(-1px);
+}
+
 /* Salvaguarda visual para ocultar botón Instalar durante la ejecución del proceso */
 body.is-installing-active #btnInstalarRow,
 .install-active-hide {
