@@ -414,30 +414,8 @@
             <!-- Contenedor Principal de la Ruleta Interactiva (Gira lentamente hasta hover) -->
             <div class="portable-roulette-wrap" id="portableRouletteWrap">
               <div class="roulette-stage" id="rouletteStage">
-                <!-- Líneas fluctuantes orbitales al estilo PSP -->
-                <svg class="roulette-psp-waves" viewBox="0 0 400 400" fill="none">
-                  <defs>
-                    <linearGradient id="pspGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.85"/>
-                      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.35"/>
-                      <stop offset="100%" stop-color="#818cf8" stop-opacity="0.85"/>
-                    </linearGradient>
-                    <linearGradient id="pspGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
-                      <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.8"/>
-                      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.4"/>
-                    </linearGradient>
-                    <filter id="pspGlow" x="-30%" y="-30%" width="160%" height="160%">
-                      <feGaussianBlur stdDeviation="3.5" result="blur"/>
-                      <feMerge>
-                        <feMergeNode in="blur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                      </feMerge>
-                    </filter>
-                  </defs>
-                  <path class="psp-wave-line psp-wave-1" filter="url(#pspGlow)" stroke="url(#pspGrad1)" stroke-width="2" d="M 345 200 C 348.8 216.5, 351.8 236.9, 347.6 253.7 C 343.5 270.6, 332.9 289.0, 320.4 301.0 C 307.8 313.0, 288.7 320.6, 272.5 325.6 C 256.3 330.6, 239.0 330.0, 223.1 330.9 C 207.1 331.7, 192.9 331.7, 176.9 330.9 C 161.0 330.0, 143.7 330.6, 127.5 325.6 C 111.3 320.6, 92.2 313.0, 79.6 301.0 C 67.1 289.0, 56.5 270.6, 52.4 253.7 C 48.2 236.9, 51.2 216.5, 55.0 200.0 C 58.8 183.5, 67.9 168.8, 75.1 154.6 C 82.3 140.3, 89.5 127.9, 98.2 114.6 C 106.9 101.2, 115.1 86.0, 127.5 74.4 C 139.9 62.9, 156.1 50.1, 172.7 45.3 C 189.3 40.4, 210.7 40.4, 227.3 45.3 C 243.9 50.1, 260.1 62.9, 272.5 74.4 C 284.9 86.0, 293.1 101.2, 301.8 114.6 C 310.5 127.9, 317.7 140.3, 324.9 154.6 C 332.1 168.8, 341.2 183.5, 345.0 200.0 Z"/>
-                  <path class="psp-wave-line psp-wave-2" filter="url(#pspGlow)" stroke="url(#pspGrad2)" stroke-width="1.6" d="M 345 200 C 341.2 216.5, 332.1 231.2, 324.9 245.4 C 317.7 259.7, 310.5 272.1, 301.8 285.4 C 293.1 298.8, 284.9 314.0, 272.5 325.6 C 260.1 337.1, 243.9 349.9, 227.3 354.7 C 210.7 359.6, 189.3 359.6, 172.7 354.7 C 156.1 349.9, 139.9 337.1, 127.5 325.6 C 115.1 314.0, 106.9 298.8, 98.2 285.4 C 89.5 272.1, 82.3 259.7, 75.1 245.4 C 67.9 231.2, 58.8 216.5, 55.0 200.0 C 51.2 183.5, 48.2 163.1, 52.4 146.3 C 56.5 129.4, 67.1 111.0, 79.6 99.0 C 92.2 87.0, 111.3 79.4, 127.5 74.4 C 143.7 69.4, 161.0 70.0, 176.9 69.1 C 192.9 68.3, 207.1 68.3, 223.1 69.1 C 239.0 70.0, 256.3 69.4, 272.5 74.4 C 288.7 79.4, 307.8 87.0, 320.4 99.0 C 332.9 111.0, 343.5 129.4, 347.6 146.3 C 351.8 163.1, 348.8 183.5, 345.0 200.0 Z"/>
-                </svg>
+                <!-- Líneas fluctuantes orgánicas al estilo PSP en Canvas -->
+                <canvas class="roulette-psp-canvas" id="roulettePspCanvas"></canvas>
 
                 <!-- Pista rotatoria de opciones: 7 sistemas con ángulo de 51.43° -->
                 <div class="roulette-track" id="rouletteTrack">
@@ -927,7 +905,7 @@
         <!-- Barra Inferior de Navegación del Asistente -->
         <footer class="wizard-footer">
           <button class="btn-nav btn-prev" id="btnPrev">⬅ Volver al Menú</button>
-          <button class="btn-nav btn-change-system" id="btnChangeSystem" type="button" style="display: none;">🔄 Cambiar</button>
+          <button class="btn-nav btn-change-system" id="btnChangeSystem" type="button" style="display: none;">Cambiar</button>
           <button class="btn-nav btn-next" id="btnNext" disabled>Siguiente ➡</button>
           <button class="btn-nav btn-cancel-install" id="btnCancelInstallProcess" style="display: none;">❌ Cancelar instalación</button>
         </footer>

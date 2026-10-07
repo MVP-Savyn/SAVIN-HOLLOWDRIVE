@@ -1198,43 +1198,21 @@ body.nav-transitioning {
   overflow: visible;
 }
 
-/* Líneas fluctuantes orbitales al estilo PSP */
-.roulette-psp-waves {
+/* Líneas fluctuantes orgánicas al estilo PSP en Canvas */
+.roulette-psp-canvas {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: calc(var(--roulette-radius) * 2 + 36px);
-  height: calc(var(--roulette-radius) * 2 + 36px);
+  width: 100%;
+  height: 100%;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 2;
   overflow: visible;
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.5s ease;
 }
 
-.psp-wave-1 {
-  transform-origin: center center;
-  animation: pspWaveOscillate1 16s ease-in-out infinite alternate;
-}
-
-.psp-wave-2 {
-  transform-origin: center center;
-  animation: pspWaveOscillate2 22s ease-in-out infinite alternate;
-}
-
-@keyframes pspWaveOscillate1 {
-  0% { transform: rotate(0deg) scale(0.98); opacity: 0.55; }
-  50% { transform: rotate(180deg) scale(1.04); opacity: 0.95; }
-  100% { transform: rotate(360deg) scale(0.98); opacity: 0.55; }
-}
-
-@keyframes pspWaveOscillate2 {
-  0% { transform: rotate(0deg) scale(1.04); opacity: 0.7; }
-  50% { transform: rotate(-180deg) scale(0.96); opacity: 0.4; }
-  100% { transform: rotate(-360deg) scale(1.04); opacity: 0.7; }
-}
-
-/* Pista rotatoria con animación continua lenta */
+/* Pista rotatoria de sistemas: orientada según CSS variable --track-angle */
 .roulette-track {
   position: absolute;
   top: 50%;
@@ -1244,30 +1222,16 @@ body.nav-transitioning {
   margin-top: calc(-1 * var(--roulette-radius));
   margin-left: calc(-1 * var(--roulette-radius));
   border-radius: 50%;
-  animation: spinRouletteWheel 40s linear infinite;
+  transform: rotate(var(--track-angle, 0deg));
   transform-origin: center center;
   z-index: 10;
+  pointer-events: none;
 }
 
-/* Pausa instantánea al pasar el cursor sobre la ruleta */
-.roulette-stage:hover .roulette-track,
-.roulette-stage:hover .roulette-item-inner,
-.roulette-stage:hover .roulette-item-info-btn,
-.roulette-stage:hover .roulette-item-name-tag {
-  animation-play-state: paused !important;
-}
-
-@keyframes spinRouletteWheel {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes counterSpinRoulette {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(-360deg); }
-}
-
-/* Cada ítem orbital posicionado en su ángulo correspondiente */
+/* Cada ítem orbital posicionado en su ángulo correspondiente.
+   MANTENIENDO ORIENTACIÓN VERTICAL PERFECTA (0deg respecto a la pantalla):
+   rotate(var(--item-angle)) -> desplaza radialmente -> rotate(-(itemAngle + trackAngle))
+   Anula exactamente la rotación combinada de pista e ítem. */
 .roulette-item {
   --item-expand-offset: 0px;
   position: absolute;
@@ -1277,22 +1241,26 @@ body.nav-transitioning {
   height: var(--item-size);
   margin-top: calc(var(--item-size) / -2);
   margin-left: calc(var(--item-size) / -2);
-  transform: rotate(var(--item-angle, 0deg)) translateY(calc(-1 * (var(--roulette-radius) + var(--item-expand-offset)))) rotate(calc(-1 * var(--item-angle, 0deg)));
+  transform: rotate(var(--item-angle, 0deg)) 
+             translateY(calc(-1 * (var(--roulette-radius) + var(--item-expand-offset)))) 
+             rotate(calc(-1 * (var(--item-angle, 0deg) + var(--track-angle, 0deg))));
   cursor: pointer;
   z-index: 15;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.1s ease;
+  pointer-events: auto;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.1s ease;
 }
 
-/* Al pasar el ratón: se separan del centro y aumentan de tamaño */
-.roulette-item:hover {
-  --item-expand-offset: 28px;
-  z-index: 30;
+/* Al pasar el ratón o activarse su sector: se separa del centro y aumenta */
+.roulette-item:hover,
+.roulette-item.is-hovered {
+  --item-expand-offset: 32px;
+  z-index: 40;
 }
 
-/* Envoltorio interno: Blanco y negro por defecto con contra-rotación */
+/* Envoltorio interno: Blanco y negro por defecto, siempre orientado horizontal */
 .roulette-item-inner {
   width: 100%;
   height: 100%;
@@ -1303,10 +1271,11 @@ body.nav-transitioning {
   background: radial-gradient(circle at 30% 30%, #1e293b, #090e17 90%);
   border: 1.5px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
-  animation: counterSpinRoulette 40s linear infinite;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
   padding: 8px;
   filter: grayscale(1) brightness(0.85); /* Blanco y negro por defecto */
+  position: relative;
+  z-index: 2;
 }
 
 .roulette-item-icon {
@@ -1318,19 +1287,20 @@ body.nav-transitioning {
   pointer-events: none;
 }
 
-/* Hover en orbes: cogen color completo y resplandor */
-.roulette-item:hover .roulette-item-inner {
-  transform: scale(1.32);
-  filter: grayscale(0) brightness(1.1); /* Color completo en hover */
+/* Hover o sector activo: cogen color completo y resplandor */
+.roulette-item:hover .roulette-item-inner,
+.roulette-item.is-hovered .roulette-item-inner {
+  transform: scale(1.36);
+  filter: grayscale(0) brightness(1.15); /* Color completo */
   border-color: #00d4ff;
-  box-shadow: 0 0 28px rgba(0, 212, 255, 0.7), inset 0 0 14px rgba(0, 212, 255, 0.35);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.75), inset 0 0 16px rgba(0, 212, 255, 0.4);
 }
 
-/* Botón de Información [ ℹ ] arriba a la derecha del orbe */
+/* Botón de Información [ ℹ ] arriba a la derecha del orbe con animación de salida */
 .roulette-item-info-btn {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: -8px;
+  right: -8px;
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -1342,13 +1312,12 @@ body.nav-transitioning {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 35;
+  z-index: 1; /* Por debajo del orbe inicialmente */
   opacity: 0;
-  transform: scale(0.6);
+  transform: translate(-14px, 14px) scale(0.2); /* Animación de salir por debajo hacia fuera */
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   padding: 0;
-  animation: counterSpinRoulette 40s linear infinite;
 }
 
 .roulette-item-info-btn svg {
@@ -1357,23 +1326,26 @@ body.nav-transitioning {
   fill: currentColor;
 }
 
+/* Al estar en hover (o sector activo): el botón de info SALE por debajo hacia arriba a la derecha */
+.roulette-item:hover .roulette-item-info-btn,
+.roulette-item.is-hovered .roulette-item-info-btn {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+  pointer-events: auto;
+  z-index: 15;
+}
+
 .roulette-item-info-btn:hover {
   background: #00d4ff;
   color: #030712;
-  transform: scale(1.18) !important;
-  box-shadow: 0 0 18px rgba(0, 212, 255, 0.9);
+  transform: translate(0, 0) scale(1.18) !important;
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.95);
 }
 
-.roulette-item:hover .roulette-item-info-btn {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
-}
-
-/* Etiqueta con el nombre del sistema justo DEBAJO del orbe y centrada */
+/* Etiqueta con el nombre del sistema justo DEBAJO del orbe y perfectamente CENTRADA */
 .roulette-item-name-tag {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: rgba(3, 7, 18, 0.95);
@@ -1381,43 +1353,33 @@ body.nav-transitioning {
   color: #fff;
   font-size: 0.76rem;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.22s ease, transform 0.22s ease;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 12px rgba(0, 212, 255, 0.25);
-  z-index: 30;
+  z-index: 50;
   letter-spacing: 0.35px;
-  animation: counterSpinRoulette 40s linear infinite;
 }
 
-.roulette-item:hover .roulette-item-name-tag {
+.roulette-item:hover .roulette-item-name-tag,
+.roulette-item.is-hovered .roulette-item-name-tag {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(3px);
+  transform: translateX(-50%) translateY(2px);
 }
 
 /* =====================================================================
    CINEMATIC ABSORPTION & ZOOM ANIMATIONS
    ===================================================================== */
 
-/* Durante la animación: giro acelerado de absorción en la pista */
-.roulette-stage.is-animating-selection .roulette-track {
-  animation: vortexAbsorptionSpin 0.75s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-}
-
-@keyframes vortexAbsorptionSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(720deg); }
-}
-
 /* El orbe seleccionado se coloca en el centro y hace zoom */
 .roulette-item.is-selected-orb {
   z-index: 100 !important;
-  transform: rotate(0deg) translate(0, 0) !important;
+  transform: rotate(0deg) translate(0, 0) scale(1) !important;
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
@@ -1448,10 +1410,9 @@ body.nav-transitioning {
   transition: transform 0.65s ease !important;
 }
 
-.roulette-stage.is-animating-selection .roulette-psp-waves {
+.roulette-stage.is-animating-selection .roulette-psp-canvas {
   opacity: 0.15;
-  transform: translate(-50%, -50%) scale(0.6);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition: opacity 0.6s ease;
 }
 
 .roulette-flying-ghost {

@@ -520,7 +520,7 @@ function initApp() {
     if (DOM.optOsDebian) DOM.optOsDebian.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Debian');
     if (DOM.btnCachyHypr) DOM.btnCachyHypr.textContent = 'Hyprland';
     if (DOM.btnCachyKde) DOM.btnCachyKde.textContent = 'KDE';
-    if (DOM.btnChangeSystem) DOM.btnChangeSystem.textContent = L('btn_change_system', '🔄 Cambiar');
+    if (DOM.btnChangeSystem) DOM.btnChangeSystem.textContent = L('btn_change_system', 'Cambiar');
 
     // 7. Step 5: Método de Descarga
     if (DOM.downloadModeTitle) DOM.downloadModeTitle.textContent = L('dl_title', '¿Cómo deseas descargar los paquetes?');
@@ -2197,6 +2197,197 @@ function initApp() {
     });
   });
 
+  // =========================================================================
+  // 🌀 CONTROLADOR DE LA RULETA DE SISTEMAS PORTABLES, SECTORES Y LÍNEAS PSP
+  // =========================================================================
+  let rouletteTrackAngle = 0;
+  let isRoulettePaused = false;
+  let hoveredSectorIndex = -1;
+  let lastRouletteTimestamp = 0;
+  const rouletteItemsList = Array.from(document.querySelectorAll('.roulette-item'));
+  const totalRouletteItems = rouletteItemsList.length || 7;
+  const sectorStepDeg = 360 / totalRouletteItems;
+
+  function drawPspWaves(timeSec) {
+    const canvas = document.getElementById('roulettePspCanvas');
+    const stage = document.getElementById('rouletteStage');
+    if (!canvas || !stage || !canvas.getContext) return;
+
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (!width || !height) return;
+
+    const targetWidth = Math.round(width * dpr);
+    const targetHeight = Math.round(height * dpr);
+    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+    }
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, width, height);
+
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 140;
+
+    // Curva 1: Armónicos fluctuantes suaves estilo PSP Wave
+    ctx.beginPath();
+    const steps = 140;
+    for (let i = 0; i <= steps; i++) {
+      const theta = (i / steps) * Math.PI * 2;
+      const dr = 14 * Math.sin(3 * theta + timeSec * 1.3) +
+                 8 * Math.cos(2 * theta - timeSec * 0.9 + 1.0) +
+                 5 * Math.sin(5 * theta + timeSec * 0.6 + 2.2);
+      const r = radius + dr;
+      const x = cx + r * Math.sin(theta);
+      const y = cy - r * Math.cos(theta);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = '#00d4ff';
+    ctx.shadowColor = '#00d4ff';
+    ctx.shadowBlur = 12;
+    ctx.lineWidth = 2.2;
+    ctx.globalAlpha = 0.85;
+    ctx.stroke();
+
+    // Curva 2: Segundo armónico fluido desfasado (Onda dual PSP)
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const theta = (i / steps) * Math.PI * 2;
+      const dr = 16 * Math.cos(2 * theta + timeSec * 0.85 + 1.4) +
+                 9 * Math.sin(4 * theta - timeSec * 1.1 + 0.7) +
+                 6 * Math.cos(3 * theta + timeSec * 0.5 + 3.0);
+      const r = radius + dr;
+      const x = cx + r * Math.sin(theta);
+      const y = cy - r * Math.cos(theta);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = '#38bdf8';
+    ctx.shadowColor = '#818cf8';
+    ctx.shadowBlur = 10;
+    ctx.lineWidth = 1.6;
+    ctx.globalAlpha = 0.65;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function onRoulettePointerMove(e) {
+    const stage = document.getElementById('rouletteStage');
+    if (!stage || isSelectingOrb) return;
+
+    const rect = stage.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const radius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 140;
+    const itemSize = parseFloat(getComputedStyle(stage).getPropertyValue('--item-size')) || 64;
+    const innerHoleRadius = radius - (itemSize * 0.55); // Hueco interior según el diagrama del usuario
+    const outerLimitRadius = radius + itemSize + 40;   // Límite exterior de los sectores
+
+    // Solo se detiene el giro si el cursor está sobre la región de uno de los sistemas
+    if (dist >= innerHoleRadius && dist <= outerLimitRadius) {
+      const cursorAngleDeg = (Math.atan2(dy, dx) * 180 / Math.PI + 90 + 360) % 360;
+      let relAngleDeg = (cursorAngleDeg - rouletteTrackAngle) % 360;
+      if (relAngleDeg < 0) relAngleDeg += 360;
+
+      const sectorIdx = Math.round(relAngleDeg / sectorStepDeg) % totalRouletteItems;
+
+      if (sectorIdx !== hoveredSectorIndex) {
+        hoveredSectorIndex = sectorIdx;
+        rouletteItemsList.forEach((item, idx) => {
+          if (idx === sectorIdx) {
+            item.classList.add('is-hovered');
+          } else {
+            item.classList.remove('is-hovered');
+          }
+        });
+      }
+      isRoulettePaused = true;
+    } else {
+      // Dentro del hueco circular central o fuera del círculo, la ruleta gira sin pausar
+      if (hoveredSectorIndex !== -1) {
+        hoveredSectorIndex = -1;
+        rouletteItemsList.forEach(item => item.classList.remove('is-hovered'));
+      }
+      isRoulettePaused = false;
+    }
+  }
+
+  function onRoulettePointerLeave() {
+    if (hoveredSectorIndex !== -1) {
+      hoveredSectorIndex = -1;
+      rouletteItemsList.forEach(item => item.classList.remove('is-hovered'));
+    }
+    isRoulettePaused = false;
+  }
+
+  function onRouletteStageClick(e) {
+    if (isSelectingOrb) return;
+    if (e.target.closest('.roulette-item-info-btn')) return;
+
+    const clickedItem = e.target.closest('.roulette-item');
+    if (clickedItem) {
+      if (clickedItem.classList.contains('disabled')) return;
+      animateAndSelectPortableSystem(clickedItem);
+      return;
+    }
+
+    if (hoveredSectorIndex >= 0 && hoveredSectorIndex < rouletteItemsList.length) {
+      const activeItem = rouletteItemsList[hoveredSectorIndex];
+      if (activeItem && !activeItem.classList.contains('disabled')) {
+        animateAndSelectPortableSystem(activeItem);
+      }
+    }
+  }
+
+  const stageEl = document.getElementById('rouletteStage');
+  if (stageEl) {
+    stageEl.addEventListener('pointermove', onRoulettePointerMove);
+    stageEl.addEventListener('pointerleave', onRoulettePointerLeave);
+    stageEl.addEventListener('click', onRouletteStageClick);
+  }
+
+  function rouletteLoop(timestamp) {
+    if (!lastRouletteTimestamp) lastRouletteTimestamp = timestamp;
+    const dt = Math.min((timestamp - lastRouletteTimestamp) / 1000, 0.1);
+    lastRouletteTimestamp = timestamp;
+
+    const wrap = DOM.portableRouletteWrap || document.getElementById('portableRouletteWrap');
+    const track = DOM.rouletteTrack || document.getElementById('rouletteTrack');
+    const step4Pane = document.querySelector('.wizard-step-pane[data-step="4"]');
+    const isStep4Active = step4Pane && step4Pane.classList.contains('active');
+
+    if (isStep4Active && wrap && wrap.style.display !== 'none' && track) {
+      if (!isRoulettePaused && !isSelectingOrb) {
+        const degreesPerSecond = 360 / 40; // ~40s por vuelta completa
+        rouletteTrackAngle = (rouletteTrackAngle + degreesPerSecond * dt) % 360;
+        track.style.setProperty('--track-angle', `${rouletteTrackAngle.toFixed(3)}deg`);
+      } else if (isSelectingOrb) {
+        // En vórtice acelerado
+        rouletteTrackAngle = (rouletteTrackAngle + 720 * dt) % 360;
+        track.style.setProperty('--track-angle', `${rouletteTrackAngle.toFixed(3)}deg`);
+      }
+
+      drawPspWaves(timestamp / 1000);
+    }
+
+    requestAnimationFrame(rouletteLoop);
+  }
+
+  requestAnimationFrame(rouletteLoop);
+
   if (DOM.btnCachyHypr) {
     DOM.btnCachyHypr.addEventListener('click', () => {
       switchCachyVideo('hyprland');
@@ -2213,6 +2404,8 @@ function initApp() {
     DOM.btnChangeSystem.addEventListener('click', () => {
       State.portableSystemSelected = false;
       isSelectingOrb = false;
+      isRoulettePaused = false;
+      hoveredSectorIndex = -1;
 
       // Restaurar cabecera e icono del título
       const titleIcon = document.getElementById('paneTitleSystemIcon') || DOM.paneTitleSystemIcon;
@@ -2230,7 +2423,7 @@ function initApp() {
       const stage = document.querySelector('.roulette-stage');
       if (stage) stage.classList.remove('is-animating-selection');
       document.querySelectorAll('.roulette-item').forEach(item => {
-        item.classList.remove('is-selected-orb', 'is-absorbed-orb');
+        item.classList.remove('is-selected-orb', 'is-absorbed-orb', 'is-hovered');
         item.style.opacity = '';
       });
 
