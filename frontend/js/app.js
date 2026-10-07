@@ -13,6 +13,16 @@ function initApp() {
     return TRANSLATIONS[code] || TRANSLATIONS['es'] || {};
   }
 
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Estado reactivo central
   const State = {
     screen: 'hub',
@@ -47,6 +57,8 @@ function initApp() {
     toolsCachyFlavor: 'hyprland',
     toolsCachySize: 20.0,
     toolsIsOperating: false,
+    toolsIsoQueue: [],
+    toolsActiveTasks: {},
     
     // Idioma
     currentLang: 'es',
@@ -277,13 +289,19 @@ function initApp() {
     btnRefreshToolsUsb: document.getElementById('btnRefreshToolsUsb'),
     btnBackFromTools: document.getElementById('btnBackFromTools'),
     
-    // HollowTools - Tarjeta 1: ISOs
+    // HollowTools - Tarjeta 1: ISOs & Cola
     toolsCardIsoTitle: document.getElementById('toolsCardIsoTitle'),
     btnInfoToolsIso: document.getElementById('btnInfoToolsIso'),
     toolsDropZone: document.getElementById('toolsDropZone'),
     toolsDropMsg: document.getElementById('toolsDropMsg'),
     btnPlusIso: document.getElementById('btnPlusIso'),
     fileInputIsos: document.getElementById('fileInputIsos'),
+    toolsIsoQueueBlock: document.getElementById('toolsIsoQueueBlock'),
+    toolsQueueCount: document.getElementById('toolsQueueCount'),
+    btnPlusMoreIso: document.getElementById('btnPlusMoreIso'),
+    btnClearIsoQueue: document.getElementById('btnClearIsoQueue'),
+    toolsIsoList: document.getElementById('toolsIsoList'),
+    btnInjectIsos: document.getElementById('btnInjectIsos'),
     
     // HollowTools - Tarjeta 2: Paquetes
     toolsCardPacksTitle: document.getElementById('toolsCardPacksTitle'),
@@ -320,11 +338,10 @@ function initApp() {
     toolsBarFuturoInfo: document.getElementById('toolsBarFuturoInfo'),
     toolsBarFuturo: document.getElementById('toolsBarFuturo'),
     
-    // HollowTools - Monitor de Operaciones
+    // HollowTools - Monitor de Operaciones Multitarea
     toolsMonitorCard: document.getElementById('toolsMonitorCard'),
-    toolsMonitorMsg: document.getElementById('toolsMonitorMsg'),
-    toolsMonitorPct: document.getElementById('toolsMonitorPct'),
-    toolsProgressFill: document.getElementById('toolsProgressFill'),
+    toolsTasksCount: document.getElementById('toolsTasksCount'),
+    toolsTasksList: document.getElementById('toolsTasksList'),
     btnCancelToolsOp: document.getElementById('btnCancelToolsOp'),
     
     // HollowTools - Modales Info
@@ -3171,43 +3188,155 @@ function initApp() {
   // =========================================================================
   // 🛠️ CONTROLADOR HOLLOWTOOLS (MANTENIMIENTO, ISOs, PAQUETES, CACHYOS)
   // =========================================================================
-  function showToolsMonitor(msg, progress = 0) {
+  function updateToolsTask(taskKey = 'copy_isos', msg = 'Procesando...', progress = 0) {
+    if (!State.toolsActiveTasks) State.toolsActiveTasks = {};
+    const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
+    
+    State.toolsActiveTasks[taskKey] = {
+      message: msg,
+      progress: pct
+    };
     State.toolsIsOperating = true;
+
+    // Bloquear controles globales mientras haya alguna operación activa
     if (DOM.btnBackFromTools) {
       DOM.btnBackFromTools.disabled = true;
       DOM.btnBackFromTools.classList.add('disabled');
       DOM.btnBackFromTools.setAttribute('title', 'Operación en curso: no se puede salir de HollowTools');
     }
-    if (DOM.toolsMonitorCard) {
-      DOM.toolsMonitorCard.style.display = 'block';
-      if (DOM.toolsMonitorMsg) DOM.toolsMonitorMsg.textContent = msg || 'Procesando operación...';
-      const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
-      if (DOM.toolsMonitorPct) DOM.toolsMonitorPct.textContent = `${pct}%`;
-      if (DOM.toolsProgressFill) DOM.toolsProgressFill.style.width = `${pct}%`;
-    }
-    if (DOM.btnInjectPacks) DOM.btnInjectPacks.disabled = true;
-    if (DOM.btnApplyCachy) DOM.btnApplyCachy.disabled = true;
-    if (DOM.btnPlusIso) DOM.btnPlusIso.disabled = true;
     if (DOM.toolsUsbSelect) DOM.toolsUsbSelect.disabled = true;
     if (DOM.btnRefreshToolsUsb) DOM.btnRefreshToolsUsb.disabled = true;
+
+    // Desactivar selectivamente el botón de la tarea en ejecución (las demás siguen habilitadas)
+    if (taskKey === 'copy_isos') {
+      if (DOM.btnInjectIsos) {
+        DOM.btnInjectIsos.disabled = true;
+        DOM.btnInjectIsos.textContent = 'Copiando ISOs...';
+      }
+    } else if (taskKey === 'inject_packages') {
+      if (DOM.btnInjectPacks) {
+        DOM.btnInjectPacks.disabled = true;
+        DOM.btnInjectPacks.textContent = 'Inyectando Paquetes...';
+      }
+    } else if (taskKey === 'cachyos') {
+      if (DOM.btnApplyCachy) {
+        DOM.btnApplyCachy.disabled = true;
+        DOM.btnApplyCachy.textContent = 'Procesando CachyOS...';
+      }
+    }
+
+    if (DOM.toolsMonitorCard) {
+      DOM.toolsMonitorCard.style.display = 'flex';
+      renderToolsTasksMonitor();
+    }
   }
 
-  function hideToolsMonitor() {
-    State.toolsIsOperating = false;
-    if (DOM.btnBackFromTools) {
-      DOM.btnBackFromTools.disabled = false;
-      DOM.btnBackFromTools.classList.remove('disabled');
-      DOM.btnBackFromTools.removeAttribute('title');
+  function finishToolsTask(taskKey = null) {
+    if (!State.toolsActiveTasks) State.toolsActiveTasks = {};
+    if (taskKey) {
+      delete State.toolsActiveTasks[taskKey];
+    } else {
+      State.toolsActiveTasks = {};
     }
-    if (DOM.toolsMonitorCard) {
-      DOM.toolsMonitorCard.style.display = 'none';
-      if (DOM.toolsProgressFill) DOM.toolsProgressFill.style.width = '0%';
+
+    // Restaurar selectivamente botones terminados
+    if (!State.toolsActiveTasks['copy_isos']) {
+      if (DOM.btnInjectIsos) {
+        DOM.btnInjectIsos.disabled = false;
+        const qCount = State.toolsIsoQueue ? State.toolsIsoQueue.length : 0;
+        DOM.btnInjectIsos.textContent = qCount === 1 ? 'Inyectar 1 ISO' : `Inyectar ${qCount} ISOs`;
+      }
     }
-    if (DOM.btnInjectPacks) DOM.btnInjectPacks.disabled = false;
-    if (DOM.btnApplyCachy) DOM.btnApplyCachy.disabled = false;
-    if (DOM.btnPlusIso) DOM.btnPlusIso.disabled = false;
-    if (DOM.toolsUsbSelect) DOM.toolsUsbSelect.disabled = false;
-    if (DOM.btnRefreshToolsUsb) DOM.btnRefreshToolsUsb.disabled = false;
+    if (!State.toolsActiveTasks['inject_packages']) {
+      if (DOM.btnInjectPacks) {
+        DOM.btnInjectPacks.disabled = false;
+        DOM.btnInjectPacks.textContent = 'Inyectar Seleccionados';
+      }
+    }
+    if (!State.toolsActiveTasks['cachyos']) {
+      if (DOM.btnApplyCachy) {
+        DOM.btnApplyCachy.disabled = false;
+        const txt = DOM.toolsBtnApplyText ? DOM.toolsBtnApplyText.textContent : 'Aplicar';
+        DOM.btnApplyCachy.textContent = txt || 'Aplicar';
+      }
+    }
+
+    const remainingKeys = Object.keys(State.toolsActiveTasks);
+    if (remainingKeys.length === 0) {
+      State.toolsIsOperating = false;
+      if (DOM.btnBackFromTools) {
+        DOM.btnBackFromTools.disabled = false;
+        DOM.btnBackFromTools.classList.remove('disabled');
+        DOM.btnBackFromTools.removeAttribute('title');
+      }
+      if (DOM.toolsUsbSelect) DOM.toolsUsbSelect.disabled = false;
+      if (DOM.btnRefreshToolsUsb) DOM.btnRefreshToolsUsb.disabled = false;
+      if (DOM.toolsMonitorCard) {
+        DOM.toolsMonitorCard.style.display = 'none';
+      }
+    } else {
+      renderToolsTasksMonitor();
+    }
+  }
+
+  function renderToolsTasksMonitor() {
+    if (!DOM.toolsTasksList) return;
+    const taskKeys = Object.keys(State.toolsActiveTasks || {});
+    if (DOM.toolsTasksCount) {
+      DOM.toolsTasksCount.textContent = `${taskKeys.length} ${taskKeys.length === 1 ? 'activa' : 'activas'}`;
+    }
+
+    const taskLabels = {
+      copy_isos: 'ISOs',
+      inject_packages: 'Paquetes',
+      cachyos: 'CachyOS'
+    };
+
+    DOM.toolsTasksList.innerHTML = taskKeys.map(k => {
+      const t = State.toolsActiveTasks[k];
+      const badgeText = taskLabels[k] || k.toUpperCase();
+      return `
+        <div class="tools-task-item" id="taskRow_${k}">
+          <div class="tools-task-head">
+            <div class="tools-task-title-group">
+              <span class="tools-task-badge badge-${k}">${badgeText}</span>
+              <span class="tools-task-msg" title="${escapeHtml(t.message)}">${escapeHtml(t.message)}</span>
+            </div>
+            <div class="tools-task-meta">
+              <span class="tools-task-pct">${t.progress}%</span>
+              <button type="button" class="btn-cancel-task" data-task="${k}" title="Cancelar esta tarea">✕ Cancelar</button>
+            </div>
+          </div>
+          <div class="tools-progress-track">
+            <div class="tools-progress-fill fill-${k}" style="width: ${t.progress}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    DOM.toolsTasksList.querySelectorAll('.btn-cancel-task').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const tKey = btn.getAttribute('data-task');
+        const confirmed = await showCustomConfirm({
+          title: "CANCELAR OPERACIÓN",
+          message: `¿Deseas cancelar la operación en curso de <strong>${taskLabels[tKey] || tKey}</strong>?`,
+          okText: "Sí, cancelar",
+          isDanger: true
+        });
+        if (confirmed) {
+          await window.hollowdrive.cancelToolsAction(tKey);
+        }
+      });
+    });
+  }
+
+  function showToolsMonitor(msg, progress = 0, taskKey = 'copy_isos') {
+    updateToolsTask(taskKey, msg, progress);
+  }
+
+  function hideToolsMonitor(taskKey = null) {
+    finishToolsTask(taskKey);
   }
 
   async function loadHollowToolsDisks() {
@@ -3548,47 +3677,147 @@ function initApp() {
     DOM.btnInfoToolsCachy.addEventListener('click', () => openModal(DOM.modalToolsCachy));
   }
 
-  // Tarjeta 1: Gestor de ISOs
-  const handleIsoFilePaths = async (paths) => {
+  // =========================================================================
+  // 📦 GESTIÓN DE COLA DE ISOs (ACUMULATIVA)
+  // =========================================================================
+  async function addIsosToQueue(paths) {
     if (!paths || paths.length === 0) return;
-    if (!State.toolsSelectedDisk) {
-      await showCustomAlert("UNIDAD NO SELECCIONADA", "Por favor, selecciona primero una unidad HOLLOWDRIVE.");
+    if (!State.toolsIsoQueue) State.toolsIsoQueue = [];
+
+    // Evitar añadir exactamente los mismos archivos duplicados
+    const existingPaths = new Set(State.toolsIsoQueue.map(item => item.path.toLowerCase()));
+    const newPaths = paths.filter(p => !existingPaths.has(p.toLowerCase()));
+
+    if (newPaths.length === 0) {
+      await showCustomAlert("ISOs YA EN COLA", "Los archivos ISO seleccionados ya están incluidos en la lista para inyectar.");
       return;
     }
-    const count = paths.length;
-    const ok = await showCustomConfirm({
-      title: "COPIAR IMÁGENES ISO",
-      message: `¿Deseas volcar <strong>${count}</strong> archivo(s) ISO a la partición <strong>HOLLOWDRIVE\\OSimages</strong>?`,
-      okText: "Copiar Archivos"
-    });
-    if (!ok) return;
 
-    showToolsMonitor("Iniciando copia de archivos ISO...", 0.02);
-    const res = await window.hollowdrive.copyIsos(State.toolsSelectedDisk, paths);
-    if (!res.success) {
-      hideToolsMonitor();
-      await showCustomAlert("ERROR AL COPIAR", "Error al iniciar la copia de ISOs: " + (res.error || "Desconocido"));
+    try {
+      const filesInfo = await window.hollowdrive.getFilesInfo(newPaths);
+      if (filesInfo && filesInfo.length > 0) {
+        filesInfo.forEach(info => {
+          State.toolsIsoQueue.push({
+            path: info.path,
+            name: info.name || (info.path.split(/[/\\]/).pop()),
+            size_str: info.size_str || ''
+          });
+        });
+      } else {
+        newPaths.forEach(p => {
+          State.toolsIsoQueue.push({
+            path: p,
+            name: p.split(/[/\\]/).pop(),
+            size_str: ''
+          });
+        });
+      }
+    } catch (err) {
+      newPaths.forEach(p => {
+        State.toolsIsoQueue.push({
+          path: p,
+          name: p.split(/[/\\]/).pop(),
+          size_str: ''
+        });
+      });
+    }
+
+    renderIsoQueue();
+  }
+
+  function removeIsoFromQueue(index) {
+    if (!State.toolsIsoQueue) return;
+    State.toolsIsoQueue.splice(index, 1);
+    renderIsoQueue();
+  }
+
+  function clearIsoQueue() {
+    State.toolsIsoQueue = [];
+    renderIsoQueue();
+  }
+
+  function renderIsoQueue() {
+    const queue = State.toolsIsoQueue || [];
+    const count = queue.length;
+
+    if (count === 0) {
+      if (DOM.toolsIsoQueueBlock) DOM.toolsIsoQueueBlock.style.display = 'none';
+      if (DOM.toolsDropZone) DOM.toolsDropZone.style.display = 'flex';
+      return;
+    }
+
+    if (DOM.toolsDropZone) DOM.toolsDropZone.style.display = 'none';
+    if (DOM.toolsIsoQueueBlock) DOM.toolsIsoQueueBlock.style.display = 'flex';
+
+    if (DOM.toolsQueueCount) {
+      DOM.toolsQueueCount.textContent = `${count} ${count === 1 ? 'ISO seleccionada' : 'ISOs seleccionadas'}`;
+    }
+
+    if (DOM.btnInjectIsos) {
+      const isCopying = State.toolsActiveTasks && State.toolsActiveTasks['copy_isos'];
+      if (!isCopying) {
+        DOM.btnInjectIsos.disabled = false;
+        DOM.btnInjectIsos.textContent = count === 1 ? 'Inyectar 1 ISO' : `Inyectar ${count} ISOs`;
+      }
+    }
+
+    if (DOM.toolsIsoList) {
+      DOM.toolsIsoList.innerHTML = queue.map((item, idx) => `
+        <div class="tools-iso-item">
+          <div class="iso-item-left">
+            <svg class="iso-file-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <span class="iso-item-name" title="${escapeHtml(item.path)}">${escapeHtml(item.name)}</span>
+          </div>
+          <div class="iso-item-right">
+            ${item.size_str ? `<span class="iso-item-size">${escapeHtml(item.size_str)}</span>` : ''}
+            <button type="button" class="btn-remove-iso" data-index="${idx}" title="Eliminar de la lista">✕</button>
+          </div>
+        </div>
+      `).join('');
+
+      DOM.toolsIsoList.querySelectorAll('.btn-remove-iso').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.getAttribute('data-index'), 10);
+          removeIsoFromQueue(idx);
+        });
+      });
+    }
+  }
+
+  // --- LISTENERS TARJETA 1: GESTOR DE ISOs ---
+  const triggerPickIso = async () => {
+    try {
+      const picked = await window.hollowdrive.pickIsoFiles();
+      if (picked && picked.length > 0) {
+        await addIsosToQueue(picked);
+      } else if (DOM.fileInputIsos) {
+        DOM.fileInputIsos.click();
+      }
+    } catch (err) {
+      console.error("Error seleccionando ISOs:", err);
+      if (DOM.fileInputIsos) DOM.fileInputIsos.click();
     }
   };
 
   if (DOM.btnPlusIso) {
     DOM.btnPlusIso.addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (!State.toolsSelectedDisk) {
-        await showCustomAlert("UNIDAD NO SELECCIONADA", "Por favor, selecciona primero una unidad HOLLOWDRIVE.");
-        return;
-      }
-      try {
-        const picked = await window.hollowdrive.pickIsoFiles();
-        if (picked && picked.length > 0) {
-          await handleIsoFilePaths(picked);
-        } else if (DOM.fileInputIsos) {
-          DOM.fileInputIsos.click();
-        }
-      } catch (err) {
-        console.error("Error seleccionando ISOs:", err);
-        if (DOM.fileInputIsos) DOM.fileInputIsos.click();
-      }
+      await triggerPickIso();
+    });
+  }
+
+  if (DOM.btnPlusMoreIso) {
+    DOM.btnPlusMoreIso.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await triggerPickIso();
+    });
+  }
+
+  if (DOM.btnClearIsoQueue) {
+    DOM.btnClearIsoQueue.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearIsoQueue();
     });
   }
 
@@ -3597,23 +3826,28 @@ function initApp() {
       const files = Array.from(e.target.files || []);
       if (files.length === 0) return;
       const paths = files.map(f => f.path || f.name);
-      await handleIsoFilePaths(paths);
+      await addIsosToQueue(paths);
       e.target.value = '';
     });
   }
 
-  if (DOM.toolsDropZone) {
-    DOM.toolsDropZone.addEventListener('dragover', (e) => {
+  // Arrastrar y soltar archivos ISO en la tarjeta
+  const cardGestorIso = document.querySelector('.card-gestor-iso');
+  if (cardGestorIso) {
+    cardGestorIso.addEventListener('dragover', (e) => {
       e.preventDefault();
-      DOM.toolsDropZone.classList.add('drag-over');
+      if (DOM.toolsDropZone) DOM.toolsDropZone.classList.add('drag-over');
+      if (DOM.toolsIsoQueueBlock) DOM.toolsIsoQueueBlock.classList.add('drag-over');
     });
-    DOM.toolsDropZone.addEventListener('dragleave', (e) => {
+    cardGestorIso.addEventListener('dragleave', (e) => {
       e.preventDefault();
-      DOM.toolsDropZone.classList.remove('drag-over');
+      if (DOM.toolsDropZone) DOM.toolsDropZone.classList.remove('drag-over');
+      if (DOM.toolsIsoQueueBlock) DOM.toolsIsoQueueBlock.classList.remove('drag-over');
     });
-    DOM.toolsDropZone.addEventListener('drop', async (e) => {
+    cardGestorIso.addEventListener('drop', async (e) => {
       e.preventDefault();
-      DOM.toolsDropZone.classList.remove('drag-over');
+      if (DOM.toolsDropZone) DOM.toolsDropZone.classList.remove('drag-over');
+      if (DOM.toolsIsoQueueBlock) DOM.toolsIsoQueueBlock.classList.remove('drag-over');
       if (e.dataTransfer && e.dataTransfer.files) {
         const files = Array.from(e.dataTransfer.files).filter(f => f.name.toLowerCase().endsWith('.iso'));
         if (files.length === 0) {
@@ -3621,7 +3855,37 @@ function initApp() {
           return;
         }
         const paths = files.map(f => f.path || f.name);
-        await handleIsoFilePaths(paths);
+        await addIsosToQueue(paths);
+      }
+    });
+  }
+
+  // Inyectar la cola acumulada de ISOs
+  if (DOM.btnInjectIsos) {
+    DOM.btnInjectIsos.addEventListener('click', async () => {
+      if (!State.toolsSelectedDisk) {
+        await showCustomAlert("UNIDAD NO SELECCIONADA", "Por favor, selecciona primero una unidad HOLLOWDRIVE.");
+        return;
+      }
+      const queue = State.toolsIsoQueue || [];
+      if (queue.length === 0) {
+        await showCustomAlert("COLA VACÍA", "No hay imágenes ISO en la lista para inyectar.");
+        return;
+      }
+      const count = queue.length;
+      const ok = await showCustomConfirm({
+        title: "INYECCIÓN DE ISOs",
+        message: `¿Deseas inyectar <strong>${count}</strong> archivo(s) ISO a la partición <strong>HOLLOWDRIVE\\OSimages</strong>?`,
+        okText: count === 1 ? "Inyectar ISO" : "Inyectar ISOs"
+      });
+      if (!ok) return;
+
+      const pathsToCopy = queue.map(item => item.path);
+      updateToolsTask('copy_isos', 'Iniciando copia de archivos ISO...', 0.02);
+      const res = await window.hollowdrive.copyIsos(State.toolsSelectedDisk, pathsToCopy);
+      if (!res.success) {
+        finishToolsTask('copy_isos');
+        await showCustomAlert("ERROR AL COPIAR", "Error al iniciar la copia de ISOs: " + (res.error || "Desconocido"));
       }
     });
   }
@@ -3648,10 +3912,10 @@ function initApp() {
       });
       if (!ok) return;
 
-      showToolsMonitor("Iniciando inyección de paquetes...", 0.05);
+      updateToolsTask('inject_packages', 'Iniciando inyección de paquetes...', 0.05);
       const res = await window.hollowdrive.injectToolsPackages(State.toolsSelectedDisk, installBato, installPack);
       if (!res.success) {
-        hideToolsMonitor();
+        finishToolsTask('inject_packages');
         await showCustomAlert("ERROR EN INYECCIÓN", "Error al iniciar la inyección: " + (res.error || "Desconocido"));
       }
     });
@@ -3711,10 +3975,10 @@ function initApp() {
         });
         if (!confirmed) return;
 
-        showToolsMonitor("Preparando actualización de CachyOS...", 0.05);
+        updateToolsTask('cachyos', 'Preparando actualización de CachyOS...', 0.05);
         const res = await window.hollowdrive.cachyosToolsAction(State.toolsSelectedDisk, 'actualizar', State.toolsCachyFlavor, 0);
         if (!res.success) {
-          hideToolsMonitor();
+          finishToolsTask('cachyos');
           await showCustomAlert("ERROR EN ACTUALIZACIÓN", "Error iniciando actualización: " + (res.error || "Desconocido"));
         }
       } else {
@@ -3726,10 +3990,10 @@ function initApp() {
         });
         if (!confirmed) return;
 
-        showToolsMonitor("Preparando instalación de CachyOS...", 0.05);
+        updateToolsTask('cachyos', 'Preparando instalación de CachyOS...', 0.05);
         const res = await window.hollowdrive.cachyosToolsAction(State.toolsSelectedDisk, 'instalar', State.toolsCachyFlavor, State.toolsCachySize);
         if (!res.success) {
-          hideToolsMonitor();
+          finishToolsTask('cachyos');
           await showCustomAlert("ERROR EN INSTALACIÓN", "Error iniciando instalación: " + (res.error || "Desconocido"));
         }
       }
@@ -3740,24 +4004,29 @@ function initApp() {
   if (DOM.btnCancelToolsOp) {
     DOM.btnCancelToolsOp.addEventListener('click', async () => {
       const ok = await showCustomConfirm({
-        title: "CANCELAR OPERACIÓN",
-        message: "¿Estás seguro de que deseas cancelar la operación en curso de HollowTools?",
-        okText: "Sí, cancelar",
+        title: "CANCELAR TODAS LAS OPERACIONES",
+        message: "¿Estás seguro de que deseas cancelar todas las operaciones en curso de HollowTools?",
+        okText: "Sí, cancelar todas",
         isDanger: true
       });
       if (ok) {
-        await window.hollowdrive.cancelToolsAction();
+        await window.hollowdrive.cancelToolsAction(null);
       }
     });
   }
 
   // Escuchadores de eventos emitidos desde Python para HollowTools
   window.hollowdrive.on('tools_progress', (data) => {
-    showToolsMonitor(data.message || 'Procesando...', data.progress || 0);
+    const taskKey = (data && data.task) ? data.task : 'copy_isos';
+    updateToolsTask(taskKey, data.message || 'Procesando...', data.progress || 0);
   });
 
   window.hollowdrive.on('tools_success', async (data) => {
-    hideToolsMonitor();
+    const taskKey = (data && data.task) ? data.task : 'copy_isos';
+    finishToolsTask(taskKey);
+    if (taskKey === 'copy_isos') {
+      clearIsoQueue();
+    }
     await showCustomAlert("OPERACIÓN COMPLETADA", data.message || "¡Operación completada con éxito!");
     if (State.toolsSelectedDisk) {
       onToolsDiskSelected(State.toolsSelectedDisk);
@@ -3765,12 +4034,14 @@ function initApp() {
   });
 
   window.hollowdrive.on('tools_error', async (data) => {
-    hideToolsMonitor();
+    const taskKey = (data && data.task) ? data.task : 'copy_isos';
+    finishToolsTask(taskKey);
     await showCustomAlert("ERROR EN OPERACIÓN", "Error en la operación: " + (data.error || "Error desconocido"));
   });
 
-  window.hollowdrive.on('tools_cancel', async () => {
-    hideToolsMonitor();
+  window.hollowdrive.on('tools_cancel', async (data) => {
+    const taskKey = (data && data.task) ? data.task : null;
+    finishToolsTask(taskKey);
     await showCustomAlert("OPERACIÓN CANCELADA", "Operación cancelada por el usuario.");
   });
 

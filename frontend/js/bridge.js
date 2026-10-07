@@ -193,6 +193,11 @@
       return res || [];
     },
 
+    async getFilesInfo(filePaths) {
+      const res = await this._call('get_files_info', filePaths);
+      return res || [];
+    },
+
     async copyIsos(diskIndex, filePaths) {
       const res = await this._call('copy_isos', diskIndex, filePaths);
       return res || { success: false, error: "API no disponible" };
@@ -208,8 +213,8 @@
       return res || { success: false, error: "API no disponible" };
     },
 
-    async cancelToolsAction() {
-      const res = await this._call('cancel_tools_action');
+    async cancelToolsAction(taskType = null) {
+      const res = await this._call('cancel_tools_action', taskType);
       return res || { success: false };
     },
 

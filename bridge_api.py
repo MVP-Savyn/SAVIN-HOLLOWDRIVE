@@ -41,6 +41,12 @@ class BridgeApi:
         self._abort_addons = False
         self._tools_thread = None
         self._abort_tools = False
+        self._iso_thread = None
+        self._abort_iso = False
+        self._packages_thread = None
+        self._abort_packages = False
+        self._cachy_thread = None
+        self._abort_cachy = False
         self._disks_cache = {}
         self._disks_cache_lock = threading.Lock()
         self._disks_active_event = None
@@ -704,14 +710,52 @@ class BridgeApi:
             logging.error(f"[BRIDGE] Error en pick_iso_files: {e}")
             return []
 
+    def get_files_info(self, file_paths):
+        """Devuelve nombres y tamaños formateados de una lista de archivos para la cola de ISOs."""
+        results = []
+        if not isinstance(file_paths, list):
+            return results
+        for p in file_paths:
+            try:
+                if p and os.path.exists(p) and os.path.isfile(p):
+                    sz = os.path.getsize(p)
+                    if sz >= 1024 * 1024 * 1024:
+                        sz_str = f"{sz / (1024 * 1024 * 1024):.2f} GB"
+                    elif sz >= 1024 * 1024:
+                        sz_str = f"{sz / (1024 * 1024):.1f} MB"
+                    else:
+                        sz_str = f"{sz / 1024:.1f} KB"
+                    results.append({
+                        "path": p,
+                        "name": os.path.basename(p),
+                        "size_bytes": sz,
+                        "size_str": sz_str
+                    })
+                else:
+                    results.append({
+                        "path": p,
+                        "name": os.path.basename(p) if p else "Desconocido",
+                        "size_bytes": 0,
+                        "size_str": "Desconocido"
+                    })
+            except Exception as e:
+                logging.error(f"[BRIDGE] Error en get_files_info para {p}: {e}")
+                results.append({
+                    "path": p,
+                    "name": os.path.basename(p) if p else "Error",
+                    "size_bytes": 0,
+                    "size_str": "Error"
+                })
+        return results
+
     def copy_isos(self, disk_index, file_paths):
-        if self._tools_thread and self._tools_thread.is_alive():
-            return {"success": False, "error": "Ya hay una operación de HollowTools en curso"}
+        if self._iso_thread and self._iso_thread.is_alive():
+            return {"success": False, "error": "Ya hay una copia de ISOs en curso"}
 
         if not file_paths:
             return {"success": False, "error": "No se proporcionaron archivos ISO para copiar"}
 
-        self._abort_tools = False
+        self._abort_iso = False
 
         def worker():
             try:
@@ -726,7 +770,10 @@ class BridgeApi:
                     letra = asignar_letra_particion_ps(disk_index, 1)
 
                 if not letra:
-                    self._emit_event("tools_error", {"error": "No se pudo encontrar ni asignar letra para HOLLOWDRIVE"})
+                    self._emit_event("tools_error", {
+                        "task": "copy_isos",
+                        "error": "No se pudo encontrar ni asignar letra para HOLLOWDRIVE"
+                    })
                     return
 
                 letra_clean = letra.rstrip("\\").rstrip("/")
@@ -737,8 +784,8 @@ class BridgeApi:
                 exitosos = 0
 
                 for idx, iso_path in enumerate(file_paths, 1):
-                    if self._abort_tools:
-                        self._emit_event("tools_cancel", {})
+                    if self._abort_iso:
+                        self._emit_event("tools_cancel", {"task": "copy_isos"})
                         return
 
                     nombre_iso = os.path.basename(iso_path)
@@ -757,13 +804,13 @@ class BridgeApi:
                             "filename": nombre_iso,
                             "progress": pct_global,
                             "mb_s": round(mb_s, 1),
-                            "message": f"Copiando ISO ({idx}/{total_files}): {nombre_iso} ({pct_file*100:.1f}%)"
+                            "message": f"Copiando ({idx}/{total_files}): {nombre_iso} ({pct_file*100:.1f}%)"
                         })
 
                     copiar_iso_ultrarrapido(
                         iso_path, ruta_dst,
                         callback_progreso=cb,
-                        abort_check=lambda: self._abort_tools
+                        abort_check=lambda: self._abort_iso
                     )
                     exitosos += 1
 
@@ -772,23 +819,23 @@ class BridgeApi:
                     "message": f"¡{exitosos} archivo(s) ISO volcado(s) con éxito en:\n{destino_osimages}!"
                 })
             except InterruptedError:
-                self._emit_event("tools_cancel", {})
+                self._emit_event("tools_cancel", {"task": "copy_isos"})
             except Exception as e:
                 logging.error(f"[BRIDGE] Error en copy_isos worker: {e}")
-                self._emit_event("tools_error", {"error": str(e)})
+                self._emit_event("tools_error", {"task": "copy_isos", "error": str(e)})
 
-        self._tools_thread = threading.Thread(target=worker, daemon=True)
-        self._tools_thread.start()
+        self._iso_thread = threading.Thread(target=worker, daemon=True)
+        self._iso_thread.start()
         return {"success": True}
 
     def inject_tools_packages(self, disk_index, install_bato=True, install_pack=True):
-        if self._tools_thread and self._tools_thread.is_alive():
-            return {"success": False, "error": "Ya hay una operación de HollowTools en curso"}
+        if self._packages_thread and self._packages_thread.is_alive():
+            return {"success": False, "error": "Ya hay una inyección de paquetes en curso"}
 
         if not (install_bato or install_pack):
             return {"success": False, "error": "Selecciona al menos un paquete para inyectar"}
 
-        self._abort_tools = False
+        self._abort_packages = False
 
         def worker():
             try:
@@ -803,7 +850,10 @@ class BridgeApi:
                     letra = asignar_letra_particion_ps(disk_index, 1)
 
                 if not letra:
-                    self._emit_event("tools_error", {"error": "No se encontró la partición 'HOLLOWDRIVE'"})
+                    self._emit_event("tools_error", {
+                        "task": "inject_packages",
+                        "error": "No se encontró la partición 'HOLLOWDRIVE'"
+                    })
                     return
 
                 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -815,7 +865,7 @@ class BridgeApi:
                             mirrors_data = json.load(f)
                     except Exception: pass
 
-                if install_bato and not self._abort_tools:
+                if install_bato and not self._abort_packages:
                     ruta_bato = os.path.join(letra, "HOLLOWDRIVE", "BATOCERUMEN")
                     os.makedirs(ruta_bato, exist_ok=True)
                     dest = os.path.join(ruta_bato, "batocera.img")
@@ -836,10 +886,10 @@ class BridgeApi:
                     stream_download_file_direct(
                         url_bato, dest, is_gdrive=is_gdrive,
                         progress_callback=prog_bato,
-                        abort_check=lambda: self._abort_tools
+                        abort_check=lambda: self._abort_packages
                     )
 
-                if install_pack and not self._abort_tools:
+                if install_pack and not self._abort_packages:
                     url_pack = mirrors_data.get("hollowdrive_pack", {}).get("mirrors", [{}])[0].get(
                         "url", "https://pub-b872cd561e404a9599c943c6705afe9e.r2.dev/HollowdrivePackV1.tar"
                     )
@@ -859,29 +909,29 @@ class BridgeApi:
                         dest_dir=letra,
                         is_gdrive=False,
                         progress_callback=prog_pack,
-                        abort_check=lambda: self._abort_tools
+                        abort_check=lambda: self._abort_packages
                     )
 
-                if not self._abort_tools:
+                if not self._abort_packages:
                     self._emit_event("tools_success", {
                         "task": "inject_packages",
                         "message": "¡Los paquetes seleccionados se han inyectado correctamente en HOLLOWDRIVE!"
                     })
             except InterruptedError:
-                self._emit_event("tools_cancel", {})
+                self._emit_event("tools_cancel", {"task": "inject_packages"})
             except Exception as e:
                 logging.error(f"[BRIDGE] Error en inject_tools_packages worker: {e}")
-                self._emit_event("tools_error", {"error": str(e)})
+                self._emit_event("tools_error", {"task": "inject_packages", "error": str(e)})
 
-        self._tools_thread = threading.Thread(target=worker, daemon=True)
-        self._tools_thread.start()
+        self._packages_thread = threading.Thread(target=worker, daemon=True)
+        self._packages_thread.start()
         return {"success": True}
 
     def cachyos_tools_action(self, disk_index, action_type, flavor="hyprland", size_gb=20.0):
-        if self._tools_thread and self._tools_thread.is_alive():
-            return {"success": False, "error": "Ya hay una operación de HollowTools en curso"}
+        if self._cachy_thread and self._cachy_thread.is_alive():
+            return {"success": False, "error": "Ya hay una operación de CachyOS en curso"}
 
-        self._abort_tools = False
+        self._abort_cachy = False
 
         def worker():
             try:
@@ -911,7 +961,7 @@ class BridgeApi:
                 letra_grub = None
                 letra_cachy = None
                 for _ in range(8):
-                    if self._abort_tools:
+                    if self._abort_cachy:
                         raise InterruptedError()
                     lg, lc = obtener_o_asignar_letras_cachyos_grub(disk_index)
                     if lg and lc:
@@ -920,7 +970,10 @@ class BridgeApi:
                     time.sleep(1.5)
 
                 if not (letra_grub and letra_cachy):
-                    self._emit_event("tools_error", {"error": "No se pudieron asignar las letras de unidad de GRUB y CachyOS"})
+                    self._emit_event("tools_error", {
+                        "task": "cachyos",
+                        "error": "No se pudieron asignar las letras de unidad de GRUB y CachyOS"
+                    })
                     return
 
                 cachy_cfg = mirrors_data.get("cachyos_images", {})
@@ -949,7 +1002,7 @@ class BridgeApi:
                 stream_flash_image_direct(
                     url_grub, letra_grub,
                     progress_callback=prog_grub,
-                    abort_check=lambda: self._abort_tools,
+                    abort_check=lambda: self._abort_cachy,
                     method="ram"
                 )
 
@@ -966,29 +1019,50 @@ class BridgeApi:
                 stream_flash_image_direct(
                     url_cachy, letra_cachy,
                     progress_callback=prog_cachy,
-                    abort_check=lambda: self._abort_tools,
+                    abort_check=lambda: self._abort_cachy,
                     method="ram"
                 )
 
-                if not self._abort_tools:
+                if not self._abort_cachy:
                     verb = "instalado" if action_type == "instalar" else "actualizado"
                     self._emit_event("tools_success", {
                         "task": "cachyos",
                         "message": f"¡CachyOS ha sido {verb} con éxito en la unidad!"
                     })
             except InterruptedError:
-                self._emit_event("tools_cancel", {})
+                self._emit_event("tools_cancel", {"task": "cachyos"})
             except Exception as e:
                 logging.error(f"[BRIDGE] Error en cachyos_tools_action worker: {e}")
-                self._emit_event("tools_error", {"error": str(e)})
+                self._emit_event("tools_error", {"task": "cachyos", "error": str(e)})
 
-        self._tools_thread = threading.Thread(target=worker, daemon=True)
-        self._tools_thread.start()
+        self._cachy_thread = threading.Thread(target=worker, daemon=True)
+        self._cachy_thread.start()
         return {"success": True}
 
-    def cancel_tools_action(self):
-        self._abort_tools = True
+    def cancel_tools_action(self, task_type=None):
+        if task_type == "copy_isos":
+            self._abort_iso = True
+        elif task_type == "inject_packages":
+            self._abort_packages = True
+        elif task_type == "cachyos":
+            self._abort_cachy = True
+        else:
+            self._abort_iso = True
+            self._abort_packages = True
+            self._abort_cachy = True
+            self._abort_tools = True
         return {"success": True}
+
+    def is_tools_running(self):
+        iso_run = bool(self._iso_thread and self._iso_thread.is_alive())
+        pack_run = bool(self._packages_thread and self._packages_thread.is_alive())
+        cachy_run = bool(self._cachy_thread and self._cachy_thread.is_alive())
+        return {
+            "running": iso_run or pack_run or cachy_run,
+            "copy_isos": iso_run,
+            "inject_packages": pack_run,
+            "cachyos": cachy_run
+        }
 
     # =========================================================================
     # ⚡ EMISIÓN DE EVENTOS HACIA JAVASCRIPT

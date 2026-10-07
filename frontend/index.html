@@ -843,6 +843,26 @@
               </div>
               <input type="file" id="fileInputIsos" accept=".iso" multiple style="display:none;" />
             </div>
+
+            <!-- BLOQUE DE COLA DE ISOs ACUMULADAS -->
+            <div class="tools-iso-queue-block" id="toolsIsoQueueBlock" style="display: none;">
+              <div class="tools-queue-header">
+                <span class="tools-queue-count" id="toolsQueueCount">0 ISOs seleccionadas</span>
+                <div class="tools-queue-actions">
+                  <button type="button" class="tools-queue-action-btn" id="btnPlusMoreIso" title="Añadir más ISOs">+ Añadir</button>
+                  <button type="button" class="tools-queue-action-btn btn-clear-queue" id="btnClearIsoQueue" title="Vaciar lista">Vaciar</button>
+                </div>
+              </div>
+              <div class="tools-iso-list" id="toolsIsoList">
+                <!-- Se llena dinámicamente con las ISOs acumuladas -->
+              </div>
+              <div class="tools-card-action-wrap" style="margin-top: auto; padding-top: 4px;">
+                <button class="tools-action-btn btn-inject-isos" id="btnInjectIsos" type="button">
+                  Inyectar ISOs
+                </button>
+              </div>
+            </div>
+
             <div class="tools-card-foot">
               <span class="tools-foot-hint" id="toolsIsoHint">Destino: HOLLOWDRIVE\OSimages</span>
             </div>
@@ -904,8 +924,8 @@
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                   </svg>
-                  <span id="toolsGearLabel">Opciones</span>
                 </button>
+                <span class="tools-gear-label" id="toolsGearLabel">Opciones</span>
               </div>
 
               <div class="tools-card-action-wrap">
@@ -918,17 +938,14 @@
 
         </div><!-- /.tools-cards-grid -->
 
-        <!-- Monitor de Progreso en Vivo para Operaciones de HollowTools (Sin emoticonos) -->
+        <!-- Monitor de Progreso en Vivo para Operaciones de HollowTools (Soporte Multitarea) -->
         <div class="tools-monitor-card" id="toolsMonitorCard" style="display: none;">
-          <div class="tools-monitor-header">
-            <span class="tools-monitor-msg" id="toolsMonitorMsg">Preparando operación...</span>
-            <span class="tools-monitor-pct" id="toolsMonitorPct">0%</span>
+          <div class="tools-monitor-title-bar">
+            <span class="tools-monitor-main-title">OPERACIONES EN CURSO</span>
+            <span class="tools-monitor-tasks-count" id="toolsTasksCount">1 activa</span>
           </div>
-          <div class="tools-progress-track">
-            <div class="tools-progress-fill" id="toolsProgressFill" style="width: 0%;"></div>
-          </div>
-          <div class="tools-monitor-actions">
-            <button class="btn-cancel-tools-op" id="btnCancelToolsOp">Cancelar Operación</button>
+          <div class="tools-tasks-list" id="toolsTasksList">
+            <!-- Items de tareas activas inyectados dinámicamente -->
           </div>
         </div>
 
