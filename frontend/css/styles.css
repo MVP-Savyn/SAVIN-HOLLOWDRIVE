@@ -192,6 +192,7 @@ body.nav-transitioning {
   align-items: center;
   justify-content: center;
   gap: 14px;
+  cursor: pointer;
 }
 
 .title-ico-large {
@@ -1141,6 +1142,29 @@ body.nav-transitioning {
 body.is-installing-active #btnInstalarRow,
 .install-active-hide {
   display: none !important;
+}
+
+/* Deshabilitar botón de la barra de menús (título del header) durante la instalación */
+body.is-installing-active .brand-title-wrap,
+body.is-installing-active #headerLogoWrap,
+body.is-installing-active #headerLogo,
+.brand-title-wrap.disabled,
+#headerLogo.disabled {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.38 !important;
+  filter: grayscale(0.7) drop-shadow(0 0 4px rgba(0, 0, 0, 0.6)) !important;
+  transform: none !important;
+  user-select: none !important;
+  transition: opacity 0.3s ease, filter 0.3s ease !important;
+}
+
+body.is-installing-active .brand-title-wrap:hover .title-ico-large,
+body.is-installing-active .brand-title-wrap:hover .brand-logo-center-huge,
+.brand-title-wrap.disabled:hover .title-ico-large,
+.brand-title-wrap.disabled:hover .brand-logo-center-huge {
+  transform: none !important;
+  filter: grayscale(0.7) !important;
 }
 
 /* Step 1: USB Selector Layout */

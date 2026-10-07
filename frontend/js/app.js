@@ -86,6 +86,7 @@ function initApp() {
     btnNext: document.getElementById('btnNext'),
     
     // Header & Info
+    headerLogoWrap: document.getElementById('headerLogoWrap'),
     headerLogo: document.getElementById('headerLogo'),
     btnHeaderInfo: document.getElementById('btnHeaderInfo'),
     overlayInfo: document.getElementById('overlayInfo'),
@@ -1360,10 +1361,24 @@ function initApp() {
     });
   }
 
+  const handleTitleBackToHub = (e) => {
+    if (State.isInstalling) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      console.warn("[HEADER] Clic en el título bloqueado: instalación en curso");
+      showCustomAlert("INSTALACIÓN EN CURSO", "No puedes volver a la pantalla principal mientras se esté realizando una instalación en el disco.");
+      return;
+    }
+    setScreen('hub');
+  };
+
   if (DOM.headerLogo) {
-    DOM.headerLogo.addEventListener('click', () => {
-      setScreen('hub');
-    });
+    DOM.headerLogo.addEventListener('click', handleTitleBackToHub);
+  }
+  if (DOM.headerLogoWrap) {
+    DOM.headerLogoWrap.addEventListener('click', handleTitleBackToHub);
   }
 
   // =========================================================================
@@ -1373,6 +1388,12 @@ function initApp() {
   let isWizardStepTransitioning = false;
 
   async function setScreen(screenName, immediate = false) {
+    if (State.isInstalling && screenName !== 'wizard') {
+      console.warn("[NAV] Navegación bloqueada: instalación en curso");
+      showCustomAlert("INSTALACIÓN EN CURSO", "No puedes salir del asistente ni volver a la pantalla principal mientras se esté realizando una instalación en el disco.");
+      return;
+    }
+
     if (State.screen === 'tools' && State.toolsIsOperating && screenName !== 'tools') {
       console.warn("[HOLLOWTOOLS] Intento de salida bloqueado durante una operación activa");
       showCustomAlert("OPERACIÓN EN CURSO", "No puedes salir de HollowTools mientras haya una operación de copia, inyección o particionado en progreso. Cancélala primero si deseas salir.");
@@ -2555,6 +2576,11 @@ function initApp() {
   function resetInstallProcessUI() {
     State.isInstalling = false;
     document.body.classList.remove('is-installing-active');
+    if (DOM.headerLogoWrap) DOM.headerLogoWrap.classList.remove('disabled');
+    if (DOM.headerLogo) {
+      DOM.headerLogo.classList.remove('disabled');
+      DOM.headerLogo.removeAttribute('title');
+    }
     TimeTickerEngine.stop();
 
     if (DOM.installModeToggle) DOM.installModeToggle.style.display = 'none';
@@ -2661,6 +2687,11 @@ function initApp() {
   async function startFullInstallation() {
     State.isInstalling = true;
     document.body.classList.add('is-installing-active');
+    if (DOM.headerLogoWrap) DOM.headerLogoWrap.classList.add('disabled');
+    if (DOM.headerLogo) {
+      DOM.headerLogo.classList.add('disabled');
+      DOM.headerLogo.setAttribute('title', 'Instalación en curso: no se puede volver a la pantalla principal');
+    }
 
     // 1. Ocultar el botón brillante de INSTALAR durante la instalación
     if (DOM.btnInstalarRow) DOM.btnInstalarRow.style.display = 'none';
@@ -2757,6 +2788,12 @@ function initApp() {
     if (!res.success) {
       logTerminal(`Error arrancando instalación: ${res.error}`, "error");
       State.isInstalling = false;
+      document.body.classList.remove('is-installing-active');
+      if (DOM.headerLogoWrap) DOM.headerLogoWrap.classList.remove('disabled');
+      if (DOM.headerLogo) {
+        DOM.headerLogo.classList.remove('disabled');
+        DOM.headerLogo.removeAttribute('title');
+      }
       TimeTickerEngine.stop();
       if (DOM.btnCancelInstallProcess) DOM.btnCancelInstallProcess.style.display = 'none';
       if (DOM.btnPrev) {
@@ -2996,6 +3033,12 @@ function initApp() {
 
   window.hollowdrive.on('success', (data) => {
     State.isInstalling = false;
+    document.body.classList.remove('is-installing-active');
+    if (DOM.headerLogoWrap) DOM.headerLogoWrap.classList.remove('disabled');
+    if (DOM.headerLogo) {
+      DOM.headerLogo.classList.remove('disabled');
+      DOM.headerLogo.removeAttribute('title');
+    }
     TimeTickerEngine.stop();
     if (DOM.metricEta) DOM.metricEta.textContent = "00:00";
     if (DOM.metricTaskTimeEst) DOM.metricTaskTimeEst.textContent = "Finalizado";
@@ -3155,6 +3198,12 @@ function initApp() {
 
   window.hollowdrive.on('error', (data) => {
     State.isInstalling = false;
+    document.body.classList.remove('is-installing-active');
+    if (DOM.headerLogoWrap) DOM.headerLogoWrap.classList.remove('disabled');
+    if (DOM.headerLogo) {
+      DOM.headerLogo.classList.remove('disabled');
+      DOM.headerLogo.removeAttribute('title');
+    }
     TimeTickerEngine.stop();
     logTerminal(`FALLO EN LA INSTALACIÓN [${data.type}]: ${data.message}`, "error");
     if (DOM.lblTaskProgress) DOM.lblTaskProgress.textContent = "Fallo en la instalación";
