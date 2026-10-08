@@ -400,7 +400,7 @@
                 </button>
                 <!-- Selector legacy oculto para compatibilidad con scripts existentes -->
                 <select class="portable-os-select" id="selectPortableOs" style="display: none;">
-                  <option value="cachyos" selected id="optOsCachy">CachyOS (Arch Linux Optimizado)</option>
+                  <option value="cachyos" selected id="optOsCachy">CachyOS (Arch Optimizado)</option>
                   <option value="none" id="optOsNone">Ninguno (No instalar sistema)</option>
                   <option value="zorin" disabled id="optOsZorin">Zorin OS (Próximamente)</option>
                   <option value="deepin" disabled id="optOsDeepin">Deepin OS (Próximamente)</option>
@@ -421,9 +421,9 @@
 
             <!-- VISTA DEL SISTEMA SELECCIONADO (Vídeo grande arriba + Opciones de escritorio + Info scroll debajo) -->
             <div class="portable-selected-wrap" id="portableSelectedWrap" style="display: none;">
-              <!-- Flujo para Sistema Seleccionado (ej. CachyOS) -->
+              <!-- Flujo para Sistema Seleccionado (ej. CachyOS) con scroll continuo -->
               <div class="portable-selected-content-flow" id="portableSelectedSystemFlow">
-                <!-- Vídeo en grande -->
+                <!-- Vídeo en grande ocupando todo el ancho posible -->
                 <div class="video-preview-wrap portable-selected-video-wrap" id="portableVideoWrap">
                   <div class="video-preview-box" data-video="videoCachy">
                     <video id="videoCachy" loop muted playsinline preload="metadata">
@@ -443,14 +443,14 @@
                   </div>
                 </div>
 
-                <!-- Debajo del todo la información con scroll vertical -->
-                <div class="portable-selected-scroll-wrap" id="portableSelectedScrollWrap">
+                <!-- Debajo del vídeo: Información amplia, legible y no compacta (se desliza con scroll) -->
+                <div class="selected-system-info-wrap" id="portableSelectedScrollWrap">
                   <div class="selected-system-summary-card">
                     <div class="selected-summary-header">
                       <div class="selected-summary-title-col">
                         <div class="selected-summary-name-row">
-                          <h3 class="selected-summary-name" id="selectedSummaryName">CachyOS Linux</h3>
-                          <span class="selected-summary-base" id="selectedSummaryBase">Base: Arch Linux</span>
+                          <h3 class="selected-summary-name cachy-green-text" id="selectedSummaryName">CachyOS</h3>
+                          <span class="selected-summary-base" id="selectedSummaryBase">Base: Arch</span>
                         </div>
                         <p class="selected-summary-lead" id="selectedSummaryLead">
                           Sistema operativo portable optimizado para gaming, fluidez extrema y productividad.
@@ -462,8 +462,8 @@
                       </a>
                     </div>
 
-                    <div class="selected-highlights-grid" id="selectedHighlightsGrid">
-                      <!-- Características detalladas con scroll -->
+                    <div class="selected-highlights-list" id="selectedHighlightsGrid">
+                      <!-- Características detalladas en lista amplia -->
                     </div>
 
                     <!-- Sección CONTENIDO AÑADIDO: SavinWelcome ✔ -->
@@ -490,11 +490,11 @@
                   </div>
                   <h3 class="portable-none-title">Sin Sistema Portable</h3>
                   <p class="portable-none-desc">
-                    No se instalará ningún sistema operativo portable en la memoria USB.<br/>
-                    Todo el espacio disponible quedará reservado para HollowDrive y tus imágenes ISO personalizadas.
+                    No se instalará ningún sistema portable en la memoria USB.<br/>
+                    Todo el espacio disponible quedará reservado para almacenamiento y tus imágenes ISO personalizadas.
                   </p>
                   <div class="portable-none-badge">
-                    <span>⚡ 100% Espacio para Ventoy e ISOs</span>
+                    <span>⚡ 100% Espacio para Almacenamiento e ISOs</span>
                   </div>
                 </div>
               </div>
@@ -1330,11 +1330,11 @@ CARACTERÍSTICAS PRINCIPALES:
         </div>
         <div class="expanded-card-titles">
           <div class="expanded-card-name-row">
-            <h3 class="expanded-system-name" id="expandedSystemName">CachyOS Linux</h3>
+            <h3 class="expanded-system-name cachy-green-text" id="expandedSystemName">CachyOS</h3>
             <span class="expanded-status-badge" id="expandedSystemBadge">Disponible</span>
           </div>
           <div class="expanded-card-sub-row">
-            <span class="expanded-base-tag" id="expandedSystemBase">Base: Arch Linux</span>
+            <span class="expanded-base-tag" id="expandedSystemBase">Base: Arch</span>
             <a class="expanded-web-link" id="expandedSystemLink" href="https://cachyos.org" target="_blank" rel="noopener noreferrer">
               <span>Sitio web oficial</span>
               <svg class="external-icon" viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6h-2v6H5V5z"/></svg>
@@ -1343,52 +1343,55 @@ CARACTERÍSTICAS PRINCIPALES:
         </div>
       </div>
 
-      <!-- Zona de Previsualización de Vídeo / Multimedia -->
-      <div class="expanded-video-section" id="expandedVideoSection">
-        <div class="expanded-video-box" id="expandedVideoBox">
-          <video id="expandedVideoPlayer" loop muted playsinline preload="metadata">
-            <source id="expandedVideoSource" src="/media/sistema.mp4" type="video/mp4" />
-          </video>
-          <!-- Controles de navegación entre vídeos (flechitas ◀ / ▶) -->
-          <div class="expanded-video-nav-bar" id="expandedVideoNavBar" style="display: none;">
-            <button class="expanded-nav-arrow" id="btnExpandedPrevVideo" type="button">
-              <svg viewBox="0 0 24 24"><polygon points="15,4 7,12 15,20" fill="currentColor"/></svg>
-            </button>
-            <div class="expanded-video-indicator" id="expandedVideoIndicator">
-              <span id="expandedVideoLabel">Hyprland (Tiling Wayland)</span>
-              <span class="expanded-video-counter" id="expandedVideoCounter">1 / 2</span>
+      <!-- Contenedor scrollable unificado: el vídeo se desliza hacia arriba con el scroll para dar espacio a la info -->
+      <div class="expanded-card-scroll-body" id="expandedInfoScrollWrap">
+        <!-- Zona de Previsualización de Vídeo / Multimedia (16:9 ocupando todo el ancho horizontal posible) -->
+        <div class="expanded-video-section" id="expandedVideoSection">
+          <div class="expanded-video-box" id="expandedVideoBox">
+            <video id="expandedVideoPlayer" loop muted playsinline preload="metadata">
+              <source id="expandedVideoSource" src="/media/sistema.mp4" type="video/mp4" />
+            </video>
+            <!-- Controles de navegación entre vídeos (flechitas ◀ / ▶) -->
+            <div class="expanded-video-nav-bar" id="expandedVideoNavBar" style="display: none;">
+              <button class="expanded-nav-arrow" id="btnExpandedPrevVideo" type="button">
+                <svg viewBox="0 0 24 24"><polygon points="15,4 7,12 15,20" fill="currentColor"/></svg>
+              </button>
+              <div class="expanded-video-indicator" id="expandedVideoIndicator">
+                <span id="expandedVideoLabel">Hyprland (Tiling Wayland)</span>
+                <span class="expanded-video-counter" id="expandedVideoCounter">1 / 2</span>
+              </div>
+              <button class="expanded-nav-arrow" id="btnExpandedNextVideo" type="button">
+                <svg viewBox="0 0 24 24"><polygon points="9,4 17,12 9,20" fill="currentColor"/></svg>
+              </button>
             </div>
-            <button class="expanded-nav-arrow" id="btnExpandedNextVideo" type="button">
-              <svg viewBox="0 0 24 24"><polygon points="9,4 17,12 9,20" fill="currentColor"/></svg>
-            </button>
           </div>
-        </div>
-        <!-- Vista alternativa sin vídeo (para 'Ninguno' o pendientes) -->
-        <div class="expanded-no-video-box" id="expandedNoVideoBox" style="display: none;">
-          <div class="expanded-no-video-icon">⚡</div>
-          <div class="expanded-no-video-text" id="expandedNoVideoText">
-            Instalación limpia sin sistema portable. 100% de la capacidad para almacenamiento y tus propias ISOs.
+          <!-- Vista alternativa sin vídeo (para 'Ninguno' o pendientes) -->
+          <div class="expanded-no-video-box" id="expandedNoVideoBox" style="display: none;">
+            <div class="expanded-no-video-icon">⚡</div>
+            <div class="expanded-no-video-text" id="expandedNoVideoText">
+              Instalación limpia sin sistema portable. 100% de la capacidad para almacenamiento y tus propias ISOs.
+            </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Información específica del sistema con scroll interno -->
-      <div class="expanded-info-scroll-wrap" id="expandedInfoScrollWrap">
-        <p class="expanded-description-lead" id="expandedSystemDesc"></p>
-        
-        <div class="expanded-features-grid" id="expandedSystemFeatures">
-          <!-- Bullets informativos generados dinámicamente -->
         </div>
 
-        <!-- SECCIÓN: CONTENIDO AÑADIDO: SavinWelcome ✔ -->
-        <div class="expanded-added-content-section" id="expandedAddedContentSection">
-          <div class="added-content-header-title">
-            <span class="added-content-label-text">CONTENIDO AÑADIDO:</span>
+        <!-- Información amplia, legible y no compacta -->
+        <div class="expanded-info-details" id="expandedInfoDetails">
+          <p class="expanded-description-lead" id="expandedSystemDesc"></p>
+          
+          <div class="expanded-features-list" id="expandedSystemFeatures">
+            <!-- Bullets informativos generados dinámicamente -->
           </div>
-          <div class="added-content-items-list" id="expandedAddedContentList">
-            <div class="added-content-pill">
-              <span class="added-content-item-name">SavinWelcome</span>
-              <span class="added-content-check-icon">✔</span>
+
+          <!-- SECCIÓN: CONTENIDO AÑADIDO: SavinWelcome ✔ -->
+          <div class="expanded-added-content-section" id="expandedAddedContentSection">
+            <div class="added-content-header-title">
+              <span class="added-content-label-text">CONTENIDO AÑADIDO:</span>
+            </div>
+            <div class="added-content-items-list" id="expandedAddedContentList">
+              <div class="added-content-pill">
+                <span class="added-content-item-name">SavinWelcome</span>
+                <span class="added-content-check-icon">✔</span>
+              </div>
             </div>
           </div>
         </div>

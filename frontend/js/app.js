@@ -2138,16 +2138,36 @@ function initApp() {
   // =========================================================================
   const PORTABLE_SYSTEMS_CATALOG = [
     {
+      id: 'none',
+      name: 'Ninguno',
+      base: 'Solo almacenamiento',
+      url: '',
+      icon: '/media/systems/ninguno.svg',
+      videos: [],
+      descLead: 'No se instalará ningún sistema portable en la memoria USB. Todo el espacio disponible quedará reservado para almacenamiento y tus imágenes ISO personalizadas.',
+      features: [
+        {
+          title: '100% Espacio Libre',
+          desc: 'Toda la capacidad de la memoria USB queda libre y limpia para almacenar tantas distribuciones ISO y archivos personales como desees.'
+        },
+        {
+          title: 'Instalación Instantánea y Ligera',
+          desc: 'Sin particiones pesadas de sistema operativo, proceso de preparación notablemente más rápido y ligero.'
+        }
+      ],
+      addedContent: []
+    },
+    {
       id: 'cachyos',
-      name: 'CachyOS Linux',
-      base: 'Arch Linux',
+      name: 'CachyOS',
+      base: 'Arch',
       url: 'https://cachyos.org',
       icon: '/media/systems/cachyos-linux.svg',
       videos: [
         { src: '/media/sistema.mp4', label: 'Hyprland (Tiling Wayland)' },
         { src: '/media/cachy_opt.mp4', label: 'KDE Plasma (Modern Desktop)' }
       ],
-      descLead: 'CachyOS es una distribución basada en Arch Linux diseñada para ofrecer un rendimiento ultra-fluido, latencias mínimas y optimizaciones profundas a nivel de procesador.',
+      descLead: 'CachyOS es una distribución optimizada diseñada para ofrecer un rendimiento ultra-fluido, latencias mínimas y optimizaciones profundas a nivel de procesador.',
       features: [
         {
           title: 'Ultra Fluidez & Optimización CPU',
@@ -2185,11 +2205,11 @@ function initApp() {
       url: 'https://ubuntu.com',
       icon: '/media/systems/ubuntu-linux.svg',
       videos: [],
-      descLead: 'Una de las distribuciones Linux más populares del mundo, conocida por su enorme ecosistema, estabilidad y facilidad de uso.',
+      descLead: 'Una de las distribuciones más populares del mundo, conocida por su enorme ecosistema, estabilidad y facilidad de uso.',
       features: [
         {
           title: 'Ecosistema Universal',
-          desc: 'Sólida base LTS con la mayor compatibilidad de software, controladores y librerías disponible en Linux.'
+          desc: 'Sólida base LTS con la mayor compatibilidad de software, controladores y librerías disponible.'
         },
         {
           title: 'Facilidad de Uso',
@@ -2207,7 +2227,7 @@ function initApp() {
     {
       id: 'debian',
       name: 'Debian',
-      base: 'Debian (Estable)',
+      base: 'Debian',
       url: 'https://www.debian.org',
       icon: '/media/systems/debian-linux.svg',
       videos: [],
@@ -2233,7 +2253,7 @@ function initApp() {
     {
       id: 'zorin',
       name: 'Zorin OS',
-      base: 'Ubuntu / Debian',
+      base: 'Debian / Ubuntu',
       url: 'https://zorin.com/os',
       icon: '/media/systems/zorin-os.svg',
       videos: [],
@@ -2289,7 +2309,7 @@ function initApp() {
       url: 'https://pika-os.com',
       icon: '/media/systems/pikaos.svg',
       videos: [],
-      descLead: 'Distribución basada en Ubuntu modificada específicamente para entusiastas del gaming y baja latencia.',
+      descLead: 'Distribución modificada específicamente para entusiastas del gaming y baja latencia.',
       features: [
         {
           title: 'Kernel Gaming de Baja Latencia',
@@ -2305,32 +2325,6 @@ function initApp() {
           name: 'SavinWelcome',
           icon: '✔',
           desc: 'Asistente interactivo de bienvenida y configuración rápida de HollowDrive'
-        }
-      ]
-    },
-    {
-      id: 'none',
-      name: 'Ninguno',
-      base: 'Solo almacenamiento (Ventoy)',
-      url: 'https://www.ventoy.net',
-      icon: '/media/systems/ninguno.svg',
-      videos: [],
-      descLead: 'No se instalará ningún sistema operativo portable en la memoria USB. Todo el espacio disponible quedará reservado para HollowDrive y tus imágenes ISO personalizadas.',
-      features: [
-        {
-          title: '100% Espacio Libre para Ventoy e ISOs',
-          desc: 'Toda la capacidad de la memoria USB queda limpia para almacenar tantas distribuciones ISO y archivos como desees.'
-        },
-        {
-          title: 'Instalación Instantánea y Ligera',
-          desc: 'Sin particiones pesadas de sistema, proceso de preparación notablemente más rápido y ligero.'
-        }
-      ],
-      addedContent: [
-        {
-          name: 'Ventoy Boot Suite',
-          icon: '✔',
-          desc: 'Gestor multiboots con soporte nativo para arranque seguro UEFI y Legacy BIOS'
         }
       ]
     }
@@ -2350,6 +2344,7 @@ function initApp() {
     PORTABLE_SYSTEMS_CATALOG.forEach(sys => {
       const isAvailable = (sys.id === 'none') || isSystemAvailableInMirrors(sys.id, cachedMirrorsData);
       const isNone = (sys.id === 'none');
+      const isCachy = (sys.id === 'cachyos');
 
       const card = document.createElement('div');
       card.className = `system-card ${isAvailable ? 'available' : 'disabled'} ${isNone ? 'card-none' : ''}`;
@@ -2363,16 +2358,17 @@ function initApp() {
           ${!isAvailable ? `<span class="system-card-badge-soon">${soonLabel}</span>` : ''}
         </div>
         <div class="system-card-body">
-          <div class="system-card-title">${sys.name}</div>
+          <div class="system-card-title ${isCachy ? 'cachy-green-text' : ''}">${sys.name}</div>
           <div class="system-card-base">
             <span class="base-badge">${sys.base}</span>
           </div>
         </div>
         <div class="system-card-foot">
+          ${sys.url ? `
           <a class="system-card-weblink" href="${sys.url}" target="_blank" rel="noopener noreferrer">
             <span>${webLabel}</span>
             <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6h-2v6H5V5z"/></svg>
-          </a>
+          </a>` : ''}
         </div>
       `;
 
@@ -2415,6 +2411,7 @@ function initApp() {
     const noVideoText = DOM.expandedNoVideoText || document.getElementById('expandedNoVideoText');
     const descEl = DOM.expandedSystemDesc || document.getElementById('expandedSystemDesc');
     const featGrid = DOM.expandedSystemFeatures || document.getElementById('expandedSystemFeatures');
+    const addedSection = DOM.expandedAddedContentSection || document.getElementById('expandedAddedContentSection');
     const addedList = DOM.expandedAddedContentList || document.getElementById('expandedAddedContentList');
     const btnSelect = DOM.btnSelectFromExpanded || document.getElementById('btnSelectFromExpanded');
     const lblSelect = DOM.lblSelectSystemModal || document.getElementById('lblSelectSystemModal');
@@ -2423,16 +2420,28 @@ function initApp() {
     const soonLabel = getT('soon', 'Próximamente');
 
     if (iconEl) iconEl.src = sys.icon;
-    if (nameEl) nameEl.textContent = sys.name;
+    if (nameEl) {
+      nameEl.textContent = sys.name;
+      if (sys.id === 'cachyos') {
+        nameEl.classList.add('cachy-green-text');
+      } else {
+        nameEl.classList.remove('cachy-green-text');
+      }
+    }
     if (badgeEl) {
       badgeEl.className = `expanded-status-badge ${isAvailable ? 'available' : 'disabled'}`;
       badgeEl.textContent = isAvailable ? getT('available', 'Disponible') : soonLabel;
     }
     if (baseEl) baseEl.textContent = `${getT('sys_base_label', 'Base')}: ${sys.base}`;
     if (linkEl) {
-      linkEl.href = sys.url;
-      const span = linkEl.querySelector('span');
-      if (span) span.textContent = getT('sys_website', 'Sitio web oficial');
+      if (sys.url) {
+        linkEl.style.display = 'inline-flex';
+        linkEl.href = sys.url;
+        const span = linkEl.querySelector('span');
+        if (span) span.textContent = getT('sys_website', 'Sitio web oficial');
+      } else {
+        linkEl.style.display = 'none';
+      }
     }
 
     // Vídeos de previsualización
@@ -2448,17 +2457,20 @@ function initApp() {
       }
     }
 
-    // Descripción y características
+    // Descripción y características en lista limpia (sin bloques excesivos)
     if (descEl) descEl.textContent = sys.descLead;
     if (featGrid) {
       featGrid.innerHTML = '';
       if (sys.features && sys.features.length > 0) {
         sys.features.forEach(feat => {
           const item = document.createElement('div');
-          item.className = 'expanded-feature-card';
+          item.className = 'expanded-keypoint-row';
           item.innerHTML = `
-            <div class="expanded-feature-title">${feat.title}</div>
-            <div class="expanded-feature-desc">${feat.desc}</div>
+            <div class="keypoint-bullet">◈</div>
+            <div class="keypoint-content">
+              <div class="keypoint-title">${feat.title}</div>
+              <div class="keypoint-desc">${feat.desc}</div>
+            </div>
           `;
           featGrid.appendChild(item);
         });
@@ -2466,6 +2478,9 @@ function initApp() {
     }
 
     // Contenido añadido
+    if (addedSection) {
+      addedSection.style.display = (sys.addedContent && sys.addedContent.length > 0) ? 'block' : 'none';
+    }
     if (addedList) {
       addedList.innerHTML = '';
       if (sys.addedContent && sys.addedContent.length > 0) {
@@ -2496,6 +2511,8 @@ function initApp() {
       overlay.style.display = 'flex';
       requestAnimationFrame(() => {
         overlay.classList.add('active');
+        const scrollWrap = document.getElementById('expandedInfoScrollWrap');
+        if (scrollWrap) scrollWrap.scrollTop = 0;
       });
     }
   }
@@ -2600,28 +2617,48 @@ function initApp() {
     const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === sysId);
     if (!sys) return;
 
-    if (DOM.selectedSummaryName) DOM.selectedSummaryName.textContent = sys.name;
+    if (DOM.selectedSummaryName) {
+      DOM.selectedSummaryName.textContent = sys.name;
+      if (sys.id === 'cachyos') {
+        DOM.selectedSummaryName.classList.add('cachy-green-text');
+      } else {
+        DOM.selectedSummaryName.classList.remove('cachy-green-text');
+      }
+    }
     if (DOM.selectedSummaryBase) DOM.selectedSummaryBase.textContent = `${getT('sys_base_label', 'Base')}: ${sys.base}`;
     if (DOM.selectedSummaryLead) DOM.selectedSummaryLead.textContent = sys.descLead;
     if (DOM.selectedSummaryLink) {
-      DOM.selectedSummaryLink.href = sys.url;
-      const span = DOM.selectedSummaryLink.querySelector('span');
-      if (span) span.textContent = sys.name;
+      if (sys.url) {
+        DOM.selectedSummaryLink.style.display = 'inline-flex';
+        DOM.selectedSummaryLink.href = sys.url;
+        const span = DOM.selectedSummaryLink.querySelector('span');
+        if (span) span.textContent = sys.name;
+      } else {
+        DOM.selectedSummaryLink.style.display = 'none';
+      }
     }
 
     if (DOM.selectedHighlightsGrid) {
       DOM.selectedHighlightsGrid.innerHTML = '';
       if (sys.features && sys.features.length > 0) {
         sys.features.forEach(feat => {
-          const card = document.createElement('div');
-          card.className = 'selected-highlight-card';
-          card.innerHTML = `
-            <div class="selected-highlight-title">${feat.title}</div>
-            <div class="selected-highlight-desc">${feat.desc}</div>
+          const row = document.createElement('div');
+          row.className = 'selected-keypoint-row';
+          row.innerHTML = `
+            <div class="keypoint-bullet">◈</div>
+            <div class="keypoint-content">
+              <div class="keypoint-title">${feat.title}</div>
+              <div class="keypoint-desc">${feat.desc}</div>
+            </div>
           `;
-          DOM.selectedHighlightsGrid.appendChild(card);
+          DOM.selectedHighlightsGrid.appendChild(row);
         });
       }
+    }
+
+    const selAddedSection = document.querySelector('.selected-added-content-box');
+    if (selAddedSection) {
+      selAddedSection.style.display = (sys.addedContent && sys.addedContent.length > 0) ? 'block' : 'none';
     }
 
     if (DOM.selectedAddedContentList) {
@@ -2667,7 +2704,10 @@ function initApp() {
         if (flowSystem) flowSystem.style.display = 'flex';
         if (wrapNone) wrapNone.style.display = 'none';
         if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'flex';
-        if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = 'CachyOS Linux';
+        if (DOM.paneTitleSystem) {
+          DOM.paneTitleSystem.textContent = 'CachyOS';
+          DOM.paneTitleSystem.classList.add('cachy-green-title');
+        }
         if (DOM.paneTitleSystemIcon) DOM.paneTitleSystemIcon.src = '/media/systems/cachyos-linux.svg';
         populateSelectedSystemDetails('cachyos');
         if (State.screen === 'wizard' && State.wizardStep === 4) {
@@ -2677,7 +2717,10 @@ function initApp() {
         if (flowSystem) flowSystem.style.display = 'none';
         if (wrapNone) wrapNone.style.display = 'flex';
         if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'none';
-        if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = 'Sin Sistema Portable';
+        if (DOM.paneTitleSystem) {
+          DOM.paneTitleSystem.textContent = 'Sin Sistema Portable';
+          DOM.paneTitleSystem.classList.remove('cachy-green-title');
+        }
         if (DOM.paneTitleSystemIcon) DOM.paneTitleSystemIcon.src = '/media/systems/ninguno.svg';
         if (vCachy) vCachy.pause();
       }
@@ -2686,7 +2729,10 @@ function initApp() {
       wrapSelected.style.display = 'none';
       if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'none';
       if (btnChange) btnChange.style.display = 'none';
-      if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = getT('sys_title', 'Elige un sistema portable');
+      if (DOM.paneTitleSystem) {
+        DOM.paneTitleSystem.textContent = getT('sys_title', 'Elige un sistema portable');
+        DOM.paneTitleSystem.classList.remove('cachy-green-title');
+      }
       if (DOM.paneTitleSystemIcon) DOM.paneTitleSystemIcon.src = '/media/sistemas.png';
       if (vCachy) vCachy.pause();
     }
