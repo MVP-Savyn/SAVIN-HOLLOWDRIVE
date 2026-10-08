@@ -187,13 +187,46 @@ function initApp() {
     btnCachyInfo: document.getElementById('btnCachyInfo'),
     videoCachy: document.getElementById('videoCachy'),
     modalCachy: document.getElementById('modalCachy'),
-    portableRouletteWrap: document.getElementById('portableRouletteWrap'),
-    rouletteTrack: document.getElementById('rouletteTrack'),
-    rouletteHub: document.getElementById('rouletteHub'),
-    rouletteHubImg: document.getElementById('rouletteHubImg'),
-    rouletteHubTitle: document.getElementById('rouletteHubTitle'),
-    rouletteHubSub: document.getElementById('rouletteHubSub'),
+    portableCardsWrap: document.getElementById('portableCardsWrap'),
+    portableCardsGrid: document.getElementById('portableCardsGrid'),
+    expandedCardOverlay: document.getElementById('expandedCardOverlay'),
+    expandedCardBox: document.getElementById('expandedCardBox'),
+    btnExpandedCardClose: document.getElementById('btnExpandedCardClose'),
+    expandedSystemIcon: document.getElementById('expandedSystemIcon'),
+    expandedSystemName: document.getElementById('expandedSystemName'),
+    expandedSystemBadge: document.getElementById('expandedSystemBadge'),
+    expandedSystemBase: document.getElementById('expandedSystemBase'),
+    expandedSystemLink: document.getElementById('expandedSystemLink'),
+    expandedVideoSection: document.getElementById('expandedVideoSection'),
+    expandedVideoBox: document.getElementById('expandedVideoBox'),
+    expandedVideoPlayer: document.getElementById('expandedVideoPlayer'),
+    expandedVideoSource: document.getElementById('expandedVideoSource'),
+    expandedVideoNavBar: document.getElementById('expandedVideoNavBar'),
+    btnExpandedPrevVideo: document.getElementById('btnExpandedPrevVideo'),
+    btnExpandedNextVideo: document.getElementById('btnExpandedNextVideo'),
+    expandedVideoIndicator: document.getElementById('expandedVideoIndicator'),
+    expandedVideoLabel: document.getElementById('expandedVideoLabel'),
+    expandedVideoCounter: document.getElementById('expandedVideoCounter'),
+    expandedNoVideoBox: document.getElementById('expandedNoVideoBox'),
+    expandedNoVideoText: document.getElementById('expandedNoVideoText'),
+    expandedInfoScrollWrap: document.getElementById('expandedInfoScrollWrap'),
+    expandedSystemDesc: document.getElementById('expandedSystemDesc'),
+    expandedSystemFeatures: document.getElementById('expandedSystemFeatures'),
+    expandedAddedContentSection: document.getElementById('expandedAddedContentSection'),
+    expandedAddedContentList: document.getElementById('expandedAddedContentList'),
+    btnDismissExpanded: document.getElementById('btnDismissExpanded'),
+    btnSelectFromExpanded: document.getElementById('btnSelectFromExpanded'),
+    lblSelectSystemModal: document.getElementById('lblSelectSystemModal'),
+    portableSelectedWrap: document.getElementById('portableSelectedWrap'),
+    portableSelectedSystemFlow: document.getElementById('portableSelectedSystemFlow'),
     portableVideoWrap: document.getElementById('portableVideoWrap'),
+    portableSelectedScrollWrap: document.getElementById('portableSelectedScrollWrap'),
+    selectedSummaryName: document.getElementById('selectedSummaryName'),
+    selectedSummaryBase: document.getElementById('selectedSummaryBase'),
+    selectedSummaryLead: document.getElementById('selectedSummaryLead'),
+    selectedSummaryLink: document.getElementById('selectedSummaryLink'),
+    selectedHighlightsGrid: document.getElementById('selectedHighlightsGrid'),
+    selectedAddedContentList: document.getElementById('selectedAddedContentList'),
     portableNoneWrap: document.getElementById('portableNoneWrap'),
     btnChangeSystem: document.getElementById('btnChangeSystem'),
     
@@ -500,45 +533,9 @@ function initApp() {
   }
 
   function applySystemsAvailability(mirrors) {
-    const soonLabel = getT('soon', 'Próximamente');
-    const items = document.querySelectorAll('.roulette-item');
-    items.forEach(item => {
-      const os = item.dataset.os;
-      if (!os || os === 'none') return;
-
-      const isAvail = isSystemAvailableInMirrors(os, mirrors);
-      if (!item.dataset.baseName) {
-        item.dataset.baseName = (item.dataset.name || os)
-          .replace(/\s*\([^)]*Próximamente[^)]*\)/i, '')
-          .replace(/\s*\([^)]*Coming Soon[^)]*\)/i, '')
-          .replace(/\s*\([^)]*Demnächst[^)]*\)/i, '')
-          .replace(/\s*\([^)]*Bientôt[^)]*\)/i, '')
-          .replace(/\s*\([^)]*Prossimamente[^)]*\)/i, '')
-          .replace(/\s*\([^)]*Em breve[^)]*\)/i, '')
-          .replace(/\s*\([^)]*Скоро[^)]*\)/i, '')
-          .replace(/\s*\([^)]*敬请期待[^)]*\)/i, '')
-          .replace(/\s*\([^)]*近日公開[^)]*\)/i, '')
-          .replace(/\s*\([^)]*출시 예정[^)]*\)/i, '')
-          .trim();
-      }
-      const baseName = item.dataset.baseName;
-      const nameTag = item.querySelector('.roulette-item-name-tag');
-
-      if (isAvail) {
-        item.classList.remove('disabled');
-        item.classList.add('available');
-        item.dataset.name = baseName;
-        item.title = baseName;
-        if (nameTag) nameTag.textContent = baseName;
-      } else {
-        item.classList.add('disabled');
-        item.classList.remove('available');
-        const displayName = `${baseName} (${soonLabel})`;
-        item.dataset.name = displayName;
-        item.title = displayName;
-        if (nameTag) nameTag.textContent = displayName;
-      }
-    });
+    if (typeof renderPortableCards === 'function') {
+      renderPortableCards();
+    }
 
     if (DOM.selectPortableOs) {
       Array.from(DOM.selectPortableOs.options).forEach(opt => {
@@ -665,7 +662,7 @@ function initApp() {
       } else {
         DOM.btnCachyKde.disabled = true;
         DOM.btnCachyKde.textContent = L('btn_kde_soon', 'KDE (Próximamente)');
-        DOM.btnCachyKde.title = L('btn_kde_soon', 'KDE (Próximamente)');
+        DOM.btnCachyKde.removeAttribute('title');
       }
     }
     if (DOM.btnChangeSystem) DOM.btnChangeSystem.textContent = L('btn_change_system', 'Cambiar');
@@ -2136,39 +2133,561 @@ function initApp() {
   }
   window.switchCachyVideo = switchCachyVideo;
 
+  // =========================================================================
+  // 📦 CATÁLOGO DE SISTEMAS PORTABLES Y TARJETAS INTERACTIVAS
+  // =========================================================================
+  const PORTABLE_SYSTEMS_CATALOG = [
+    {
+      id: 'cachyos',
+      name: 'CachyOS Linux',
+      base: 'Arch Linux',
+      url: 'https://cachyos.org',
+      icon: '/media/systems/cachyos-linux.svg',
+      videos: [
+        { src: '/media/sistema.mp4', label: 'Hyprland (Tiling Wayland)' },
+        { src: '/media/cachy_opt.mp4', label: 'KDE Plasma (Modern Desktop)' }
+      ],
+      descLead: 'CachyOS es una distribución basada en Arch Linux diseñada para ofrecer un rendimiento ultra-fluido, latencias mínimas y optimizaciones profundas a nivel de procesador.',
+      features: [
+        {
+          title: 'Ultra Fluidez & Optimización CPU',
+          desc: 'Compilado específicamente con optimizaciones x86-64-v3 y v4, junto con un kernel afinado con los planificadores Sched-ext y BORE. Cero tirones, latencias mínimas y respuesta instantánea.'
+        },
+        {
+          title: 'Perfecto para Gaming',
+          desc: 'Optimizado de fábrica para videojuegos. Ofrece latencias ultra-bajas, compatibilidad nativa con Steam, Proton, Wine y emuladores, con los controladores gráficos más recientes integrados.'
+        },
+        {
+          title: 'Ideal para Productividad y Trabajos de Clase',
+          desc: 'Excelente para tareas de estudio, trabajos de clase o universidad, ofimática, edición multimedia y desarrollo sin sobrecargar la memoria ni ralentizar el ordenador.'
+        },
+        {
+          title: 'Máquinas Virtuales y Desarrollo',
+          desc: 'Soporte y aceleración nativa por hardware para virtualización (KVM/QEMU, Docker), permitiendo ejecutar otros entornos y sistemas en paralelo con total fluidez.'
+        },
+        {
+          title: 'Rolling Release (Siempre a la última)',
+          desc: 'Modelo de actualización continua. Dispones siempre de las versiones más recientes de software, controladores Mesa y kernel sin necesidad de formatear o reinstalar jamás.'
+        }
+      ],
+      addedContent: [
+        {
+          name: 'SavinWelcome',
+          icon: '✔',
+          desc: 'Asistente interactivo de bienvenida y configuración rápida de HollowDrive'
+        }
+      ]
+    },
+    {
+      id: 'ubuntu',
+      name: 'Ubuntu',
+      base: 'Debian',
+      url: 'https://ubuntu.com',
+      icon: '/media/systems/ubuntu-linux.svg',
+      videos: [],
+      descLead: 'Una de las distribuciones Linux más populares del mundo, conocida por su enorme ecosistema, estabilidad y facilidad de uso.',
+      features: [
+        {
+          title: 'Ecosistema Universal',
+          desc: 'Sólida base LTS con la mayor compatibilidad de software, controladores y librerías disponible en Linux.'
+        },
+        {
+          title: 'Facilidad de Uso',
+          desc: 'Entorno intuitivo y amigable, perfecto tanto para principiantes como para uso profesional.'
+        }
+      ],
+      addedContent: [
+        {
+          name: 'SavinWelcome',
+          icon: '✔',
+          desc: 'Asistente interactivo de bienvenida y configuración rápida de HollowDrive'
+        }
+      ]
+    },
+    {
+      id: 'debian',
+      name: 'Debian',
+      base: 'Debian (Estable)',
+      url: 'https://www.debian.org',
+      icon: '/media/systems/debian-linux.svg',
+      videos: [],
+      descLead: 'El sistema operativo universal, famoso por su legendaria estabilidad, fiabilidad y compromiso con el software libre.',
+      features: [
+        {
+          title: 'Estabilidad de Grado Servidor',
+          desc: 'Probado exhaustivamente para garantizar una fiabilidad inquebrantable en cualquier circunstancia.'
+        },
+        {
+          title: 'Consumo Mínimo de Recursos',
+          desc: 'Huella de memoria sumamente ligera, excelente para maximizar la autonomía y la velocidad en cualquier hardware.'
+        }
+      ],
+      addedContent: [
+        {
+          name: 'SavinWelcome',
+          icon: '✔',
+          desc: 'Asistente interactivo de bienvenida y configuración rápida de HollowDrive'
+        }
+      ]
+    },
+    {
+      id: 'zorin',
+      name: 'Zorin OS',
+      base: 'Ubuntu / Debian',
+      url: 'https://zorin.com/os',
+      icon: '/media/systems/zorin-os.svg',
+      videos: [],
+      descLead: 'Diseñado para hacer que tu ordenador sea más rápido, potente y seguro con una interfaz familiar y elegante.',
+      features: [
+        {
+          title: 'Interfaz Familiar Adaptable',
+          desc: 'Diseño visual inspirado en entornos de escritorio clásicos para una adaptación instantánea.'
+        },
+        {
+          title: 'Compatibilidad de Software Windows',
+          desc: 'Capas de soporte integradas para ejecutar aplicaciones y utilidades tradicionales de Windows con facilidad.'
+        }
+      ],
+      addedContent: [
+        {
+          name: 'SavinWelcome',
+          icon: '✔',
+          desc: 'Asistente interactivo de bienvenida y configuración rápida de HollowDrive'
+        }
+      ]
+    },
+    {
+      id: 'deepin',
+      name: 'Deepin OS',
+      base: 'Debian',
+      url: 'https://www.deepin.org',
+      icon: '/media/systems/deepin.svg',
+      videos: [],
+      descLead: 'Distribución elegante y refinada con el entorno gráfico Deepin Desktop Environment (DDE) y aplicaciones integradas.',
+      features: [
+        {
+          title: 'Diseño Visual Exquisito',
+          desc: 'Efectos modernos de desenfoque, estética cuidada y centro de control lateral unificado.'
+        },
+        {
+          title: 'Suite de Aplicaciones Propias',
+          desc: 'Conjunto completo de herramientas nativas para multimedia, captura, productividad y gestión del sistema.'
+        }
+      ],
+      addedContent: [
+        {
+          name: 'SavinWelcome',
+          icon: '✔',
+          desc: 'Asistente interactivo de bienvenida y configuración rápida de HollowDrive'
+        }
+      ]
+    },
+    {
+      id: 'pikaos',
+      name: 'PikaOS',
+      base: 'Ubuntu (Gaming)',
+      url: 'https://pika-os.com',
+      icon: '/media/systems/pikaos.svg',
+      videos: [],
+      descLead: 'Distribución basada en Ubuntu modificada específicamente para entusiastas del gaming y baja latencia.',
+      features: [
+        {
+          title: 'Kernel Gaming de Baja Latencia',
+          desc: 'Afinado para reducir el retardo de cuadros y acelerar la respuesta de controladores y pantallas de alto refresco.'
+        },
+        {
+          title: 'Gestor de Lanzadores Integrado',
+          desc: 'Instalación en un clic de utilidades para emulación, lanzadores de juegos y herramientas de streaming.'
+        }
+      ],
+      addedContent: [
+        {
+          name: 'SavinWelcome',
+          icon: '✔',
+          desc: 'Asistente interactivo de bienvenida y configuración rápida de HollowDrive'
+        }
+      ]
+    },
+    {
+      id: 'none',
+      name: 'Ninguno',
+      base: 'Solo almacenamiento (Ventoy)',
+      url: 'https://www.ventoy.net',
+      icon: '/media/systems/ninguno.svg',
+      videos: [],
+      descLead: 'No se instalará ningún sistema operativo portable en la memoria USB. Todo el espacio disponible quedará reservado para HollowDrive y tus imágenes ISO personalizadas.',
+      features: [
+        {
+          title: '100% Espacio Libre para Ventoy e ISOs',
+          desc: 'Toda la capacidad de la memoria USB queda limpia para almacenar tantas distribuciones ISO y archivos como desees.'
+        },
+        {
+          title: 'Instalación Instantánea y Ligera',
+          desc: 'Sin particiones pesadas de sistema, proceso de preparación notablemente más rápido y ligero.'
+        }
+      ],
+      addedContent: [
+        {
+          name: 'Ventoy Boot Suite',
+          icon: '✔',
+          desc: 'Gestor multiboots con soporte nativo para arranque seguro UEFI y Legacy BIOS'
+        }
+      ]
+    }
+  ];
+
+  let currentExpandedSystemId = null;
+  let currentExpandedVideoIndex = 0;
+
+  function renderPortableCards() {
+    const grid = DOM.portableCardsGrid || document.getElementById('portableCardsGrid');
+    if (!grid) return;
+
+    const soonLabel = getT('soon', 'Próximamente');
+    const webLabel = getT('sys_website', 'Sitio web');
+
+    grid.innerHTML = '';
+    PORTABLE_SYSTEMS_CATALOG.forEach(sys => {
+      const isAvailable = (sys.id === 'none') || isSystemAvailableInMirrors(sys.id, cachedMirrorsData);
+      const isNone = (sys.id === 'none');
+
+      const card = document.createElement('div');
+      card.className = `system-card ${isAvailable ? 'available' : 'disabled'} ${isNone ? 'card-none' : ''}`;
+      card.dataset.os = sys.id;
+
+      card.innerHTML = `
+        <div class="system-card-top">
+          <div class="system-card-icon-box">
+            <img src="${sys.icon}" alt="${sys.name}" class="system-card-icon" />
+          </div>
+          ${!isAvailable ? `<span class="system-card-badge-soon">${soonLabel}</span>` : ''}
+        </div>
+        <div class="system-card-body">
+          <div class="system-card-title">${sys.name}</div>
+          <div class="system-card-base">
+            <span class="base-badge">${sys.base}</span>
+          </div>
+        </div>
+        <div class="system-card-foot">
+          <a class="system-card-weblink" href="${sys.url}" target="_blank" rel="noopener noreferrer">
+            <span>${webLabel}</span>
+            <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6h-2v6H5V5z"/></svg>
+          </a>
+        </div>
+      `;
+
+      // Clic en la tarjeta abre el detalle ampliado
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.system-card-weblink')) return;
+        openExpandedCard(sys.id);
+      });
+
+      // Clic en el enlace web abre en navegador externo
+      const linkEl = card.querySelector('.system-card-weblink');
+      if (linkEl) {
+        linkEl.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openExternalUrl(sys.url);
+        });
+      }
+
+      grid.appendChild(card);
+    });
+  }
+  window.renderPortableCards = renderPortableCards;
+
+  function openExpandedCard(systemId) {
+    const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === systemId);
+    if (!sys) return;
+
+    currentExpandedSystemId = systemId;
+    currentExpandedVideoIndex = 0;
+
+    const overlay = DOM.expandedCardOverlay || document.getElementById('expandedCardOverlay');
+    const iconEl = DOM.expandedSystemIcon || document.getElementById('expandedSystemIcon');
+    const nameEl = DOM.expandedSystemName || document.getElementById('expandedSystemName');
+    const badgeEl = DOM.expandedSystemBadge || document.getElementById('expandedSystemBadge');
+    const baseEl = DOM.expandedSystemBase || document.getElementById('expandedSystemBase');
+    const linkEl = DOM.expandedSystemLink || document.getElementById('expandedSystemLink');
+    const videoBox = DOM.expandedVideoBox || document.getElementById('expandedVideoBox');
+    const noVideoBox = DOM.expandedNoVideoBox || document.getElementById('expandedNoVideoBox');
+    const noVideoText = DOM.expandedNoVideoText || document.getElementById('expandedNoVideoText');
+    const descEl = DOM.expandedSystemDesc || document.getElementById('expandedSystemDesc');
+    const featGrid = DOM.expandedSystemFeatures || document.getElementById('expandedSystemFeatures');
+    const addedList = DOM.expandedAddedContentList || document.getElementById('expandedAddedContentList');
+    const btnSelect = DOM.btnSelectFromExpanded || document.getElementById('btnSelectFromExpanded');
+    const lblSelect = DOM.lblSelectSystemModal || document.getElementById('lblSelectSystemModal');
+
+    const isAvailable = (sys.id === 'none') || isSystemAvailableInMirrors(sys.id, cachedMirrorsData);
+    const soonLabel = getT('soon', 'Próximamente');
+
+    if (iconEl) iconEl.src = sys.icon;
+    if (nameEl) nameEl.textContent = sys.name;
+    if (badgeEl) {
+      badgeEl.className = `expanded-status-badge ${isAvailable ? 'available' : 'disabled'}`;
+      badgeEl.textContent = isAvailable ? getT('available', 'Disponible') : soonLabel;
+    }
+    if (baseEl) baseEl.textContent = `${getT('sys_base_label', 'Base')}: ${sys.base}`;
+    if (linkEl) {
+      linkEl.href = sys.url;
+      const span = linkEl.querySelector('span');
+      if (span) span.textContent = getT('sys_website', 'Sitio web oficial');
+    }
+
+    // Vídeos de previsualización
+    if (sys.videos && sys.videos.length > 0) {
+      if (videoBox) videoBox.style.display = 'flex';
+      if (noVideoBox) noVideoBox.style.display = 'none';
+      updateExpandedVideoDisplay();
+    } else {
+      if (videoBox) videoBox.style.display = 'none';
+      if (noVideoBox) {
+        noVideoBox.style.display = 'block';
+        if (noVideoText) noVideoText.textContent = sys.descLead;
+      }
+    }
+
+    // Descripción y características
+    if (descEl) descEl.textContent = sys.descLead;
+    if (featGrid) {
+      featGrid.innerHTML = '';
+      if (sys.features && sys.features.length > 0) {
+        sys.features.forEach(feat => {
+          const item = document.createElement('div');
+          item.className = 'expanded-feature-card';
+          item.innerHTML = `
+            <div class="expanded-feature-title">${feat.title}</div>
+            <div class="expanded-feature-desc">${feat.desc}</div>
+          `;
+          featGrid.appendChild(item);
+        });
+      }
+    }
+
+    // Contenido añadido
+    if (addedList) {
+      addedList.innerHTML = '';
+      if (sys.addedContent && sys.addedContent.length > 0) {
+        sys.addedContent.forEach(item => {
+          const pill = document.createElement('div');
+          pill.className = 'added-content-pill';
+          pill.innerHTML = `
+            <span class="added-content-item-name">${item.name}</span>
+            <span class="added-content-check-icon">${item.icon || '✔'}</span>
+          `;
+          addedList.appendChild(pill);
+        });
+      }
+    }
+
+    // Botón de selección
+    if (btnSelect && lblSelect) {
+      if (isAvailable) {
+        btnSelect.disabled = false;
+        lblSelect.textContent = getT('sys_select_this', 'Seleccionar este sistema');
+      } else {
+        btnSelect.disabled = true;
+        lblSelect.textContent = soonLabel;
+      }
+    }
+
+    if (overlay) {
+      overlay.style.display = 'flex';
+      requestAnimationFrame(() => {
+        overlay.classList.add('active');
+      });
+    }
+  }
+  window.openExpandedCard = openExpandedCard;
+
+  function closeExpandedCard() {
+    const overlay = DOM.expandedCardOverlay || document.getElementById('expandedCardOverlay');
+    const video = DOM.expandedVideoPlayer || document.getElementById('expandedVideoPlayer');
+    if (video) video.pause();
+
+    if (overlay) {
+      overlay.classList.remove('active');
+      setTimeout(() => {
+        if (!overlay.classList.contains('active')) {
+          overlay.style.display = 'none';
+        }
+      }, 250);
+    }
+    currentExpandedSystemId = null;
+  }
+  window.closeExpandedCard = closeExpandedCard;
+
+  function updateExpandedVideoDisplay() {
+    const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === currentExpandedSystemId);
+    if (!sys || !sys.videos || sys.videos.length === 0) return;
+
+    const navBar = DOM.expandedVideoNavBar || document.getElementById('expandedVideoNavBar');
+    const labelEl = DOM.expandedVideoLabel || document.getElementById('expandedVideoLabel');
+    const counterEl = DOM.expandedVideoCounter || document.getElementById('expandedVideoCounter');
+    const videoPlayer = DOM.expandedVideoPlayer || document.getElementById('expandedVideoPlayer');
+
+    if (sys.videos.length > 1) {
+      if (navBar) navBar.style.display = 'flex';
+    } else {
+      if (navBar) navBar.style.display = 'none';
+    }
+
+    const currentVideo = sys.videos[currentExpandedVideoIndex] || sys.videos[0];
+    if (labelEl) labelEl.textContent = currentVideo.label;
+    if (counterEl) counterEl.textContent = `${currentExpandedVideoIndex + 1} / ${sys.videos.length}`;
+
+    if (videoPlayer) {
+      videoPlayer.src = currentVideo.src;
+      videoPlayer.load();
+      videoPlayer.play().catch(() => {});
+    }
+  }
+
+  function nextExpandedVideo() {
+    const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === currentExpandedSystemId);
+    if (!sys || !sys.videos || sys.videos.length <= 1) return;
+    currentExpandedVideoIndex = (currentExpandedVideoIndex + 1) % sys.videos.length;
+    updateExpandedVideoDisplay();
+  }
+
+  function prevExpandedVideo() {
+    const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === currentExpandedSystemId);
+    if (!sys || !sys.videos || sys.videos.length <= 1) return;
+    currentExpandedVideoIndex = (currentExpandedVideoIndex - 1 + sys.videos.length) % sys.videos.length;
+    updateExpandedVideoDisplay();
+  }
+
+  // Eventos de la tarjeta ampliada
+  if (DOM.btnExpandedCardClose) {
+    DOM.btnExpandedCardClose.addEventListener('click', closeExpandedCard);
+  }
+  if (DOM.btnDismissExpanded) {
+    DOM.btnDismissExpanded.addEventListener('click', closeExpandedCard);
+  }
+  if (DOM.expandedCardOverlay) {
+    DOM.expandedCardOverlay.addEventListener('click', (e) => {
+      if (e.target === DOM.expandedCardOverlay) {
+        closeExpandedCard();
+      }
+    });
+  }
+  if (DOM.btnExpandedNextVideo) {
+    DOM.btnExpandedNextVideo.addEventListener('click', nextExpandedVideo);
+  }
+  if (DOM.btnExpandedPrevVideo) {
+    DOM.btnExpandedPrevVideo.addEventListener('click', prevExpandedVideo);
+  }
+  if (DOM.expandedSystemLink) {
+    DOM.expandedSystemLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === currentExpandedSystemId);
+      if (sys && sys.url) openExternalUrl(sys.url);
+    });
+  }
+
+  if (DOM.btnSelectFromExpanded) {
+    DOM.btnSelectFromExpanded.addEventListener('click', () => {
+      if (currentExpandedSystemId) {
+        const sysId = currentExpandedSystemId;
+        closeExpandedCard();
+        selectPortableSystem(sysId);
+      }
+    });
+  }
+
+  function populateSelectedSystemDetails(sysId) {
+    const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === sysId);
+    if (!sys) return;
+
+    if (DOM.selectedSummaryName) DOM.selectedSummaryName.textContent = sys.name;
+    if (DOM.selectedSummaryBase) DOM.selectedSummaryBase.textContent = `${getT('sys_base_label', 'Base')}: ${sys.base}`;
+    if (DOM.selectedSummaryLead) DOM.selectedSummaryLead.textContent = sys.descLead;
+    if (DOM.selectedSummaryLink) {
+      DOM.selectedSummaryLink.href = sys.url;
+      const span = DOM.selectedSummaryLink.querySelector('span');
+      if (span) span.textContent = sys.name;
+    }
+
+    if (DOM.selectedHighlightsGrid) {
+      DOM.selectedHighlightsGrid.innerHTML = '';
+      if (sys.features && sys.features.length > 0) {
+        sys.features.forEach(feat => {
+          const card = document.createElement('div');
+          card.className = 'selected-highlight-card';
+          card.innerHTML = `
+            <div class="selected-highlight-title">${feat.title}</div>
+            <div class="selected-highlight-desc">${feat.desc}</div>
+          `;
+          DOM.selectedHighlightsGrid.appendChild(card);
+        });
+      }
+    }
+
+    if (DOM.selectedAddedContentList) {
+      DOM.selectedAddedContentList.innerHTML = '';
+      if (sys.addedContent && sys.addedContent.length > 0) {
+        sys.addedContent.forEach(item => {
+          const pill = document.createElement('div');
+          pill.className = 'added-content-pill';
+          pill.innerHTML = `
+            <span class="added-content-item-name">${item.name}</span>
+            <span class="added-content-check-icon">${item.icon || '✔'}</span>
+          `;
+          DOM.selectedAddedContentList.appendChild(pill);
+        });
+      }
+    }
+  }
+
+  if (DOM.selectedSummaryLink) {
+    DOM.selectedSummaryLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const sys = PORTABLE_SYSTEMS_CATALOG.find(s => s.id === State.portableOs);
+      if (sys && sys.url) openExternalUrl(sys.url);
+    });
+  }
+
   function syncPortableSystemUI() {
-    const wrapRoulette = DOM.portableRouletteWrap || document.getElementById('portableRouletteWrap');
-    const wrapVideo = DOM.portableVideoWrap || document.getElementById('portableVideoWrap');
+    const wrapCards = DOM.portableCardsWrap || document.getElementById('portableCardsWrap');
+    const wrapSelected = DOM.portableSelectedWrap || document.getElementById('portableSelectedWrap');
+    const flowSystem = DOM.portableSelectedSystemFlow || document.getElementById('portableSelectedSystemFlow');
     const wrapNone = DOM.portableNoneWrap || document.getElementById('portableNoneWrap');
     const btnChange = DOM.btnChangeSystem || document.getElementById('btnChangeSystem');
     const vCachy = DOM.videoCachy || document.getElementById('videoCachy');
 
-    if (!wrapRoulette) return;
+    if (!wrapCards || !wrapSelected) return;
 
     if (State.portableSystemSelected) {
-      wrapRoulette.style.display = 'none';
+      wrapCards.style.display = 'none';
+      wrapSelected.style.display = 'flex';
       if (btnChange) btnChange.style.display = 'flex';
 
       if (State.portableOs === 'cachyos') {
-        if (wrapVideo) wrapVideo.style.display = 'flex';
+        if (flowSystem) flowSystem.style.display = 'flex';
         if (wrapNone) wrapNone.style.display = 'none';
         if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'flex';
+        if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = 'CachyOS Linux';
+        if (DOM.paneTitleSystemIcon) DOM.paneTitleSystemIcon.src = '/media/systems/cachyos-linux.svg';
+        populateSelectedSystemDetails('cachyos');
         if (State.screen === 'wizard' && State.wizardStep === 4) {
-          if (vCachy) {
-            vCachy.play().catch(() => {});
-          }
+          if (vCachy) vCachy.play().catch(() => {});
         }
       } else {
-        if (wrapVideo) wrapVideo.style.display = 'none';
+        if (flowSystem) flowSystem.style.display = 'none';
         if (wrapNone) wrapNone.style.display = 'flex';
         if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'none';
+        if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = 'Sin Sistema Portable';
+        if (DOM.paneTitleSystemIcon) DOM.paneTitleSystemIcon.src = '/media/systems/ninguno.svg';
         if (vCachy) vCachy.pause();
       }
     } else {
-      wrapRoulette.style.display = 'flex';
-      if (wrapVideo) wrapVideo.style.display = 'none';
-      if (wrapNone) wrapNone.style.display = 'none';
+      wrapCards.style.display = 'flex';
+      wrapSelected.style.display = 'none';
+      if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'none';
       if (btnChange) btnChange.style.display = 'none';
+      if (DOM.paneTitleSystem) DOM.paneTitleSystem.textContent = getT('sys_title', 'Elige un sistema portable');
+      if (DOM.paneTitleSystemIcon) DOM.paneTitleSystemIcon.src = '/media/sistemas.png';
       if (vCachy) vCachy.pause();
     }
   }
@@ -2233,387 +2752,6 @@ function initApp() {
   }
   window.openExternalUrl = openExternalUrl;
 
-  // Botones de información [ ℹ ] en cada orbe de sistema portable
-  document.querySelectorAll('.roulette-item-info-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      const targetUrl = btn.dataset.url || btn.closest('.roulette-item')?.dataset.url;
-      if (targetUrl) {
-        openExternalUrl(targetUrl);
-      }
-    });
-  });
-
-  let isSelectingOrb = false;
-  let selectionStartTime = 0;
-  let selectedItemPlaceholder = null;
-  let activeSelectedOrbElement = null;
-
-  function restoreSelectedOrbToTrack() {
-    if (activeSelectedOrbElement && selectedItemPlaceholder && selectedItemPlaceholder.parentNode) {
-      selectedItemPlaceholder.parentNode.insertBefore(activeSelectedOrbElement, selectedItemPlaceholder);
-      selectedItemPlaceholder.remove();
-      selectedItemPlaceholder = null;
-      activeSelectedOrbElement.style.removeProperty('--orb-x');
-      activeSelectedOrbElement.style.removeProperty('--orb-y');
-      activeSelectedOrbElement.style.removeProperty('transition');
-      activeSelectedOrbElement.classList.remove('is-selected-orb', 'is-absorbed-orb', 'is-hovered');
-      activeSelectedOrbElement.style.opacity = '';
-      activeSelectedOrbElement = null;
-    }
-  }
-
-  function animateAndSelectPortableSystem(selectedItem) {
-    if (isSelectingOrb) return;
-    if (selectedItem.classList.contains('disabled')) return;
-    isSelectingOrb = true;
-    selectionStartTime = performance.now();
-
-    const os = selectedItem.dataset.os;
-    const systemName = selectedItem.dataset.name || (os === 'cachyos' ? 'CachyOS Linux' : 'Ninguno');
-    const stage = document.querySelector('.roulette-stage');
-    const track = document.getElementById('rouletteTrack');
-    const items = document.querySelectorAll('.roulette-item');
-    const titleIcon = document.getElementById('paneTitleSystemIcon') || DOM.paneTitleSystemIcon;
-    const titleText = document.getElementById('paneTitleSystem') || DOM.paneTitleSystem;
-
-    // 1. Fase 1: Activar vórtice acelerado en el escenario
-    if (stage) stage.classList.add('is-animating-selection');
-
-    // Desacoplar el orbe seleccionado a stage (fuera del track rotatorio) para que NUNCA gire sobre sí mismo
-    if (stage && selectedItem.parentNode === track) {
-      activeSelectedOrbElement = selectedItem;
-      selectedItemPlaceholder = document.createElement('div');
-      selectedItemPlaceholder.className = 'roulette-item-placeholder';
-      selectedItemPlaceholder.style.display = 'none';
-      track.insertBefore(selectedItemPlaceholder, selectedItem);
-
-      const stageRect = stage.getBoundingClientRect();
-      const itemRect = selectedItem.getBoundingClientRect();
-      const startDx = (itemRect.left + itemRect.width / 2) - (stageRect.left + stageRect.width / 2);
-      const startDy = (itemRect.top + itemRect.height / 2) - (stageRect.top + stageRect.height / 2);
-
-      stage.appendChild(selectedItem);
-      selectedItem.classList.add('is-selected-orb');
-      selectedItem.style.setProperty('--orb-x', `${startDx.toFixed(2)}px`);
-      selectedItem.style.setProperty('--orb-y', `${startDy.toFixed(2)}px`);
-      selectedItem.style.transition = 'none';
-
-      // Forzar reflow para anclar origen sin rotación
-      void selectedItem.offsetWidth;
-
-      requestAnimationFrame(() => {
-        selectedItem.style.transition = 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
-        selectedItem.style.setProperty('--orb-x', '0px');
-        selectedItem.style.setProperty('--orb-y', '0px');
-      });
-    } else {
-      selectedItem.classList.add('is-selected-orb');
-    }
-
-    // Los demás orbes se contraen hacia el centro mientras giran a toda velocidad con el track
-    items.forEach(item => {
-      if (item !== selectedItem) {
-        item.classList.add('is-absorbed-orb');
-      }
-    });
-
-    // Duración de la fase 1 (absorción vorticial y zoom en el centro): 650ms
-    setTimeout(() => {
-      // 2. Fase 2: Deslizamiento fluido del icono hacia la cabecera
-      const iconImg = selectedItem.querySelector('.roulette-item-icon');
-      const iconSrc = iconImg ? iconImg.src : (os === 'cachyos' ? '/media/systems/cachyos-linux.svg' : '/media/systems/ninguno.svg');
-
-      const inner = selectedItem.querySelector('.roulette-item-inner');
-      const startRect = inner ? inner.getBoundingClientRect() : selectedItem.getBoundingClientRect();
-      const targetRect = titleIcon ? titleIcon.getBoundingClientRect() : null;
-
-      if (targetRect && startRect.width > 0) {
-        const flyingGhost = document.createElement('div');
-        flyingGhost.className = 'roulette-flying-ghost';
-        flyingGhost.style.position = 'fixed';
-        flyingGhost.style.left = `${startRect.left}px`;
-        flyingGhost.style.top = `${startRect.top}px`;
-        flyingGhost.style.width = `${startRect.width}px`;
-        flyingGhost.style.height = `${startRect.height}px`;
-        flyingGhost.style.zIndex = '99999';
-        flyingGhost.style.pointerEvents = 'none';
-        flyingGhost.style.borderRadius = '50%';
-        flyingGhost.style.transition = 'all 0.52s cubic-bezier(0.2, 0.8, 0.2, 1)';
-        flyingGhost.style.boxShadow = (os === 'none') ? '0 0 25px rgba(239, 68, 68, 0.85)' : '0 0 25px rgba(0, 212, 255, 0.85)';
-        const shadowFilter = (os === 'none') ? 'drop-shadow(0 0 10px #ef4444)' : 'drop-shadow(0 0 10px #00d4ff)';
-        flyingGhost.innerHTML = `<img src="${iconSrc}" style="width: 100%; height: 100%; object-fit: contain; filter: ${shadowFilter};" />`;
-        document.body.appendChild(flyingGhost);
-
-        // Ocultar temporalmente el orbe central
-        selectedItem.style.opacity = '0';
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            flyingGhost.style.left = `${targetRect.left}px`;
-            flyingGhost.style.top = `${targetRect.top}px`;
-            flyingGhost.style.width = `${targetRect.width}px`;
-            flyingGhost.style.height = `${targetRect.height}px`;
-            flyingGhost.style.borderRadius = '6px';
-            flyingGhost.style.boxShadow = (os === 'none') ? '0 0 12px rgba(239, 68, 68, 0.4)' : '0 0 12px rgba(0, 212, 255, 0.4)';
-          });
-        });
-
-        setTimeout(() => {
-          if (flyingGhost.parentNode) flyingGhost.parentNode.removeChild(flyingGhost);
-
-          // Actualizar icono y texto del título con morph visual
-          if (titleIcon) {
-            titleIcon.src = iconSrc;
-            titleIcon.classList.remove('title-icon-morph');
-            void titleIcon.offsetWidth;
-            titleIcon.classList.add('title-icon-morph');
-          }
-          if (titleText) {
-            titleText.textContent = systemName;
-            titleText.classList.remove('title-text-morph');
-            void titleText.offsetWidth;
-            titleText.classList.add('title-text-morph');
-          }
-
-          // Completar la selección del sistema
-          selectPortableSystem(os);
-          isSelectingOrb = false;
-        }, 530);
-      } else {
-        if (titleIcon) titleIcon.src = iconSrc;
-        if (titleText) titleText.textContent = systemName;
-        selectPortableSystem(os);
-        isSelectingOrb = false;
-      }
-    }, 650);
-  }
-
-  const rouletteItems = document.querySelectorAll('.roulette-item');
-  rouletteItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      // Si el clic fue en el botón de info, no seleccionar
-      if (e.target.closest('.roulette-item-info-btn')) return;
-
-      if (item.classList.contains('disabled')) {
-        return;
-      }
-      animateAndSelectPortableSystem(item);
-    });
-  });
-
-  // =========================================================================
-  // 🌀 CONTROLADOR DE LA RULETA DE SISTEMAS PORTABLES, SECTORES Y LÍNEAS PSP
-  // =========================================================================
-  let rouletteTrackAngle = 0;
-  let isRoulettePaused = false;
-  let hoveredSectorIndex = -1;
-  let lastRouletteTimestamp = 0;
-  const rouletteItemsList = Array.from(document.querySelectorAll('.roulette-item'));
-  const totalRouletteItems = rouletteItemsList.length || 7;
-  const sectorStepDeg = 360 / totalRouletteItems;
-
-  function drawPspWaves(timeSec) {
-    const canvas = document.getElementById('roulettePspCanvas');
-    const stage = document.getElementById('rouletteStage');
-    if (!canvas || !stage || !canvas.getContext) return;
-
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    if (!width || !height) return;
-
-    const targetWidth = Math.round(width * dpr);
-    const targetHeight = Math.round(height * dpr);
-    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-    }
-
-    ctx.save();
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, width, height);
-
-    const cx = width / 2;
-    const cy = height / 2;
-    const baseRadius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 116;
-
-    // Si está en absorción de selección: las ondas se contraen hacia el centro hasta desaparecer bajo el sistema seleccionado
-    let currentRadius = baseRadius;
-    let waveAlpha = 0.85;
-    let spinOffset = 0;
-
-    if (isSelectingOrb && selectionStartTime > 0) {
-      const elapsed = Math.min((performance.now() - selectionStartTime) / 650, 1);
-      // Contracción acelerada hacia el centro
-      currentRadius = baseRadius * Math.max(1 - Math.pow(elapsed, 1.4), 0);
-      waveAlpha = Math.max(1 - elapsed, 0) * 0.85;
-      spinOffset = elapsed * 8.0; // Giro acelerado de las ondas mientras se contraen
-    }
-
-    if (currentRadius <= 0.5 || waveAlpha <= 0.01) {
-      ctx.restore();
-      return;
-    }
-
-    // Curva 1: Ondulaciones pequeñas y en gran cantidad (Frecuencias 12, 18, 24 con amplitud muy pequeña 3.2px, 2.0px, 1.2px)
-    ctx.beginPath();
-    const steps = 300;
-    for (let i = 0; i <= steps; i++) {
-      const theta = (i / steps) * Math.PI * 2;
-      const effectiveTheta = theta + spinOffset;
-      const dr = 3.2 * Math.sin(12 * effectiveTheta + timeSec * 2.2) +
-                 2.0 * Math.cos(18 * effectiveTheta - timeSec * 1.8 + 0.9) +
-                 1.2 * Math.sin(24 * effectiveTheta + timeSec * 2.8 + 1.8);
-      const r = currentRadius + dr;
-      const x = cx + r * Math.sin(theta);
-      const y = cy - r * Math.cos(theta);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.strokeStyle = '#00d4ff';
-    ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = 10;
-    ctx.lineWidth = 1.9;
-    ctx.globalAlpha = waveAlpha;
-    ctx.stroke();
-
-    // Curva 2: Segundo armónico fluido con alta densidad de ondas pequeñas (Frecuencias 14, 20, 28 con amplitud 3.0px, 2.1px, 1.1px)
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const theta = (i / steps) * Math.PI * 2;
-      const effectiveTheta = theta + spinOffset;
-      const dr = 3.0 * Math.cos(14 * effectiveTheta + timeSec * 2.0 + 1.4) +
-                 2.1 * Math.sin(20 * effectiveTheta - timeSec * 2.4 + 0.7) +
-                 1.1 * Math.cos(28 * effectiveTheta + timeSec * 3.1 + 2.5);
-      const r = currentRadius + dr;
-      const x = cx + r * Math.sin(theta);
-      const y = cy - r * Math.cos(theta);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.strokeStyle = '#38bdf8';
-    ctx.shadowColor = '#818cf8';
-    ctx.shadowBlur = 8;
-    ctx.lineWidth = 1.5;
-    ctx.globalAlpha = waveAlpha * 0.75;
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  function onRoulettePointerMove(e) {
-    const stage = document.getElementById('rouletteStage');
-    if (!stage || isSelectingOrb) return;
-
-    const rect = stage.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = e.clientX - cx;
-    const dy = e.clientY - cy;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    const radius = parseFloat(getComputedStyle(stage).getPropertyValue('--roulette-radius')) || 116;
-    const itemSize = parseFloat(getComputedStyle(stage).getPropertyValue('--item-size')) || 58;
-    const innerHoleRadius = radius - (itemSize * 0.55); // Hueco interior según el diagrama del usuario
-    const outerLimitRadius = radius + itemSize + 40;   // Límite exterior de los sectores
-
-    // Solo se detiene el giro si el cursor está sobre la región de uno de los sistemas
-    if (dist >= innerHoleRadius && dist <= outerLimitRadius) {
-      const cursorAngleDeg = (Math.atan2(dy, dx) * 180 / Math.PI + 90 + 360) % 360;
-      let relAngleDeg = (cursorAngleDeg - rouletteTrackAngle) % 360;
-      if (relAngleDeg < 0) relAngleDeg += 360;
-
-      const sectorIdx = Math.round(relAngleDeg / sectorStepDeg) % totalRouletteItems;
-
-      if (sectorIdx !== hoveredSectorIndex) {
-        hoveredSectorIndex = sectorIdx;
-        rouletteItemsList.forEach((item, idx) => {
-          if (idx === sectorIdx) {
-            item.classList.add('is-hovered');
-          } else {
-            item.classList.remove('is-hovered');
-          }
-        });
-      }
-      isRoulettePaused = true;
-    } else {
-      // Dentro del hueco circular central o fuera del círculo, la ruleta gira sin pausar
-      if (hoveredSectorIndex !== -1) {
-        hoveredSectorIndex = -1;
-        rouletteItemsList.forEach(item => item.classList.remove('is-hovered'));
-      }
-      isRoulettePaused = false;
-    }
-  }
-
-  function onRoulettePointerLeave() {
-    if (hoveredSectorIndex !== -1) {
-      hoveredSectorIndex = -1;
-      rouletteItemsList.forEach(item => item.classList.remove('is-hovered'));
-    }
-    isRoulettePaused = false;
-  }
-
-  function onRouletteStageClick(e) {
-    if (isSelectingOrb) return;
-    if (e.target.closest('.roulette-item-info-btn')) return;
-
-    const clickedItem = e.target.closest('.roulette-item');
-    if (clickedItem) {
-      if (clickedItem.classList.contains('disabled')) return;
-      animateAndSelectPortableSystem(clickedItem);
-      return;
-    }
-
-    if (hoveredSectorIndex >= 0 && hoveredSectorIndex < rouletteItemsList.length) {
-      const activeItem = rouletteItemsList[hoveredSectorIndex];
-      if (activeItem && !activeItem.classList.contains('disabled')) {
-        animateAndSelectPortableSystem(activeItem);
-      }
-    }
-  }
-
-  const stageEl = document.getElementById('rouletteStage');
-  if (stageEl) {
-    stageEl.addEventListener('pointermove', onRoulettePointerMove);
-    stageEl.addEventListener('pointerleave', onRoulettePointerLeave);
-    stageEl.addEventListener('click', onRouletteStageClick);
-  }
-
-  function rouletteLoop(timestamp) {
-    if (!lastRouletteTimestamp) lastRouletteTimestamp = timestamp;
-    const dt = Math.min((timestamp - lastRouletteTimestamp) / 1000, 0.1);
-    lastRouletteTimestamp = timestamp;
-
-    const wrap = DOM.portableRouletteWrap || document.getElementById('portableRouletteWrap');
-    const track = DOM.rouletteTrack || document.getElementById('rouletteTrack');
-    const step4Pane = document.querySelector('.wizard-step-pane[data-step="4"]');
-    const isStep4Active = step4Pane && step4Pane.classList.contains('active');
-
-    if (isStep4Active && wrap && wrap.style.display !== 'none' && track) {
-      if (!isRoulettePaused && !isSelectingOrb) {
-        const degreesPerSecond = 360 / 40; // ~40s por vuelta completa
-        rouletteTrackAngle = (rouletteTrackAngle + degreesPerSecond * dt) % 360;
-        track.style.setProperty('--track-angle', `${rouletteTrackAngle.toFixed(3)}deg`);
-      } else if (isSelectingOrb) {
-        // En vórtice acelerado: los demás sistemas giran y se contraen
-        rouletteTrackAngle = (rouletteTrackAngle + 900 * dt) % 360;
-        track.style.setProperty('--track-angle', `${rouletteTrackAngle.toFixed(3)}deg`);
-      }
-
-      drawPspWaves(timestamp / 1000);
-    }
-
-    requestAnimationFrame(rouletteLoop);
-  }
-
-  requestAnimationFrame(rouletteLoop);
-
   if (DOM.btnCachyHypr) {
     DOM.btnCachyHypr.addEventListener('click', () => {
       switchCachyVideo('hyprland');
@@ -2630,33 +2768,13 @@ function initApp() {
   if (DOM.btnChangeSystem) {
     DOM.btnChangeSystem.addEventListener('click', () => {
       State.portableSystemSelected = false;
-      isSelectingOrb = false;
-      selectionStartTime = 0;
-      isRoulettePaused = false;
-      hoveredSectorIndex = -1;
-
-      // Restaurar el orbe a su lugar original en el track rotatorio
-      restoreSelectedOrbToTrack();
+      closeExpandedCard();
 
       // Restaurar cabecera e icono del título
-      const titleIcon = document.getElementById('paneTitleSystemIcon') || DOM.paneTitleSystemIcon;
-      const titleText = document.getElementById('paneTitleSystem') || DOM.paneTitleSystem;
-      if (titleIcon) {
-        titleIcon.src = '/media/sistemas.png';
-        titleIcon.classList.remove('title-icon-morph');
-      }
-      if (titleText) {
-        titleText.textContent = getT('sys_title', 'Elige un sistema portable');
-        titleText.classList.remove('title-text-morph');
-      }
-
-      // Limpiar clases de animación en orbes y escenario de la ruleta
-      const stage = document.querySelector('.roulette-stage');
-      if (stage) stage.classList.remove('is-animating-selection');
-      document.querySelectorAll('.roulette-item').forEach(item => {
-        item.classList.remove('is-selected-orb', 'is-absorbed-orb', 'is-hovered');
-        item.style.opacity = '';
-      });
+      const titleIcon = DOM.paneTitleSystemIcon || document.getElementById('paneTitleSystemIcon');
+      const titleText = DOM.paneTitleSystem || document.getElementById('paneTitleSystem');
+      if (titleIcon) titleIcon.src = '/media/sistemas.png';
+      if (titleText) titleText.textContent = getT('sys_title', 'Elige un sistema portable');
 
       syncPortableSystemUI();
       updateWizardUIControls();
@@ -2668,6 +2786,9 @@ function initApp() {
       selectPortableSystem(e.target.value);
     });
   }
+
+  // Render inicial de tarjetas al cargar
+  renderPortableCards();
 
   // =========================================================================
   // 🎚️ LÓGICA DE PARTISIONADO REAL (HOLLOWDRIVE, SISTEMA, LIBRE)

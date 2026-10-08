@@ -390,12 +390,12 @@
               </div>
               <!-- Selector de Entornos (Hyprland / KDE) y Botón de Información a la derecha -->
               <div class="pane-actions-right">
-                <div class="segmented-selector" id="cachyFlavorWrap">
+                <div class="segmented-selector" id="cachyFlavorWrap" style="display: none;">
                   <button class="segment-btn active" id="btnCachyHypr" type="button">Hyprland</button>
-                  <button class="segment-btn" id="btnCachyKde" type="button" disabled title="KDE (Próximamente)">KDE (Próximamente)</button>
+                  <button class="segment-btn" id="btnCachyKde" type="button" disabled>KDE (Próximamente)</button>
                 </div>
                 <!-- Botón de información independiente [ ℹ ] -->
-                <button class="btn-mini-info" id="btnCachyInfo" type="button" title="Información sobre Sistemas Portables" onclick="window.openModal && window.openModal(document.getElementById('modalCachy'))">
+                <button class="btn-mini-info" id="btnCachyInfo" type="button" onclick="window.openModal && window.openModal(document.getElementById('modalCachy'))">
                   <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                 </button>
                 <!-- Selector legacy oculto para compatibilidad con scripts existentes -->
@@ -411,127 +411,91 @@
               </div>
             </div>
 
-            <!-- Contenedor Principal de la Ruleta Interactiva (Gira lentamente hasta hover) -->
-            <div class="portable-roulette-wrap" id="portableRouletteWrap">
-              <div class="roulette-stage" id="rouletteStage">
-                <!-- Líneas fluctuantes orgánicas al estilo PSP en Canvas -->
-                <canvas class="roulette-psp-canvas" id="roulettePspCanvas"></canvas>
-
-                <!-- Pista rotatoria de opciones: 7 sistemas con ángulo de 51.43° -->
-                <div class="roulette-track" id="rouletteTrack">
-                  <!-- 1. CachyOS (Disponible) -->
-                  <div class="roulette-item available" data-os="cachyos" data-name="CachyOS Linux" data-url="https://cachyos.org" style="--item-angle: 0deg;" title="CachyOS Linux">
-                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de CachyOS" data-url="https://cachyos.org">
-                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </button>
-                    <div class="roulette-item-inner">
-                      <img src="/media/systems/cachyos-linux.svg" alt="CachyOS" class="roulette-item-icon" />
-                    </div>
-                    <div class="roulette-item-name-tag">CachyOS Linux</div>
-                  </div>
-
-                  <!-- 2. Ubuntu -->
-                  <div class="roulette-item disabled" data-os="ubuntu" data-name="Ubuntu (Próximamente)" data-url="https://ubuntu.com" style="--item-angle: 51.43deg;" title="Ubuntu (Próximamente)">
-                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Ubuntu" data-url="https://ubuntu.com">
-                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </button>
-                    <div class="roulette-item-inner">
-                      <img src="/media/systems/ubuntu-linux.svg" alt="Ubuntu" class="roulette-item-icon" />
-                    </div>
-                    <div class="roulette-item-name-tag">Ubuntu (Próximamente)</div>
-                  </div>
-
-                  <!-- 3. Debian -->
-                  <div class="roulette-item disabled" data-os="debian" data-name="Debian (Próximamente)" data-url="https://www.debian.org" style="--item-angle: 102.86deg;" title="Debian (Próximamente)">
-                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Debian" data-url="https://www.debian.org">
-                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </button>
-                    <div class="roulette-item-inner">
-                      <img src="/media/systems/debian-linux.svg" alt="Debian" class="roulette-item-icon" />
-                    </div>
-                    <div class="roulette-item-name-tag">Debian (Próximamente)</div>
-                  </div>
-
-                  <!-- 4. Zorin OS -->
-                  <div class="roulette-item disabled" data-os="zorin" data-name="Zorin OS (Próximamente)" data-url="https://zorin.com/os" style="--item-angle: 154.29deg;" title="Zorin OS (Próximamente)">
-                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Zorin OS" data-url="https://zorin.com/os">
-                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </button>
-                    <div class="roulette-item-inner">
-                      <img src="/media/systems/zorin-os.svg" alt="Zorin OS" class="roulette-item-icon" />
-                    </div>
-                    <div class="roulette-item-name-tag">Zorin OS (Próximamente)</div>
-                  </div>
-
-                  <!-- 5. Deepin -->
-                  <div class="roulette-item disabled" data-os="deepin" data-name="Deepin OS (Próximamente)" data-url="https://www.deepin.org" style="--item-angle: 205.71deg;" title="Deepin OS (Próximamente)">
-                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de Deepin" data-url="https://www.deepin.org">
-                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </button>
-                    <div class="roulette-item-inner">
-                      <img src="/media/systems/deepin.svg" alt="Deepin" class="roulette-item-icon" />
-                    </div>
-                    <div class="roulette-item-name-tag">Deepin OS (Próximamente)</div>
-                  </div>
-
-                  <!-- 6. PikaOS -->
-                  <div class="roulette-item disabled" data-os="pikaos" data-name="PikaOS (Próximamente)" data-url="https://pika-os.com" style="--item-angle: 257.14deg;" title="PikaOS (Próximamente)">
-                    <button class="roulette-item-info-btn" type="button" title="Página web oficial de PikaOS" data-url="https://pika-os.com">
-                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </button>
-                    <div class="roulette-item-inner">
-                      <img src="/media/systems/pikaos.svg" alt="PikaOS" class="roulette-item-icon" />
-                    </div>
-                    <div class="roulette-item-name-tag">PikaOS (Próximamente)</div>
-                  </div>
-
-                  <!-- 7. Ninguno -->
-                  <div class="roulette-item available item-none" data-os="none" data-name="Ninguno" data-url="https://www.ventoy.net" style="--item-angle: 308.57deg;" title="Ninguno (Sin Sistema)">
-                    <button class="roulette-item-info-btn" type="button" title="Información sobre Ventoy y almacenamiento" data-url="https://www.ventoy.net">
-                      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </button>
-                    <div class="roulette-item-inner">
-                      <img src="/media/systems/ninguno.svg" alt="Ninguno" class="roulette-item-icon icon-none" />
-                    </div>
-                    <div class="roulette-item-name-tag">Ninguno (Sin Sistema)</div>
-                  </div>
-                </div>
+            <!-- CONTENEDOR DE CATÁLOGO: Cuadrícula de Tarjetas Compactas de Sistemas -->
+            <div class="portable-cards-wrap" id="portableCardsWrap">
+              <div class="portable-cards-grid" id="portableCardsGrid">
+                <!-- Se inyectan dinámicamente según el catálogo PORTABLE_SYSTEMS_CATALOG -->
               </div>
             </div>
 
-            <!-- Preview Vídeo del Sistema Seleccionado (Se muestra al elegir sistema con vídeo) -->
-            <div class="video-preview-wrap portable-selected-video-wrap" id="portableVideoWrap" style="display: none;">
-              <div class="video-preview-box" data-video="videoCachy">
-                <video id="videoCachy" loop muted playsinline preload="metadata">
-                  <source id="videoCachySource" src="/media/sistema.mp4" type="video/mp4" />
-                </video>
-                <div class="video-hover-bar">
-                  <button class="video-play-btn" type="button" title="Reproducir / Pausar">
-                    <svg class="icon-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/></svg>
-                    <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
-                  </button>
-                  <div class="video-scrub-track" title="Deslizar para avanzar o retroceder">
-                    <div class="video-scrub-fill"></div>
-                    <div class="video-scrub-thumb"></div>
+
+            <!-- VISTA DEL SISTEMA SELECCIONADO (Vídeo grande arriba + Opciones de escritorio + Info scroll debajo) -->
+            <div class="portable-selected-wrap" id="portableSelectedWrap" style="display: none;">
+              <!-- Flujo para Sistema Seleccionado (ej. CachyOS) -->
+              <div class="portable-selected-content-flow" id="portableSelectedSystemFlow">
+                <!-- Vídeo en grande -->
+                <div class="video-preview-wrap portable-selected-video-wrap" id="portableVideoWrap">
+                  <div class="video-preview-box" data-video="videoCachy">
+                    <video id="videoCachy" loop muted playsinline preload="metadata">
+                      <source id="videoCachySource" src="/media/sistema.mp4" type="video/mp4" />
+                    </video>
+                    <div class="video-hover-bar">
+                      <button class="video-play-btn" type="button">
+                        <svg class="icon-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/></svg>
+                        <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
+                      </button>
+                      <div class="video-scrub-track">
+                        <div class="video-scrub-fill"></div>
+                        <div class="video-scrub-thumb"></div>
+                      </div>
+                      <span class="video-time-chip">0:00 / 0:00</span>
+                    </div>
                   </div>
-                  <span class="video-time-chip">0:00 / 0:00</span>
+                </div>
+
+                <!-- Debajo del todo la información con scroll vertical -->
+                <div class="portable-selected-scroll-wrap" id="portableSelectedScrollWrap">
+                  <div class="selected-system-summary-card">
+                    <div class="selected-summary-header">
+                      <div class="selected-summary-title-col">
+                        <div class="selected-summary-name-row">
+                          <h3 class="selected-summary-name" id="selectedSummaryName">CachyOS Linux</h3>
+                          <span class="selected-summary-base" id="selectedSummaryBase">Base: Arch Linux</span>
+                        </div>
+                        <p class="selected-summary-lead" id="selectedSummaryLead">
+                          Sistema operativo portable optimizado para gaming, fluidez extrema y productividad.
+                        </p>
+                      </div>
+                      <a class="selected-summary-link" id="selectedSummaryLink" href="https://cachyos.org" target="_blank" rel="noopener noreferrer">
+                        <span>Sitio web</span>
+                        <svg class="external-icon" viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6h-2v6H5V5z"/></svg>
+                      </a>
+                    </div>
+
+                    <div class="selected-highlights-grid" id="selectedHighlightsGrid">
+                      <!-- Características detalladas con scroll -->
+                    </div>
+
+                    <!-- Sección CONTENIDO AÑADIDO: SavinWelcome ✔ -->
+                    <div class="selected-added-content-box">
+                      <div class="added-content-header-title">
+                        <span class="added-content-label-text">CONTENIDO AÑADIDO:</span>
+                      </div>
+                      <div class="added-content-items-list" id="selectedAddedContentList">
+                        <div class="added-content-pill">
+                          <span class="added-content-item-name">SavinWelcome</span>
+                          <span class="added-content-check-icon">✔</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Vista 'Ninguno' cuando se selecciona no instalar sistema -->
-            <div class="portable-none-wrap" id="portableNoneWrap" style="display: none;">
-              <div class="portable-none-card">
-                <div class="portable-none-icon-box">
-                  <img src="/media/systems/ninguno.svg" alt="Sin Sistema" class="portable-none-img" />
-                </div>
-                <h3 class="portable-none-title">Sin Sistema Portable</h3>
-                <p class="portable-none-desc">
-                  No se instalará ningún sistema operativo portable en la memoria USB.<br/>
-                  Todo el espacio disponible quedará reservado para HollowDrive y tus imágenes ISO personalizadas.
-                </p>
-                <div class="portable-none-badge">
-                  <span>⚡ 100% Espacio para Ventoy e ISOs</span>
+              <!-- Vista 'Ninguno' cuando se selecciona no instalar sistema -->
+              <div class="portable-none-wrap" id="portableNoneWrap" style="display: none;">
+                <div class="portable-none-card">
+                  <div class="portable-none-icon-box">
+                    <img src="/media/systems/ninguno.svg" alt="Sin Sistema" class="portable-none-img" />
+                  </div>
+                  <h3 class="portable-none-title">Sin Sistema Portable</h3>
+                  <p class="portable-none-desc">
+                    No se instalará ningún sistema operativo portable en la memoria USB.<br/>
+                    Todo el espacio disponible quedará reservado para HollowDrive y tus imágenes ISO personalizadas.
+                  </p>
+                  <div class="portable-none-badge">
+                    <span>⚡ 100% Espacio para Ventoy e ISOs</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1347,6 +1311,95 @@ CARACTERÍSTICAS PRINCIPALES:
       </div>
       <div style="display:flex; justify-content:center; margin-top:14px;">
         <button class="btn-nav btn-next btn-modal-understood" data-modal-close="modalCachy" style="padding:8px 30px;">ENTENDIDO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL: TARJETA AMPLIADA DE SISTEMA PORTABLE (CENTRO DE PANTALLA)
+       ===================================================================== -->
+  <div class="expanded-card-overlay" id="expandedCardOverlay" style="display: none;">
+    <div class="expanded-card-box" id="expandedCardBox">
+      <!-- Botón Cerrar (✕) -->
+      <button class="expanded-card-close-btn" id="btnExpandedCardClose" type="button">&times;</button>
+      
+      <!-- Encabezado de la Tarjeta Ampliada -->
+      <div class="expanded-card-header">
+        <div class="expanded-card-icon-wrap">
+          <img id="expandedSystemIcon" src="/media/systems/cachyos-linux.svg" alt="Sistema" class="expanded-system-icon" />
+        </div>
+        <div class="expanded-card-titles">
+          <div class="expanded-card-name-row">
+            <h3 class="expanded-system-name" id="expandedSystemName">CachyOS Linux</h3>
+            <span class="expanded-status-badge" id="expandedSystemBadge">Disponible</span>
+          </div>
+          <div class="expanded-card-sub-row">
+            <span class="expanded-base-tag" id="expandedSystemBase">Base: Arch Linux</span>
+            <a class="expanded-web-link" id="expandedSystemLink" href="https://cachyos.org" target="_blank" rel="noopener noreferrer">
+              <span>Sitio web oficial</span>
+              <svg class="external-icon" viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6h-2v6H5V5z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zona de Previsualización de Vídeo / Multimedia -->
+      <div class="expanded-video-section" id="expandedVideoSection">
+        <div class="expanded-video-box" id="expandedVideoBox">
+          <video id="expandedVideoPlayer" loop muted playsinline preload="metadata">
+            <source id="expandedVideoSource" src="/media/sistema.mp4" type="video/mp4" />
+          </video>
+          <!-- Controles de navegación entre vídeos (flechitas ◀ / ▶) -->
+          <div class="expanded-video-nav-bar" id="expandedVideoNavBar" style="display: none;">
+            <button class="expanded-nav-arrow" id="btnExpandedPrevVideo" type="button">
+              <svg viewBox="0 0 24 24"><polygon points="15,4 7,12 15,20" fill="currentColor"/></svg>
+            </button>
+            <div class="expanded-video-indicator" id="expandedVideoIndicator">
+              <span id="expandedVideoLabel">Hyprland (Tiling Wayland)</span>
+              <span class="expanded-video-counter" id="expandedVideoCounter">1 / 2</span>
+            </div>
+            <button class="expanded-nav-arrow" id="btnExpandedNextVideo" type="button">
+              <svg viewBox="0 0 24 24"><polygon points="9,4 17,12 9,20" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+        <!-- Vista alternativa sin vídeo (para 'Ninguno' o pendientes) -->
+        <div class="expanded-no-video-box" id="expandedNoVideoBox" style="display: none;">
+          <div class="expanded-no-video-icon">⚡</div>
+          <div class="expanded-no-video-text" id="expandedNoVideoText">
+            Instalación limpia sin sistema portable. 100% de la capacidad para almacenamiento y tus propias ISOs.
+          </div>
+        </div>
+      </div>
+
+      <!-- Información específica del sistema con scroll interno -->
+      <div class="expanded-info-scroll-wrap" id="expandedInfoScrollWrap">
+        <p class="expanded-description-lead" id="expandedSystemDesc"></p>
+        
+        <div class="expanded-features-grid" id="expandedSystemFeatures">
+          <!-- Bullets informativos generados dinámicamente -->
+        </div>
+
+        <!-- SECCIÓN: CONTENIDO AÑADIDO: SavinWelcome ✔ -->
+        <div class="expanded-added-content-section" id="expandedAddedContentSection">
+          <div class="added-content-header-title">
+            <span class="added-content-label-text">CONTENIDO AÑADIDO:</span>
+          </div>
+          <div class="added-content-items-list" id="expandedAddedContentList">
+            <div class="added-content-pill">
+              <span class="added-content-item-name">SavinWelcome</span>
+              <span class="added-content-check-icon">✔</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer de la Tarjeta Ampliada con Botón Seleccionar -->
+      <div class="expanded-card-footer">
+        <button class="btn-cancel-modal" id="btnDismissExpanded" type="button">Cerrar</button>
+        <button class="btn-select-system-modal" id="btnSelectFromExpanded" type="button">
+          <span id="lblSelectSystemModal">Seleccionar este sistema</span>
+        </button>
       </div>
     </div>
   </div>
