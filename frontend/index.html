@@ -71,20 +71,24 @@
        Izquierda: Idiomas | Centro: Título PNG Grande | Derecha: Botón Info
        ===================================================================== -->
   <header class="app-header">
-    <div class="header-left">
+    <div class="header-left" id="headerLeft">
       <!-- Perfil de GitHub a la izquierda -->
       <a href="https://github.com/MVP-Savyn" target="_blank" rel="noopener" class="github-pill" title="GitHub: MVP-Savyn">
         <img src="https://github.com/MVP-Savyn.png" class="avatar-img" alt="MVP-Savyn" onerror="this.src='/media/hollowdrive.ico';" />
         <span>MVP-Savyn</span>
       </a>
+      <!-- Slot para ubicar el logo/título a la izquierda al maximizar en el asistente -->
+      <div class="docked-logo-slot" id="dockedLogoSlot"></div>
     </div>
 
-    <div class="header-center">
+    <div class="header-center" id="headerCenter">
       <!-- Título grande en medio arriba con icono de hollowdrive -->
       <div class="brand-title-wrap" id="headerLogoWrap">
         <img src="/media/hollowdrive.ico" class="title-ico-large" alt="HollowDrive" />
         <img src="/media/HollowDrive-2.png" alt="HOLLOWDRIVE" class="brand-logo-img brand-logo-center-huge" id="headerLogo" />
       </div>
+      <!-- Slot para ubicar el stepper en el centro del header al maximizar en el asistente -->
+      <div class="docked-stepper-slot" id="dockedStepperSlot"></div>
     </div>
 
     <div class="header-right">
@@ -213,36 +217,39 @@
     <section class="screen" id="screen-wizard">
       <div class="wizard-container">
         
-        <!-- Stepper Bar -->
-        <div class="stepper-wrap" id="stepperWrap">
-          <div class="step-item active" data-step="1">
-            <span class="step-num">1</span>
-            <span id="stepLabel1">Unidad USB</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="step-item" data-step="2">
-            <span class="step-num">2</span>
-            <span id="stepLabel2">Kit de Herramientas</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="step-item" data-step="3">
-            <span class="step-num">3</span>
-            <span id="stepLabel3">Batocera</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="step-item" data-step="4">
-            <span class="step-num">4</span>
-            <span id="stepLabel4">Sistema Portable</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="step-item" data-step="5">
-            <span class="step-num">5</span>
-            <span id="stepLabel5">Método de Descarga</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="step-item" data-step="6">
-            <span class="step-num">6</span>
-            <span id="stepLabel6">Particionado</span>
+        <!-- Contenedor anfitrión del Stepper Bar (permite acoplarlo al header en pantalla completa) -->
+        <div class="wizard-stepper-host" id="wizardStepperHost">
+          <!-- Stepper Bar -->
+          <div class="stepper-wrap" id="stepperWrap">
+            <div class="step-item active" data-step="1">
+              <span class="step-num">1</span>
+              <span id="stepLabel1">Unidad USB</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item" data-step="2">
+              <span class="step-num">2</span>
+              <span id="stepLabel2">Kit de Herramientas</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item" data-step="3">
+              <span class="step-num">3</span>
+              <span id="stepLabel3">Batocera</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item" data-step="4">
+              <span class="step-num">4</span>
+              <span id="stepLabel4">Sistema Portable</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item" data-step="5">
+              <span class="step-num">5</span>
+              <span id="stepLabel5">Método de Descarga</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item" data-step="6">
+              <span class="step-num">6</span>
+              <span id="stepLabel6">Particionado</span>
+            </div>
           </div>
         </div>
 

@@ -87,8 +87,13 @@ function initApp() {
     btnNext: document.getElementById('btnNext'),
     
     // Header & Info
+    headerLeft: document.getElementById('headerLeft'),
+    headerCenter: document.getElementById('headerCenter'),
     headerLogoWrap: document.getElementById('headerLogoWrap'),
     headerLogo: document.getElementById('headerLogo'),
+    dockedLogoSlot: document.getElementById('dockedLogoSlot'),
+    dockedStepperSlot: document.getElementById('dockedStepperSlot'),
+    wizardStepperHost: document.getElementById('wizardStepperHost'),
     btnHeaderInfo: document.getElementById('btnHeaderInfo'),
     overlayInfo: document.getElementById('overlayInfo'),
     btnEnterApp: document.getElementById('btnEnterApp'),
@@ -1133,23 +1138,85 @@ function initApp() {
   const UNMAXIMIZE_PULL_THRESHOLD = 20; // Si está maximizada y arrastra hacia abajo >= 20px, se desmaximiza
   const SNAP_TOP_THRESHOLD = 14; // Píxeles al borde superior de pantalla para activar Aero Snap
 
+  function isCurrentWindowMaximized() {
+    if (document.fullscreenElement) return true;
+    if (window.hollowdrive) {
+      return Boolean(isWindowMaximized);
+    }
+    // Modo testing / navegador sin backend nativo
+    if (typeof isWindowMaximized === 'boolean') {
+      if (isWindowMaximized) return true;
+      if (!isWindowMaximized && window.innerWidth <= 1300) return false;
+    }
+    if (window.screen && window.screen.availWidth > 1300 && window.screen.availHeight > 700) {
+      const nearFullW = window.innerWidth >= (window.screen.availWidth - 24);
+      const nearFullH = window.innerHeight >= (window.screen.availHeight - 64);
+      if (nearFullW && nearFullH) return true;
+    }
+    return Boolean(isWindowMaximized);
+  }
+
+  function syncMaximizedHeaderLayout() {
+    const isMax = isCurrentWindowMaximized();
+    const isWizard = (State && State.screen === 'wizard');
+    const shouldDock = isMax && isWizard;
+
+    const dockedLogoSlot = DOM.dockedLogoSlot || document.getElementById('dockedLogoSlot');
+    const dockedStepperSlot = DOM.dockedStepperSlot || document.getElementById('dockedStepperSlot');
+    const wizardStepperHost = DOM.wizardStepperHost || document.getElementById('wizardStepperHost');
+    const headerCenter = DOM.headerCenter || document.getElementById('headerCenter');
+    const headerLogoWrap = DOM.headerLogoWrap || document.getElementById('headerLogoWrap');
+    const stepperWrap = DOM.stepperWrap || document.getElementById('stepperWrap');
+
+    if (!dockedLogoSlot || !dockedStepperSlot || !wizardStepperHost || !headerCenter || !headerLogoWrap || !stepperWrap) {
+      return;
+    }
+
+    if (shouldDock) {
+      if (!document.body.classList.contains('header-docked-stepper')) {
+        document.body.classList.add('header-docked-stepper');
+      }
+      if (headerLogoWrap.parentElement !== dockedLogoSlot) {
+        dockedLogoSlot.appendChild(headerLogoWrap);
+      }
+      if (stepperWrap.parentElement !== dockedStepperSlot) {
+        dockedStepperSlot.appendChild(stepperWrap);
+      }
+    } else {
+      if (document.body.classList.contains('header-docked-stepper')) {
+        document.body.classList.remove('header-docked-stepper');
+      }
+      if (headerLogoWrap.parentElement !== headerCenter) {
+        headerCenter.insertBefore(headerLogoWrap, dockedStepperSlot);
+      }
+      if (stepperWrap.parentElement !== wizardStepperHost) {
+        wizardStepperHost.appendChild(stepperWrap);
+      }
+    }
+  }
+
   function updateResponsiveState() {
+    const isMax = isCurrentWindowMaximized();
     const isWide = window.innerWidth >= 1340 || (window.screen && window.innerWidth >= (window.screen.availWidth - 24));
     document.body.classList.toggle('is-large-screen', isWide);
-    if (isWindowMaximized) {
+    if (isMax) {
       document.body.classList.add('is-maximized');
     } else {
       document.body.classList.remove('is-maximized');
     }
+    syncMaximizedHeaderLayout();
   }
 
   function setMaximizedState(isMax) {
     isWindowMaximized = Boolean(isMax);
     updateResponsiveState();
   }
+  window.setMaximizedState = setMaximizedState;
+  window.isCurrentWindowMaximized = isCurrentWindowMaximized;
+  window.syncMaximizedHeaderLayout = syncMaximizedHeaderLayout;
 
   // Sincronizar estado inicial de maximizado
-  if (window.hollowdrive?.windowGetState) {
+  if (window.hollowdrive?.hasRealApi && window.hollowdrive?.windowGetState) {
     window.hollowdrive.windowGetState().then(st => {
       if (st && typeof st.is_maximized === 'boolean') {
         setMaximizedState(st.is_maximized);
@@ -1158,13 +1225,13 @@ function initApp() {
   }
   updateResponsiveState();
 
-  // Sincronizar estado al cambiar el tamaño de ventana
+  // Sincronizar estado al cambiar el tamaño de ventana o alternar pantalla completa
   window.addEventListener('resize', () => {
     updateResponsiveState();
     if (typeof updateUsbBlockWidth === 'function') {
       updateUsbBlockWidth();
     }
-    if (window.hollowdrive?.windowGetState) {
+    if (window.hollowdrive?.hasRealApi && window.hollowdrive?.windowGetState) {
       window.hollowdrive.windowGetState().then(st => {
         if (st && typeof st.is_maximized === 'boolean') {
           setMaximizedState(st.is_maximized);
@@ -1173,12 +1240,16 @@ function initApp() {
     }
   });
 
+  document.addEventListener('fullscreenchange', () => {
+    updateResponsiveState();
+  });
+
   // Doble clic en la barra superior para alternar maximizado (gesto estándar)
   const appHeaderEl = document.querySelector('.app-header');
   if (appHeaderEl) {
     appHeaderEl.addEventListener('dblclick', (e) => {
       const targetEl = e.target instanceof Element ? e.target : e.target.parentElement;
-      if (!targetEl || targetEl.closest('button, a, input, select, .win-btn, .lang-select-wrap, .github-pill')) return;
+      if (!targetEl || targetEl.closest('button, a, input, select, .win-btn, .lang-select-wrap, .github-pill, .stepper-wrap, .brand-title-wrap')) return;
       if (DOM.winBtnMaximize) DOM.winBtnMaximize.click();
     });
   }
@@ -1229,7 +1300,7 @@ function initApp() {
         '.terminal-console, .segmented-selector, .partition-bar, .partition-sliders-grid, ' +
         '.tools-disk-select, .tools-drop-zone, .knight-wrapper, .hub-knight-widget, .hub-knight-widget *, ' +
         '.video-scrubber-track, .video-progress-container, .video-timeline-wrap, ' +
-        '.disk-card, .disk-option, .dl-card'
+        '.disk-card, .disk-option, .dl-card, .stepper-wrap, .step-item, .brand-title-wrap, .docked-logo-slot, .docked-stepper-slot'
       )
     );
     if (isInteractive) return;
@@ -1596,6 +1667,7 @@ function initApp() {
         }
       });
       State.screen = screenName;
+      syncMaximizedHeaderLayout();
       if (screenName === 'wizard') {
         updateWizardUIControls();
         manageStepVideos(State.wizardStep);
@@ -1625,6 +1697,7 @@ function initApp() {
 
       // Con el escenario despejado, actualizar el estado
       State.screen = screenName;
+      syncMaximizedHeaderLayout();
       if (screenName === 'wizard') {
         updateWizardUIControls();
         manageStepVideos(State.wizardStep);
@@ -1651,6 +1724,7 @@ function initApp() {
     } finally {
       isScreenTransitioning = false;
       document.body.classList.remove('nav-transitioning');
+      syncMaximizedHeaderLayout();
     }
   }
 
