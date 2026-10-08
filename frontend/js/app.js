@@ -2350,27 +2350,42 @@ function initApp() {
       card.className = `system-card ${isAvailable ? 'available' : 'disabled'} ${isNone ? 'card-none' : ''}`;
       card.dataset.os = sys.id;
 
-      card.innerHTML = `
-        <div class="system-card-top">
-          <div class="system-card-icon-box">
-            <img src="${sys.icon}" alt="${sys.name}" class="system-card-icon" />
+      if (isNone) {
+        card.innerHTML = `
+          <div class="system-card-top">
+            <div class="system-card-icon-box">
+              <img src="${sys.icon}" alt="${sys.name}" class="system-card-icon" />
+            </div>
           </div>
-          ${!isAvailable ? `<span class="system-card-badge-soon">${soonLabel}</span>` : ''}
-        </div>
-        <div class="system-card-body">
-          <div class="system-card-title ${isCachy ? 'cachy-green-text' : ''}">${sys.name}</div>
-          <div class="system-card-base">
-            <span class="base-badge">${sys.base}</span>
+          <div class="system-card-body">
+            <div class="system-card-title">${sys.name}</div>
+            <div class="system-card-base">
+              <span class="base-badge">${sys.base}</span>
+            </div>
           </div>
-        </div>
-        <div class="system-card-foot">
-          ${sys.url ? `
-          <a class="system-card-weblink" href="${sys.url}" target="_blank" rel="noopener noreferrer">
-            <span>${webLabel}</span>
-            <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6h-2v6H5V5z"/></svg>
-          </a>` : ''}
-        </div>
-      `;
+        `;
+      } else {
+        card.innerHTML = `
+          <div class="system-card-top">
+            <div class="system-card-icon-box">
+              <img src="${sys.icon}" alt="${sys.name}" class="system-card-icon" />
+            </div>
+            ${!isAvailable ? `<span class="system-card-badge-soon">${soonLabel}</span>` : ''}
+          </div>
+          <div class="system-card-body">
+            <div class="system-card-title ${isCachy ? 'cachy-green-text' : ''}">${sys.name}</div>
+          </div>
+          <div class="system-card-divider"></div>
+          <div class="system-card-bottom-info">
+            <div class="system-card-distro-type">${sys.base}</div>
+            ${sys.url ? `
+            <a class="system-card-weblink" href="${sys.url}" target="_blank" rel="noopener noreferrer">
+              <span>${webLabel}</span>
+              <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6h-2v6H5V5z"/></svg>
+            </a>` : ''}
+          </div>
+        `;
+      }
 
       // Clic en la tarjeta abre el detalle ampliado
       card.addEventListener('click', (e) => {

@@ -1165,29 +1165,29 @@ body.nav-transitioning {
   overflow: hidden;
 }
 
-/* Cuadrícula de Tarjetas Amplias (Proporción Horizontal) */
+/* Cuadrícula de Tarjetas Amplias (Alineadas a la izquierda, eliminando hueco vacío) */
 .portable-cards-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: stretch;
-  gap: 18px 20px;
-  max-width: 980px;
+  gap: 16px 18px;
+  max-width: 100%;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
   padding: 4px 0 16px;
   box-sizing: border-box;
 }
 
-/* Tarjeta individual de Sistema Portable (Más grande y ancha) */
+/* Tarjeta individual de Sistema Portable */
 .system-card {
-  width: clamp(210px, 20vw, 255px);
-  min-height: 142px;
+  width: clamp(210px, 20vw, 245px);
+  min-height: 136px;
   background: radial-gradient(circle at 50% 15%, rgba(30, 41, 59, 0.78), rgba(9, 14, 23, 0.96));
   border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-  padding: 14px 16px 12px;
+  padding: 12px 14px 10px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -1240,12 +1240,12 @@ body.nav-transitioning {
   justify-content: center;
   position: relative;
   width: 100%;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .system-card-icon-box {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.04);
   display: flex;
@@ -1259,8 +1259,8 @@ body.nav-transitioning {
 }
 
 .system-card-icon {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
@@ -1279,14 +1279,14 @@ body.nav-transitioning {
   letter-spacing: 0.2px;
 }
 
-/* Cuerpo de la tarjeta: Título y Base */
+/* Cuerpo de la tarjeta: Título */
 .system-card-body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   width: 100%;
-  margin: 4px 0 8px;
+  margin: 2px 0 4px;
 }
 
 .system-card-title {
@@ -1313,39 +1313,70 @@ body.nav-transitioning {
   white-space: nowrap;
 }
 
-/* Pie de la tarjeta: Enlace web */
+/* Barra separadora interna en tarjetas */
+.system-card-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.09);
+  margin: 4px 0 6px 0;
+}
+
+/* Parte inferior a la barra separadora: SIN BLOQUES, alineada a la izquierda */
+.system-card-bottom-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 3px;
+}
+
+.system-card-distro-type {
+  font-size: clamp(0.70rem, 0.95vw, 0.76rem);
+  font-weight: 600;
+  color: #38bdf8;
+  line-height: 1.25;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.system-card-bottom-info .system-card-weblink {
+  font-size: clamp(0.66rem, 0.88vw, 0.72rem);
+  color: #94a3b8;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  line-height: 1.25;
+  transition: color 0.18s ease;
+}
+
+.system-card-bottom-info .system-card-weblink:hover {
+  color: #00d4ff;
+  text-decoration: underline;
+}
+
+.system-card-bottom-info .system-card-weblink svg {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+  opacity: 0.85;
+}
+
+/* Pie de la tarjeta legado */
 .system-card-foot {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-}
-
-.system-card-weblink {
-  font-size: clamp(0.70rem, 0.95vw, 0.78rem);
-  color: #38bdf8;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  background: rgba(56, 189, 248, 0.05);
-  transition: all 0.18s ease;
-}
-
-.system-card-weblink svg {
-  width: 10px;
-  height: 10px;
-  fill: currentColor;
-}
-
-.system-card-weblink:hover {
-  color: #00d4ff;
-  background: rgba(0, 212, 255, 0.16);
-  border-color: #00d4ff;
-  text-decoration: none;
 }
 
 /* Utilidad Verde CachyOS */
