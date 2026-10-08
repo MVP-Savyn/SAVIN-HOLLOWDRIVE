@@ -180,6 +180,7 @@ function initApp() {
     optOsDeepin: document.getElementById('optOsDeepin'),
     optOsUbuntu: document.getElementById('optOsUbuntu'),
     optOsDebian: document.getElementById('optOsDebian'),
+    optOsPika: document.getElementById('optOsPika'),
     cachyFlavorWrap: document.getElementById('cachyFlavorWrap'),
     btnCachyHypr: document.getElementById('btnCachyHypr'),
     btnCachyKde: document.getElementById('btnCachyKde'),
@@ -453,6 +454,141 @@ function initApp() {
     return fallback;
   }
 
+  // =========================================================================
+  // 🪞 GESTIÓN DINÁMICA DE MIRRORS Y DISPONIBILIDAD DE SISTEMAS PORTABLES
+  // =========================================================================
+  let cachedMirrorsData = null;
+
+  async function loadMirrorsData() {
+    if (cachedMirrorsData) return cachedMirrorsData;
+    try {
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.get_mirrors_data) {
+        cachedMirrorsData = await window.pywebview.api.get_mirrors_data();
+      } else {
+        const resp = await fetch('/engine/mirrors.json');
+        if (resp.ok) {
+          cachedMirrorsData = await resp.json();
+        }
+      }
+    } catch (e) {
+      console.warn('[MIRRORS] No se pudo cargar mirrors.json:', e);
+    }
+    return cachedMirrorsData || {};
+  }
+
+  function isSystemAvailableInMirrors(osKey, mirrors) {
+    if (!osKey || osKey === 'none') return true;
+    if (!mirrors || Object.keys(mirrors).length === 0) {
+      return osKey === 'cachyos'; // Fallback por defecto si aún no han cargado los mirrors
+    }
+    if (osKey === 'cachyos') {
+      const cachy = mirrors.cachyos_images;
+      if (!cachy) return false;
+      const hyprMirrors = cachy.hyprland?.mirrors || [];
+      return Array.isArray(hyprMirrors) && hyprMirrors.length > 0;
+    }
+    const sysData = mirrors[osKey] || mirrors[`${osKey}_images`] || mirrors[`${osKey}_base`];
+    if (!sysData) return false;
+    const sysMirrors = sysData.mirrors || sysData.x86_64?.mirrors || [];
+    return Array.isArray(sysMirrors) && sysMirrors.length > 0;
+  }
+
+  function isKdeAvailableInMirrors(mirrors) {
+    if (!mirrors || !mirrors.cachyos_images) return false;
+    const kdeMirrors = mirrors.cachyos_images.kde?.mirrors;
+    return Array.isArray(kdeMirrors) && kdeMirrors.length > 0;
+  }
+
+  function applySystemsAvailability(mirrors) {
+    const soonLabel = getT('soon', 'Próximamente');
+    const items = document.querySelectorAll('.roulette-item');
+    items.forEach(item => {
+      const os = item.dataset.os;
+      if (!os || os === 'none') return;
+
+      const isAvail = isSystemAvailableInMirrors(os, mirrors);
+      if (!item.dataset.baseName) {
+        item.dataset.baseName = (item.dataset.name || os)
+          .replace(/\s*\([^)]*Próximamente[^)]*\)/i, '')
+          .replace(/\s*\([^)]*Coming Soon[^)]*\)/i, '')
+          .replace(/\s*\([^)]*Demnächst[^)]*\)/i, '')
+          .replace(/\s*\([^)]*Bientôt[^)]*\)/i, '')
+          .replace(/\s*\([^)]*Prossimamente[^)]*\)/i, '')
+          .replace(/\s*\([^)]*Em breve[^)]*\)/i, '')
+          .replace(/\s*\([^)]*Скоро[^)]*\)/i, '')
+          .replace(/\s*\([^)]*敬请期待[^)]*\)/i, '')
+          .replace(/\s*\([^)]*近日公開[^)]*\)/i, '')
+          .replace(/\s*\([^)]*출시 예정[^)]*\)/i, '')
+          .trim();
+      }
+      const baseName = item.dataset.baseName;
+      const nameTag = item.querySelector('.roulette-item-name-tag');
+
+      if (isAvail) {
+        item.classList.remove('disabled');
+        item.classList.add('available');
+        item.dataset.name = baseName;
+        item.title = baseName;
+        if (nameTag) nameTag.textContent = baseName;
+      } else {
+        item.classList.add('disabled');
+        item.classList.remove('available');
+        const displayName = `${baseName} (${soonLabel})`;
+        item.dataset.name = displayName;
+        item.title = displayName;
+        if (nameTag) nameTag.textContent = displayName;
+      }
+    });
+
+    if (DOM.selectPortableOs) {
+      Array.from(DOM.selectPortableOs.options).forEach(opt => {
+        const val = opt.value;
+        if (!val || val === 'none') return;
+        const isAvail = isSystemAvailableInMirrors(val, mirrors);
+        if (!opt.dataset.baseText) {
+          opt.dataset.baseText = opt.textContent
+            .replace(/\s*\([^)]*Próximamente[^)]*\)/i, '')
+            .replace(/\s*\([^)]*Coming Soon[^)]*\)/i, '')
+            .replace(/\s*\([^)]*Demnächst[^)]*\)/i, '')
+            .replace(/\s*\([^)]*Bientôt[^)]*\)/i, '')
+            .replace(/\s*\([^)]*Prossimamente[^)]*\)/i, '')
+            .replace(/\s*\([^)]*Em breve[^)]*\)/i, '')
+            .replace(/\s*\([^)]*Скоро[^)]*\)/i, '')
+            .replace(/\s*\([^)]*敬请期待[^)]*\)/i, '')
+            .replace(/\s*\([^)]*近日公開[^)]*\)/i, '')
+            .replace(/\s*\([^)]*출시 예정[^)]*\)/i, '')
+            .trim();
+        }
+        const baseText = opt.dataset.baseText;
+        if (isAvail) {
+          opt.disabled = false;
+          opt.textContent = baseText;
+        } else {
+          opt.disabled = true;
+          opt.textContent = `${baseText} (${soonLabel})`;
+        }
+      });
+    }
+
+    const kdeAvail = isKdeAvailableInMirrors(mirrors);
+    if (DOM.btnCachyKde) {
+      if (kdeAvail) {
+        DOM.btnCachyKde.disabled = false;
+        DOM.btnCachyKde.textContent = 'KDE';
+        DOM.btnCachyKde.removeAttribute('title');
+      } else {
+        DOM.btnCachyKde.disabled = true;
+        DOM.btnCachyKde.textContent = getT('btn_kde_soon', 'KDE (Próximamente)');
+        DOM.btnCachyKde.title = getT('btn_kde_soon', 'KDE (Próximamente)');
+      }
+    }
+  }
+
+  async function initSystemsFromMirrors() {
+    const mirrors = await loadMirrorsData();
+    applySystemsAvailability(mirrors);
+  }
+
   function applyTranslations() {
     const L = (key, def) => getT(key, def);
 
@@ -518,9 +654,22 @@ function initApp() {
     if (DOM.optOsDeepin) DOM.optOsDeepin.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Deepin OS');
     if (DOM.optOsUbuntu) DOM.optOsUbuntu.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Ubuntu');
     if (DOM.optOsDebian) DOM.optOsDebian.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'Debian');
+    if (DOM.optOsPika) DOM.optOsPika.textContent = L('sys_opt_soon', '{name} (Próximamente)').replace('{name}', 'PikaOS');
     if (DOM.btnCachyHypr) DOM.btnCachyHypr.textContent = 'Hyprland';
-    if (DOM.btnCachyKde) DOM.btnCachyKde.textContent = 'KDE';
+    if (DOM.btnCachyKde) {
+      const kdeAvail = isKdeAvailableInMirrors(cachedMirrorsData);
+      if (kdeAvail) {
+        DOM.btnCachyKde.disabled = false;
+        DOM.btnCachyKde.textContent = 'KDE';
+        DOM.btnCachyKde.removeAttribute('title');
+      } else {
+        DOM.btnCachyKde.disabled = true;
+        DOM.btnCachyKde.textContent = L('btn_kde_soon', 'KDE (Próximamente)');
+        DOM.btnCachyKde.title = L('btn_kde_soon', 'KDE (Próximamente)');
+      }
+    }
     if (DOM.btnChangeSystem) DOM.btnChangeSystem.textContent = L('btn_change_system', 'Cambiar');
+    applySystemsAvailability(cachedMirrorsData);
 
     // 7. Step 5: Método de Descarga
     if (DOM.downloadModeTitle) DOM.downloadModeTitle.textContent = L('dl_title', '¿Cómo deseas descargar los paquetes?');
@@ -2026,6 +2175,9 @@ function initApp() {
   window.syncPortableSystemUI = syncPortableSystemUI;
 
   function selectPortableSystem(os) {
+    if (os !== 'none' && !isSystemAvailableInMirrors(os, cachedMirrorsData)) {
+      return;
+    }
     if (os === 'cachyos') {
       if (State.totalDiskGb > 0 && State.totalDiskGb < 28.0) {
         showCustomAlert("ESPACIO INSUFICIENTE", "CachyOS requiere una unidad USB de al menos 32 GB.");
@@ -2034,6 +2186,10 @@ function initApp() {
       State.portableOs = 'cachyos';
       State.installCachy = true;
       State.portableSystemSelected = true;
+
+      if (!isKdeAvailableInMirrors(cachedMirrorsData)) {
+        State.cachyFlavor = 'hyprland';
+      }
 
       if (DOM.selectPortableOs) DOM.selectPortableOs.value = 'cachyos';
       if (DOM.cachyFlavorWrap) DOM.cachyFlavorWrap.style.display = 'flex';
@@ -2091,15 +2247,33 @@ function initApp() {
 
   let isSelectingOrb = false;
   let selectionStartTime = 0;
+  let selectedItemPlaceholder = null;
+  let activeSelectedOrbElement = null;
+
+  function restoreSelectedOrbToTrack() {
+    if (activeSelectedOrbElement && selectedItemPlaceholder && selectedItemPlaceholder.parentNode) {
+      selectedItemPlaceholder.parentNode.insertBefore(activeSelectedOrbElement, selectedItemPlaceholder);
+      selectedItemPlaceholder.remove();
+      selectedItemPlaceholder = null;
+      activeSelectedOrbElement.style.removeProperty('--orb-x');
+      activeSelectedOrbElement.style.removeProperty('--orb-y');
+      activeSelectedOrbElement.style.removeProperty('transition');
+      activeSelectedOrbElement.classList.remove('is-selected-orb', 'is-absorbed-orb', 'is-hovered');
+      activeSelectedOrbElement.style.opacity = '';
+      activeSelectedOrbElement = null;
+    }
+  }
 
   function animateAndSelectPortableSystem(selectedItem) {
     if (isSelectingOrb) return;
+    if (selectedItem.classList.contains('disabled')) return;
     isSelectingOrb = true;
     selectionStartTime = performance.now();
 
     const os = selectedItem.dataset.os;
     const systemName = selectedItem.dataset.name || (os === 'cachyos' ? 'CachyOS Linux' : 'Ninguno');
     const stage = document.querySelector('.roulette-stage');
+    const track = document.getElementById('rouletteTrack');
     const items = document.querySelectorAll('.roulette-item');
     const titleIcon = document.getElementById('paneTitleSystemIcon') || DOM.paneTitleSystemIcon;
     const titleText = document.getElementById('paneTitleSystem') || DOM.paneTitleSystem;
@@ -2107,11 +2281,40 @@ function initApp() {
     // 1. Fase 1: Activar vórtice acelerado en el escenario
     if (stage) stage.classList.add('is-animating-selection');
 
-    // El orbe seleccionado se coloca en el centro y hace zoom; los demás se empequeñecen y son absorbidos
+    // Desacoplar el orbe seleccionado a stage (fuera del track rotatorio) para que NUNCA gire sobre sí mismo
+    if (stage && selectedItem.parentNode === track) {
+      activeSelectedOrbElement = selectedItem;
+      selectedItemPlaceholder = document.createElement('div');
+      selectedItemPlaceholder.className = 'roulette-item-placeholder';
+      selectedItemPlaceholder.style.display = 'none';
+      track.insertBefore(selectedItemPlaceholder, selectedItem);
+
+      const stageRect = stage.getBoundingClientRect();
+      const itemRect = selectedItem.getBoundingClientRect();
+      const startDx = (itemRect.left + itemRect.width / 2) - (stageRect.left + stageRect.width / 2);
+      const startDy = (itemRect.top + itemRect.height / 2) - (stageRect.top + stageRect.height / 2);
+
+      stage.appendChild(selectedItem);
+      selectedItem.classList.add('is-selected-orb');
+      selectedItem.style.setProperty('--orb-x', `${startDx.toFixed(2)}px`);
+      selectedItem.style.setProperty('--orb-y', `${startDy.toFixed(2)}px`);
+      selectedItem.style.transition = 'none';
+
+      // Forzar reflow para anclar origen sin rotación
+      void selectedItem.offsetWidth;
+
+      requestAnimationFrame(() => {
+        selectedItem.style.transition = 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)';
+        selectedItem.style.setProperty('--orb-x', '0px');
+        selectedItem.style.setProperty('--orb-y', '0px');
+      });
+    } else {
+      selectedItem.classList.add('is-selected-orb');
+    }
+
+    // Los demás orbes se contraen hacia el centro mientras giran a toda velocidad con el track
     items.forEach(item => {
-      if (item === selectedItem) {
-        item.classList.add('is-selected-orb');
-      } else {
+      if (item !== selectedItem) {
         item.classList.add('is-absorbed-orb');
       }
     });
@@ -2138,8 +2341,9 @@ function initApp() {
         flyingGhost.style.pointerEvents = 'none';
         flyingGhost.style.borderRadius = '50%';
         flyingGhost.style.transition = 'all 0.52s cubic-bezier(0.2, 0.8, 0.2, 1)';
-        flyingGhost.style.boxShadow = '0 0 25px rgba(0, 212, 255, 0.85)';
-        flyingGhost.innerHTML = `<img src="${iconSrc}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 10px #00d4ff);" />`;
+        flyingGhost.style.boxShadow = (os === 'none') ? '0 0 25px rgba(239, 68, 68, 0.85)' : '0 0 25px rgba(0, 212, 255, 0.85)';
+        const shadowFilter = (os === 'none') ? 'drop-shadow(0 0 10px #ef4444)' : 'drop-shadow(0 0 10px #00d4ff)';
+        flyingGhost.innerHTML = `<img src="${iconSrc}" style="width: 100%; height: 100%; object-fit: contain; filter: ${shadowFilter};" />`;
         document.body.appendChild(flyingGhost);
 
         // Ocultar temporalmente el orbe central
@@ -2152,7 +2356,7 @@ function initApp() {
             flyingGhost.style.width = `${targetRect.width}px`;
             flyingGhost.style.height = `${targetRect.height}px`;
             flyingGhost.style.borderRadius = '6px';
-            flyingGhost.style.boxShadow = '0 0 12px rgba(0, 212, 255, 0.4)';
+            flyingGhost.style.boxShadow = (os === 'none') ? '0 0 12px rgba(239, 68, 68, 0.4)' : '0 0 12px rgba(0, 212, 255, 0.4)';
           });
         });
 
@@ -2418,6 +2622,7 @@ function initApp() {
 
   if (DOM.btnCachyKde) {
     DOM.btnCachyKde.addEventListener('click', () => {
+      if (DOM.btnCachyKde.disabled) return;
       switchCachyVideo('kde');
     });
   }
@@ -2429,6 +2634,9 @@ function initApp() {
       selectionStartTime = 0;
       isRoulettePaused = false;
       hoveredSectorIndex = -1;
+
+      // Restaurar el orbe a su lugar original en el track rotatorio
+      restoreSelectedOrbToTrack();
 
       // Restaurar cabecera e icono del título
       const titleIcon = document.getElementById('paneTitleSystemIcon') || DOM.paneTitleSystemIcon;
@@ -4859,6 +5067,7 @@ function initApp() {
     if (isInitialized) return;
     isInitialized = true;
     try { initLanguages(); } catch (e) { console.error("[STARTUP] Error initLanguages:", e); }
+    try { initSystemsFromMirrors(); } catch (e) { console.error("[STARTUP] Error initSystemsFromMirrors:", e); }
     try { setInstallViewMode(State.installViewMode || 'simple'); } catch (e) { console.error("[STARTUP] Error setInstallViewMode:", e); }
     try { refreshDisks(); } catch (e) { console.error("[STARTUP] Error refreshDisks:", e); }
     try { checkInternetConnection(); } catch (e) { console.error("[STARTUP] Error checkInternetConnection:", e); }

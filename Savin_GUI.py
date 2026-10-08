@@ -162,6 +162,11 @@ def crear_servidor_app():
     def serve_assets(filepath):
         return bottle.static_file(filepath, root=assets_dir, headers={'Cache-Control': 'public, max-age=86400'})
 
+    @app.route('/engine/<filepath:path>')
+    def serve_engine(filepath):
+        engine_dir = os.path.join(BASE_DIR, "engine")
+        return bottle.static_file(filepath, root=engine_dir, headers={'Cache-Control': 'no-cache, must-revalidate'})
+
     return app
 
 def iniciar_watchdog():
@@ -187,12 +192,27 @@ def main():
     api = BridgeApi()
     server_app = crear_servidor_app()
 
+    win_w = 1060
+    win_h = 860
+    pos_x = None
+    pos_y = None
+    if os.name == 'nt':
+        try:
+            screen_w = ctypes.windll.user32.GetSystemMetrics(0)
+            screen_h = ctypes.windll.user32.GetSystemMetrics(1)
+            pos_x = max(0, (screen_w - win_w) // 2)
+            pos_y = max(0, (screen_h - win_h) // 2)
+        except Exception as e:
+            logging.warning(f"No se pudieron calcular métricas de pantalla para centrado: {e}")
+
     window = webview.create_window(
         title=f"HOLLOWDRIVE // V{VERSION_ACTUAL}",
         url=server_app,
         js_api=api,
-        width=1060,
-        height=860,
+        width=win_w,
+        height=win_h,
+        x=pos_x,
+        y=pos_y,
         min_size=(940, 700),
         frameless=True,
         easy_drag=False,
@@ -237,8 +257,23 @@ def main():
                     ctypes.sizeof(ctypes.c_int)
                 )
                 logging.info("✔ Esquinas redondeadas aplicadas a la ventana vía DWM")
+
+                # Asegurar centrado de ventana siempre en pantalla
+                screen_w = ctypes.windll.user32.GetSystemMetrics(0)
+                screen_h = ctypes.windll.user32.GetSystemMetrics(1)
+                cx = max(0, (screen_w - win_w) // 2)
+                cy = max(0, (screen_h - win_h) // 2)
+                SWP_NOZORDER = 0x0004
+                SWP_NOSIZE = 0x0001
+                ctypes.windll.user32.SetWindowPos(
+                    ctypes.c_void_p(hwnd),
+                    0,
+                    cx, cy, win_w, win_h,
+                    SWP_NOZORDER | SWP_NOSIZE
+                )
+                logging.info(f"✔ Ventana centrada en pantalla ({cx}, {cy})")
         except Exception as e:
-            logging.warning(f"No se pudieron configurar esquinas redondeadas DWM: {e}")
+            logging.warning(f"No se pudieron configurar esquinas redondeadas/centrado DWM: {e}")
 
     window.events.shown += aplicar_esquinas_redondeadas
     window.events.closing += on_closing

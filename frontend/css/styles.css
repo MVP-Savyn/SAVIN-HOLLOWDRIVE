@@ -1318,17 +1318,36 @@ body.nav-transitioning {
   pointer-events: none;
 }
 
-/* Hover o sector activo: cogen color completo y resplandor */
-.roulette-item:hover .roulette-item-inner,
-.roulette-item.is-hovered .roulette-item-inner {
+/* Hover o sector activo: cogen color completo y resplandor (sólo si no está disabled) */
+.roulette-item:not(.disabled):hover .roulette-item-inner,
+.roulette-item:not(.disabled).is-hovered .roulette-item-inner {
   transform: scale(1.34);
   filter: grayscale(0) brightness(1.15); /* Color completo */
   border-color: #00d4ff;
   box-shadow: 0 0 30px rgba(0, 212, 255, 0.75), inset 0 0 16px rgba(0, 212, 255, 0.4);
 }
 
+/* Sistemas no disponibles (Próximamente): se agrandan en hover pero SE QUEDAN ESTRICTAMENTE EN GRIS */
+.roulette-item.disabled {
+  cursor: not-allowed;
+}
+
+.roulette-item.disabled:hover .roulette-item-inner,
+.roulette-item.disabled.is-hovered .roulette-item-inner {
+  transform: scale(1.34);
+  filter: grayscale(1) brightness(0.78) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.12), inset 0 0 8px rgba(255, 255, 255, 0.05) !important;
+}
+
+.roulette-item.disabled .roulette-item-name-tag {
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #94a3b8;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 255, 255, 0.08);
+}
+
 /* Botón de Información [ ℹ ] arriba a la derecha del orbe:
-   Comienza DENTRO del círculo y sale hacia FUERA comenzando 0.5s tras el hover */
+   Comienza DENTRO del círculo y sale hacia FUERA comenzando 0.2s tras el hover */
 .roulette-item-info-btn {
   position: absolute;
   top: 4px;
@@ -1362,15 +1381,15 @@ body.nav-transitioning {
   fill: currentColor;
 }
 
-/* Al estar en hover (o sector activo): la animación arranca medio segundo (0.5s) después y acaba FUERA del orbe */
+/* Al estar en hover (o sector activo): la animación arranca a los 0.2s y acaba FUERA del orbe */
 .roulette-item:hover .roulette-item-info-btn,
 .roulette-item.is-hovered .roulette-item-info-btn {
   opacity: 1;
   transform: translate(22px, -22px) scale(1); /* Totalmente FUERA del círculo del sistema */
   pointer-events: auto;
   z-index: 30;
-  transition: opacity 0.35s ease 0.5s, 
-              transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s, 
+  transition: opacity 0.3s ease 0.2s, 
+              transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s, 
               background-color 0.2s ease 0s, 
               color 0.2s ease 0s, 
               box-shadow 0.2s ease 0s;
@@ -1418,10 +1437,22 @@ body.nav-transitioning {
    CINEMATIC ABSORPTION & ZOOM ANIMATIONS
    ===================================================================== */
 
-/* El orbe seleccionado se coloca en el centro SIN DAR VUELTAS */
-.roulette-item.is-selected-orb {
+/* El orbe seleccionado como hijo directo del escenario (desacoplado del track): NUNCA gira sobre sí mismo */
+.roulette-stage > .roulette-item.is-selected-orb {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  margin-top: calc(-0.5 * var(--item-size, 58px)) !important;
+  margin-left: calc(-0.5 * var(--item-size, 58px)) !important;
   z-index: 100 !important;
-  /* Anula la rotación del track para permanecer estrictamente fijo en 0deg de pantalla */
+  pointer-events: none !important;
+  transform: translate(var(--orb-x, 0px), var(--orb-y, 0px)) !important;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Fallback si permaneciera dentro del track */
+.roulette-track > .roulette-item.is-selected-orb {
+  z-index: 100 !important;
   transform: rotate(calc(-1 * var(--track-angle, 0deg))) translate(0, 0) scale(1) !important;
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }

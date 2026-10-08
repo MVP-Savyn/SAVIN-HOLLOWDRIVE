@@ -317,6 +317,16 @@ class BridgeApi:
             "os": sys.platform
         }
 
+    def get_mirrors_data(self):
+        try:
+            mpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "engine", "mirrors.json")
+            if os.path.exists(mpath):
+                with open(mpath, "r", encoding="utf-8") as f:
+                    return json.load(f)
+        except Exception as e:
+            logging.warning(f"[BRIDGE] Error al obtener mirrors.json: {e}")
+        return {}
+
     def open_external_url(self, url):
         return self.open_url(url)
 
